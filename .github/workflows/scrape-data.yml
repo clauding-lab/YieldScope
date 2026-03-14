@@ -1,0 +1,72 @@
+name: Scrape BB Data
+
+on:
+  schedule:
+    # Tuesday 19:00 BST (13:00 UTC) — scrape Sunday T-Bill results
+    - cron: '0 13 * * 2'
+    # Thursday 19:00 BST (13:00 UTC) — scrape Tuesday T-Bond results
+    - cron: '0 13 * * 4'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Determine which day triggered this run
+      - name: Determine scrape type
+        id: scrape-type
+        run: |
+          DAY=$(date +%u)
+          echo "day=$DAY" >> $GITHUB_OUTPUT
+          if [ "$DAY" = "2" ]; then
+            echo "type=tbill" >> $GITHUB_OUTPUT
+          elif [ "$DAY" = "4" ]; then
+            echo "type=tbond" >> $GITHUB_OUTPUT
+          else
+            echo "type=manual" >> $GITHUB_OUTPUT
+          fi
+
+      # Scrape T-Bill results (Tuesday runs or manual)
+      - name: Scrape T-Bill auctions
+        if: steps.scrape-type.outputs.type == 'tbill' || steps.scrape-type.outputs.type == 'manual'
+        run: node scripts/scrape-tbill.mjs
+
+      # Scrape T-Bond results (Thursday runs or manual)
+      - name: Scrape T-Bond auctions
+        if: steps.scrape-type.outputs.type == 'tbond' || steps.scrape-type.outputs.type == 'manual'
+        run: node scripts/scrape-tbond.mjs
+
+      # Always scrape circulars
+      - name: Scrape BB circulars
+        run: node scripts/scrape-circulars.mjs
+
+      # Update yield curve from latest auction data
+      - name: Update yield curve
+        run: node scripts/update-yield-curve.mjs
+
+      # Generate AI analysis (autopsy + weekly commentary)
+      - name: Generate AI analysis
+        run: node scripts/generate-ai-analysis.mjs
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      # Commit and push if there are changes
+      - name: Commit updated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/data/*.json
+          git diff --cached --quiet || git commit -m "data: update auction results & analysis [automated]"
+          git push

@@ -1,0 +1,32 @@
+{
+  "lastUpdated": "2026-03-15T00:00:00+06:00",
+  "circulars": [
+    {
+      "id": "circ-2026-01-15-repo",
+      "date": "2026-01-15",
+      "title": "MPD Circular No. 01/2026 - Repo Rate Reduction",
+      "category": "monetary_policy",
+      "pdfUrl": "https://www.bb.org.bd/mediaroom/circular/mpd012026.pdf",
+      "summary": "Bangladesh Bank reduced the repo rate by 50bps to 8.50%, citing declining inflation trajectory and adequate banking sector liquidity.",
+      "impactOnYields": "positive"
+    },
+    {
+      "id": "circ-2025-12-01-mps",
+      "date": "2025-12-01",
+      "title": "Monetary Policy Statement - January-June 2026",
+      "category": "monetary_policy",
+      "pdfUrl": "https://www.bb.org.bd/mediaroom/circular/mps2026h1.pdf",
+      "summary": "BB signaled continued easing bias with focus on supporting economic recovery while monitoring inflation expectations.",
+      "impactOnYields": "positive"
+    },
+    {
+      "id": "circ-2025-10-15-crr",
+      "date": "2025-10-15",
+      "title": "MPD Circular No. 04/2025 - CRR Maintained at 4.00%",
+      "category": "monetary_policy",
+      "pdfUrl": "https://www.bb.org.bd/mediaroom/circular/mpd042025.pdf",
+      "summary": "CRR maintained at 4.00% to preserve system liquidity while monitoring credit growth trends.",
+      "impactOnYields": "neutral"
+    }
+  ]
+}

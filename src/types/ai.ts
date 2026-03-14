@@ -33,3 +33,28 @@ export interface WeeklyCommentaryData {
   lastUpdated: string
   commentaries: WeeklyCommentary[]
 }
+
+export interface CurveInterpretation {
+  shape: 'normal' | 'flat' | 'inverted' | 'humped'
+  interpretation: string
+  implications: string[]
+  generatedAt: string
+}
+
+export interface AnomalyAlert {
+  id: string
+  anomaly: Anomaly
+  aiExplanation: string | null
+  generatedAt: string
+}
+
+export interface ChatMessage {
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: string
+}
+
+export interface AIConfig {
+  apiKey: string | null
+  isConfigured: boolean
+}
