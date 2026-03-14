@@ -1,0 +1,95 @@
+{
+  "lastUpdated": "2026-03-12T18:00:00+06:00",
+  "currentRates": {
+    "repoRate": 8.50,
+    "reverseRepoRate": 7.00,
+    "bankRate": 4.00,
+    "slrRate": 13.00,
+    "crrRate": 4.00
+  },
+  "corridor": {
+    "ceiling": 8.50,
+    "floor": 7.00,
+    "midpoint": 7.75
+  },
+  "events": [
+    {
+      "id": "2026-01-15-repo",
+      "date": "2026-01-15",
+      "type": "rate_change",
+      "instrument": "repo",
+      "previousValue": 9.00,
+      "newValue": 8.50,
+      "changeBps": -50,
+      "title": "Repo rate cut 50bps to 8.50%",
+      "summary": "Bangladesh Bank cut the repo rate by 50bps citing declining inflation trajectory and adequate banking sector liquidity. This was the second consecutive cut in the easing cycle.",
+      "circularRef": "MPD Circular No. 01/2026",
+      "bbCircularUrl": null
+    },
+    {
+      "id": "2025-10-20-repo",
+      "date": "2025-10-20",
+      "type": "rate_change",
+      "instrument": "repo",
+      "previousValue": 9.50,
+      "newValue": 9.00,
+      "changeBps": -50,
+      "title": "Repo rate cut 50bps to 9.00% — easing cycle begins",
+      "summary": "BB initiated the easing cycle with a 50bps repo rate cut after holding at 9.50% for nearly a year. CPI had moderated to single digits and excess liquidity was building in the banking system.",
+      "circularRef": "MPD Circular No. 04/2025",
+      "bbCircularUrl": null
+    },
+    {
+      "id": "2025-10-20-reverse-repo",
+      "date": "2025-10-20",
+      "type": "rate_change",
+      "instrument": "reverse_repo",
+      "previousValue": 7.50,
+      "newValue": 7.00,
+      "changeBps": -50,
+      "title": "Reverse repo (SDF) rate cut 50bps to 7.00%",
+      "summary": "The SDF rate was reduced in tandem with the repo rate cut to maintain the 200bps policy corridor width.",
+      "circularRef": "MPD Circular No. 04/2025",
+      "bbCircularUrl": null
+    },
+    {
+      "id": "2025-01-28-mps",
+      "date": "2025-01-28",
+      "type": "mps",
+      "instrument": "mps",
+      "previousValue": null,
+      "newValue": null,
+      "changeBps": null,
+      "title": "January 2025 MPS — Rates held, cautious stance",
+      "summary": "BB held all policy rates steady in the January MPS, citing persistent inflationary pressures despite some moderation. Signaled readiness to ease if inflation continued to decline.",
+      "circularRef": "MPS January 2025",
+      "bbCircularUrl": null
+    },
+    {
+      "id": "2024-06-10-repo",
+      "date": "2024-06-10",
+      "type": "rate_change",
+      "instrument": "repo",
+      "previousValue": 8.50,
+      "newValue": 9.50,
+      "changeBps": 100,
+      "title": "Repo rate hiked 100bps to 9.50%",
+      "summary": "Aggressive 100bps hike to combat double-digit inflation. This completed the tightening cycle that started in mid-2023, bringing the repo rate to its highest level since 2012.",
+      "circularRef": "MPD Circular No. 02/2024",
+      "bbCircularUrl": null
+    },
+    {
+      "id": "2024-01-15-crr",
+      "date": "2024-01-15",
+      "type": "rate_change",
+      "instrument": "crr",
+      "previousValue": 4.00,
+      "newValue": 4.00,
+      "changeBps": 0,
+      "title": "CRR maintained at 4.00%",
+      "summary": "BB kept CRR unchanged despite tightening the policy rate, choosing to manage liquidity primarily through the rate corridor rather than reserve requirements.",
+      "circularRef": "MPS January 2024",
+      "bbCircularUrl": null
+    }
+  ]
+}

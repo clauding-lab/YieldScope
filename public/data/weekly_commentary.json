@@ -1,0 +1,20 @@
+{
+  "lastUpdated": "2026-03-12T18:00:00+06:00",
+  "commentaries": [
+    {
+      "id": "2026-W11",
+      "weekEnding": "2026-03-12",
+      "title": "Yields Drift Lower as Liquidity Builds",
+      "body": "The Bangladesh government securities curve continued its gradual descent this week, with the belly of the curve (2Y-5Y) leading the rally. The 364-day T-bill cutoff fell 11bps to 10.07%, marking the sixth consecutive weekly decline and the longest streak since the pre-tightening era. The 91-day bill, the system's liquidity barometer, touched 9.85% — firmly below the repo rate floor for the first time in this cycle. Sunday's T-bill auction saw bid-cover ratios above 1.7x across tenors, while Tuesday's bond auction told a more nuanced story: the 5Y cleared comfortably at 1.6x, but the 10Y saw modest devolvement of 200 Cr. Banks remain comfortable extending to five years but hesitate at the long end. The 10Y-91D spread narrowed to 130bps from 135bps last week — a slow but persistent flattening that suggests the market is pricing in further BB cuts. With excess liquidity now at BDT 185,000 Cr and climbing, next week's T-bill auction should see continued compression. Watch the 20Y for signs that institutional buyers are finally extending duration.",
+      "keyPoints": [
+        "364D yield down 11bps to 10.07% — sixth consecutive weekly decline",
+        "91D at 9.85%, now below the repo rate floor",
+        "10Y saw 200 Cr devolvement (10%), long-end remains sticky",
+        "10Y-91D spread compressed to 130bps"
+      ],
+      "curveShapeNote": "Normal upward-sloping with mild flattening in the 10Y-20Y segment. The short end is moving faster than the long end.",
+      "outlook": "Expect continued downward pressure on the short end as excess liquidity persists. The long end needs a catalyst — either a clear signal from BB on further cuts or a shift in institutional appetite.",
+      "attribution": "Curated by Adnan Rashid · Produced with Claude AI"
+    }
+  ]
+}
