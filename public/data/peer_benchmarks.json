@@ -1,0 +1,56 @@
+{
+  "lastUpdated": "2026-03-12T18:00:00+06:00",
+  "curves": [
+    {
+      "country": "BD",
+      "countryName": "Bangladesh",
+      "currency": "BDT",
+      "date": "2026-03-12",
+      "yields": {
+        "91D": 9.85,
+        "182D": 10.11,
+        "364D": 10.07,
+        "2Y": 10.45,
+        "5Y": 10.82,
+        "10Y": 11.15
+      },
+      "policyRate": 8.50,
+      "cpiYoY": 8.5,
+      "fxRateToUsd": 119.50
+    },
+    {
+      "country": "IN",
+      "countryName": "India",
+      "currency": "INR",
+      "date": "2026-03-12",
+      "yields": {
+        "91D": 6.65,
+        "182D": 6.72,
+        "364D": 6.80,
+        "2Y": 6.90,
+        "5Y": 7.05,
+        "10Y": 7.15
+      },
+      "policyRate": 6.25,
+      "cpiYoY": 4.2,
+      "fxRateToUsd": 84.50
+    },
+    {
+      "country": "PK",
+      "countryName": "Pakistan",
+      "currency": "PKR",
+      "date": "2026-03-12",
+      "yields": {
+        "91D": 11.50,
+        "182D": 11.65,
+        "364D": 11.80,
+        "2Y": 12.10,
+        "5Y": 12.45,
+        "10Y": 12.80
+      },
+      "policyRate": 12.00,
+      "cpiYoY": 12.5,
+      "fxRateToUsd": 278.50
+    }
+  ]
+}

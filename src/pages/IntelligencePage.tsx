@@ -9,6 +9,10 @@ import { CurveInterpreter } from '../components/ai/CurveInterpreter'
 import { RateCorridorChart } from '../components/charts/RateCorridorChart'
 import { TransmissionSpread } from '../components/policy/TransmissionSpread'
 import { PolicyTimeline } from '../components/policy/PolicyTimeline'
+import { usePeerData } from '../hooks/usePeerData'
+import { PeerYieldOverlay } from '../components/peer/PeerYieldOverlay'
+import { RealYieldComparison } from '../components/peer/RealYieldComparison'
+import { FxAdjustedReturns } from '../components/peer/FxAdjustedReturns'
 
 export default function IntelligencePage() {
   const { data: yieldData, isLoading: yieldLoading } = useYieldData()
@@ -21,6 +25,7 @@ export default function IntelligencePage() {
     policyData?.currentRates.repoRate
   )
 
+  const { data: peerData, comparisons: peerComparisons } = usePeerData()
   const latestCommentary = commentaryData?.commentaries?.[0]
   const latestYield = yieldData?.daily?.[yieldData.daily.length - 1]
 
@@ -70,6 +75,20 @@ export default function IntelligencePage() {
       {/* Policy Timeline */}
       {policyData && (
         <PolicyTimeline events={policyData.events} />
+      )}
+
+      {/* Peer Benchmarking */}
+      {peerData && peerComparisons.length > 0 && (
+        <>
+          <div className="pt-2">
+            <h2 className="text-lg font-semibold text-slate-200">Peer Benchmarking</h2>
+            <p className="text-xs text-slate-500">BD vs India vs Pakistan yield comparison</p>
+          </div>
+
+          <PeerYieldOverlay comparisons={peerComparisons} />
+          <RealYieldComparison comparisons={peerComparisons} />
+          <FxAdjustedReturns curves={peerData.curves} />
+        </>
       )}
     </div>
   )
