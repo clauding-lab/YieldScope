@@ -1,0 +1,72 @@
+{
+  "lastUpdated": "2026-03-12T18:00:00+06:00",
+  "tdsRates": {
+    "tbillWithholding": 0,
+    "tbondCouponTds": 10,
+    "tbondCapitalGainTds": 10,
+    "effectiveDate": "2025-07-01",
+    "sourceCircular": "NBR SRO 215/2025"
+  },
+  "valuationBenchmarks": [
+    {
+      "date": "2026-03-12",
+      "tenor": "2Y",
+      "bbRevalYield": 10.45,
+      "secondaryMarketYield": 10.38,
+      "spread": 7,
+      "dirtyPrice": 99.12,
+      "cleanPrice": 98.75,
+      "accruedInterest": 0.37,
+      "nextCouponDate": "2026-06-15",
+      "postTdsYield": 9.41
+    },
+    {
+      "date": "2026-03-12",
+      "tenor": "5Y",
+      "bbRevalYield": 10.82,
+      "secondaryMarketYield": 10.75,
+      "spread": 7,
+      "dirtyPrice": 97.85,
+      "cleanPrice": 97.22,
+      "accruedInterest": 0.63,
+      "nextCouponDate": "2026-06-15",
+      "postTdsYield": 9.74
+    },
+    {
+      "date": "2026-03-12",
+      "tenor": "10Y",
+      "bbRevalYield": 11.15,
+      "secondaryMarketYield": 11.08,
+      "spread": 7,
+      "dirtyPrice": 98.45,
+      "cleanPrice": 97.82,
+      "accruedInterest": 0.63,
+      "nextCouponDate": "2026-06-15",
+      "postTdsYield": 10.04
+    },
+    {
+      "date": "2026-03-12",
+      "tenor": "15Y",
+      "bbRevalYield": 11.35,
+      "secondaryMarketYield": 11.25,
+      "spread": 10,
+      "dirtyPrice": 97.20,
+      "cleanPrice": 96.55,
+      "accruedInterest": 0.65,
+      "nextCouponDate": "2026-06-15",
+      "postTdsYield": 10.22
+    },
+    {
+      "date": "2026-03-12",
+      "tenor": "20Y",
+      "bbRevalYield": 11.48,
+      "secondaryMarketYield": 11.40,
+      "spread": 8,
+      "dirtyPrice": 96.80,
+      "cleanPrice": 96.12,
+      "accruedInterest": 0.68,
+      "nextCouponDate": "2026-06-15",
+      "postTdsYield": 10.33
+    }
+  ]
+}

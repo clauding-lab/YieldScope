@@ -5,6 +5,7 @@ import { AuctionsPage } from './pages/AuctionsPage'
 import IntelligencePage from './pages/IntelligencePage'
 import SimulatorPage from './pages/SimulatorPage'
 import SettingsPage from './pages/SettingsPage'
+import LiquidityPage from './pages/LiquidityPage'
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/auctions" element={<AuctionsPage />} />
         <Route path="/intelligence" element={<IntelligencePage />} />
         <Route path="/simulator" element={<SimulatorPage />} />
+        <Route path="/liquidity" element={<LiquidityPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         {/* Legacy route redirect */}
         <Route path="/policy" element={<Navigate to="/intelligence" replace />} />

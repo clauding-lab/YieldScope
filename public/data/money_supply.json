@@ -1,0 +1,89 @@
+{
+  "lastUpdated": "2026-03-12T18:00:00+06:00",
+  "monthly": [
+    {
+      "date": "2025-09-30",
+      "m1Bn": 3980,
+      "m2Bn": 21200,
+      "m3Bn": 22400,
+      "m2GrowthYoY": 10.5,
+      "reserveMoneyBn": 3900,
+      "netDomesticAssetsBn": 3050,
+      "netForeignAssetsBn": 850,
+      "excessLiquidityCrore": 210000,
+      "excessLiquidityChange30d": 8000,
+      "callMoneyRate": 8.75,
+      "callMoneyVolumeCrore": 9200
+    },
+    {
+      "date": "2025-10-31",
+      "m1Bn": 4020,
+      "m2Bn": 21450,
+      "m3Bn": 22650,
+      "m2GrowthYoY": 10.2,
+      "reserveMoneyBn": 3930,
+      "netDomesticAssetsBn": 3080,
+      "netForeignAssetsBn": 850,
+      "excessLiquidityCrore": 205000,
+      "excessLiquidityChange30d": -5000,
+      "callMoneyRate": 8.65,
+      "callMoneyVolumeCrore": 8800
+    },
+    {
+      "date": "2025-11-30",
+      "m1Bn": 4060,
+      "m2Bn": 21700,
+      "m3Bn": 22900,
+      "m2GrowthYoY": 10.0,
+      "reserveMoneyBn": 3960,
+      "netDomesticAssetsBn": 3100,
+      "netForeignAssetsBn": 860,
+      "excessLiquidityCrore": 198000,
+      "excessLiquidityChange30d": -7000,
+      "callMoneyRate": 8.50,
+      "callMoneyVolumeCrore": 8500
+    },
+    {
+      "date": "2025-12-31",
+      "m1Bn": 4100,
+      "m2Bn": 21900,
+      "m3Bn": 23100,
+      "m2GrowthYoY": 9.8,
+      "reserveMoneyBn": 3990,
+      "netDomesticAssetsBn": 3120,
+      "netForeignAssetsBn": 870,
+      "excessLiquidityCrore": 195000,
+      "excessLiquidityChange30d": -3000,
+      "callMoneyRate": 8.40,
+      "callMoneyVolumeCrore": 8600
+    },
+    {
+      "date": "2026-01-31",
+      "m1Bn": 4150,
+      "m2Bn": 22100,
+      "m3Bn": 23400,
+      "m2GrowthYoY": 9.6,
+      "reserveMoneyBn": 4020,
+      "netDomesticAssetsBn": 3140,
+      "netForeignAssetsBn": 880,
+      "excessLiquidityCrore": 190000,
+      "excessLiquidityChange30d": -5000,
+      "callMoneyRate": 8.30,
+      "callMoneyVolumeCrore": 8400
+    },
+    {
+      "date": "2026-02-28",
+      "m1Bn": 4200,
+      "m2Bn": 22300,
+      "m3Bn": 23600,
+      "m2GrowthYoY": 9.5,
+      "reserveMoneyBn": 4060,
+      "netDomesticAssetsBn": 3170,
+      "netForeignAssetsBn": 890,
+      "excessLiquidityCrore": 185000,
+      "excessLiquidityChange30d": -5000,
+      "callMoneyRate": 8.15,
+      "callMoneyVolumeCrore": 8500
+    }
+  ]
+}
