@@ -1,0 +1,77 @@
+{
+  "lastUpdated": "2026-03-12T18:00:00+06:00",
+  "daily": [
+    {
+      "date": "2026-02-05",
+      "bbRepoOutstandingCrore": 52000,
+      "bbReverseRepoOutstandingCrore": 15000,
+      "netLiquidityInjectionCrore": 37000,
+      "repoMaturitySchedule": [
+        { "maturityDate": "2026-02-10", "amountCrore": 18000 },
+        { "maturityDate": "2026-02-13", "amountCrore": 22000 }
+      ],
+      "interBankRepoVolumeCrore": 6200,
+      "interBankRepoRate": 8.45
+    },
+    {
+      "date": "2026-02-12",
+      "bbRepoOutstandingCrore": 48000,
+      "bbReverseRepoOutstandingCrore": 14000,
+      "netLiquidityInjectionCrore": 34000,
+      "repoMaturitySchedule": [
+        { "maturityDate": "2026-02-17", "amountCrore": 15000 },
+        { "maturityDate": "2026-02-20", "amountCrore": 20000 }
+      ],
+      "interBankRepoVolumeCrore": 5800,
+      "interBankRepoRate": 8.40
+    },
+    {
+      "date": "2026-02-19",
+      "bbRepoOutstandingCrore": 50000,
+      "bbReverseRepoOutstandingCrore": 13000,
+      "netLiquidityInjectionCrore": 37000,
+      "repoMaturitySchedule": [
+        { "maturityDate": "2026-02-24", "amountCrore": 20000 },
+        { "maturityDate": "2026-02-27", "amountCrore": 18000 }
+      ],
+      "interBankRepoVolumeCrore": 5500,
+      "interBankRepoRate": 8.38
+    },
+    {
+      "date": "2026-02-26",
+      "bbRepoOutstandingCrore": 47000,
+      "bbReverseRepoOutstandingCrore": 14500,
+      "netLiquidityInjectionCrore": 32500,
+      "repoMaturitySchedule": [
+        { "maturityDate": "2026-03-03", "amountCrore": 17000 },
+        { "maturityDate": "2026-03-06", "amountCrore": 15000 }
+      ],
+      "interBankRepoVolumeCrore": 5400,
+      "interBankRepoRate": 8.35
+    },
+    {
+      "date": "2026-03-05",
+      "bbRepoOutstandingCrore": 46000,
+      "bbReverseRepoOutstandingCrore": 13000,
+      "netLiquidityInjectionCrore": 33000,
+      "repoMaturitySchedule": [
+        { "maturityDate": "2026-03-10", "amountCrore": 16000 },
+        { "maturityDate": "2026-03-13", "amountCrore": 18000 }
+      ],
+      "interBankRepoVolumeCrore": 5200,
+      "interBankRepoRate": 8.35
+    },
+    {
+      "date": "2026-03-12",
+      "bbRepoOutstandingCrore": 45000,
+      "bbReverseRepoOutstandingCrore": 12000,
+      "netLiquidityInjectionCrore": 33000,
+      "repoMaturitySchedule": [
+        { "maturityDate": "2026-03-15", "amountCrore": 15000 },
+        { "maturityDate": "2026-03-19", "amountCrore": 20000 }
+      ],
+      "interBankRepoVolumeCrore": 5200,
+      "interBankRepoRate": 8.35
+    }
+  ]
+}

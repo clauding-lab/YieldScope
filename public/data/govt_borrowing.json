@@ -1,0 +1,75 @@
+{
+  "lastUpdated": "2026-03-12T18:00:00+06:00",
+  "fiscalYear": "FY2025-26",
+  "budgetTarget": {
+    "netBorrowingFromBankingCrore": 105000,
+    "netBorrowingFromNonBankingCrore": 38000,
+    "totalDomesticBorrowingCrore": 143000
+  },
+  "actual": {
+    "netBorrowingFromBankingCrore": 72000,
+    "netBorrowingFromNonBankingCrore": 25000,
+    "totalDomesticBorrowingCrore": 97000,
+    "pctOfBudgetTarget": 67.8,
+    "remainingMonths": 3,
+    "impliedMonthlyRunRate": 15333
+  },
+  "weekly": [
+    {
+      "weekEnding": "2026-01-30",
+      "tbillNetIssuanceCrore": 3200,
+      "tbondNetIssuanceCrore": 2100,
+      "waysAndMeansAdvanceCrore": 0,
+      "outstandingTbillsCrore": 178000,
+      "outstandingTbondsCrore": 312000
+    },
+    {
+      "weekEnding": "2026-02-06",
+      "tbillNetIssuanceCrore": 2800,
+      "tbondNetIssuanceCrore": 1500,
+      "waysAndMeansAdvanceCrore": 0,
+      "outstandingTbillsCrore": 180800,
+      "outstandingTbondsCrore": 313500
+    },
+    {
+      "weekEnding": "2026-02-13",
+      "tbillNetIssuanceCrore": -500,
+      "tbondNetIssuanceCrore": 2200,
+      "waysAndMeansAdvanceCrore": 0,
+      "outstandingTbillsCrore": 180300,
+      "outstandingTbondsCrore": 315700
+    },
+    {
+      "weekEnding": "2026-02-20",
+      "tbillNetIssuanceCrore": 1800,
+      "tbondNetIssuanceCrore": 1200,
+      "waysAndMeansAdvanceCrore": 0,
+      "outstandingTbillsCrore": 182100,
+      "outstandingTbondsCrore": 316900
+    },
+    {
+      "weekEnding": "2026-02-27",
+      "tbillNetIssuanceCrore": 2200,
+      "tbondNetIssuanceCrore": 1800,
+      "waysAndMeansAdvanceCrore": 0,
+      "outstandingTbillsCrore": 184300,
+      "outstandingTbondsCrore": 318700
+    },
+    {
+      "weekEnding": "2026-03-06",
+      "tbillNetIssuanceCrore": 800,
+      "tbondNetIssuanceCrore": 2500,
+      "waysAndMeansAdvanceCrore": 0,
+      "outstandingTbillsCrore": 185100,
+      "outstandingTbondsCrore": 321200
+    },
+    {
+      "weekEnding": "2026-03-12",
+      "tbillNetIssuanceCrore": 2500,
+      "tbondNetIssuanceCrore": 1800,
+      "waysAndMeansAdvanceCrore": 0,
+      "outstandingTbillsCrore": 185000,
+      "outstandingTbondsCrore": 320000
+    }
+  ]
+}
