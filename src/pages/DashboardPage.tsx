@@ -13,7 +13,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-slate-100">Dashboard</h1>
-          <p className="text-xs text-slate-500">Command center for Bangladesh fixed income markets</p>
+          <p className="text-xs text-slate-500">Bangladesh ALCO Intelligence Platform</p>
         </div>
         <DataTimestamp lastUpdated={yieldData?.lastUpdated ?? null} compact />
       </div>

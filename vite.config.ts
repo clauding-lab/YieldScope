@@ -12,9 +12,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons/*.png'],
       manifest: {
-        name: 'YieldScope 2.0 - Fixed Income Intelligence',
+        name: 'YieldScope - Bangladesh ALCO Intelligence',
         short_name: 'YieldScope',
-        description: "Bangladesh's definitive fixed income & macroeconomic intelligence platform",
+        description: 'Bangladesh ALCO Intelligence Platform',
         theme_color: '#0f172a',
         background_color: '#0f172a',
         display: 'standalone',

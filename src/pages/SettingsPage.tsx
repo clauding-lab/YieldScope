@@ -39,7 +39,7 @@ export default function SettingsPage() {
       <div className="rounded-xl bg-slate-800 p-4">
         <h3 className="text-sm font-medium text-slate-300 mb-2">About YieldScope</h3>
         <p className="text-xs text-slate-400 leading-relaxed">
-          Bangladesh's definitive fixed income and macroeconomic intelligence platform.
+          Bangladesh ALCO Intelligence Platform.
           Combines real-time data visualization with AI-powered contextual analysis.
         </p>
         <div className="mt-3 space-y-1 text-xs text-slate-500">
