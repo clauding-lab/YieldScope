@@ -10,7 +10,7 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-sm border-b border-slate-800 px-5 py-4 flex items-center justify-between">
+      <header className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-sm border-b border-slate-800 px-5 py-4 pt-[max(1rem,env(safe-area-inset-top))] flex items-center justify-between">
         <div className="flex items-center gap-3">
           <svg className="w-8 h-8 text-accent" viewBox="0 0 64 64" fill="none">
             <path
