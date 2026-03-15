@@ -88,7 +88,7 @@ export default function BankingPage() {
       <div className="grid grid-cols-3 gap-2">
         <SummaryBox label="Credit Growth" value={`${latest.privateCreditGrowthBanks.toFixed(1)}%`} sub="Banks" color="text-sky-400" />
         <SummaryBox label="NPL Rate" value={`${latest.nplPctBanks.toFixed(1)}%`} sub="Banks" color="text-red-400" />
-        <SummaryBox label="Excess Liq." value={`₹${(latest.excessLiquidityBanksCrore / 1000).toFixed(0)}K Cr`} sub="Banks" color="text-emerald-400" />
+        <SummaryBox label="Excess Liq." value={`₹${(latest.excessLiquidityBanksCrore / 100000).toFixed(1)}L Cr`} sub="Banks" color="text-emerald-400" />
       </div>
 
       {/* 1. Private Sector Credit Growth */}
@@ -123,7 +123,7 @@ export default function BankingPage() {
 
       <InsightPanel
         tier={1}
-        content="When credit growth outpaces deposit growth, the banking system's structural liquidity declines. Banks either raise deposit rates (increasing cost of funds) or slow lending. Currently, deposit growth (13.0%) exceeds credit growth (7.1%), creating a temporary liquidity buffer — but rising NPLs erode the quality of that credit base."
+        content="When credit growth outpaces deposit growth, the banking system's structural liquidity declines. Currently, deposit growth (12.0%) far exceeds credit growth (7.1%), creating a massive liquidity surplus — banks' excess liquid assets surged 64% to ₹3.35L Cr. But over 70% sits in government securities, not deployable for productive lending. Rising NPLs (30.5%) make banks reluctant to lend."
       />
 
       {/* 3. Banking Sector Liquidity */}
@@ -166,7 +166,7 @@ export default function BankingPage() {
 
       <InsightPanel
         tier={1}
-        content="Rising government borrowing from the banking sector crowds out private credit. As the government absorbs more bank funds through T-bills and bonds, less capital is available for productive lending. This fiscal dominance effect is a key driver of the credit growth slowdown from 10.6% to 7.1% since March 2024."
+        content="Government borrowing from banks swung dramatically — from net repayment in early FY26 to ₹62,000 Cr net borrowing by February 2026 (nearly 5x YoY). A ₹33,542 Cr spike in just two weeks (Dec 2025) was driven by election spending and bank recapitalization. This crowds out private credit and absorbs the excess liquidity banks have parked in government securities."
       />
 
       {/* 5. Loan Disbursement by Category */}
@@ -202,7 +202,7 @@ export default function BankingPage() {
 
       <InsightPanel
         tier={1}
-        content="The trade deficit directly impacts forex reserves and BDT stability. When imports exceed exports, BB sells USD to meet demand, draining domestic liquidity. The narrowing trade gap (from -$1.3B to -$0.4B) is a positive sign for reserve stabilization, partly driven by import compression due to LC restrictions."
+        content="The trade deficit directly impacts forex reserves and BDT stability. Imports peaked at $7.16B in Dec 2024 before moderating, while exports recovered steadily (led by RMG, 80% of total). The narrowing trade gap, combined with record remittances ($32.81B in 2025, +22% YoY), enabled BB to shift from massive USD selling to net buying — rebuilding reserves from under $20B to $35.1B."
       />
 
       {/* 7. NPL Percentage */}
@@ -248,7 +248,7 @@ export default function BankingPage() {
 
       <InsightPanel
         tier={1}
-        content="Rescheduled loans mask the true extent of NPLs. When a troubled loan is rescheduled, it moves off the NPL books — but the underlying credit risk remains. The surge from ₹1.73L Cr to ₹3.42L Cr (Banks + NBFIs combined) suggests the actual stressed asset ratio is far higher than the reported NPL figure."
+        content="Rescheduled loans mask the true extent of NPLs. 38.42% of rescheduled loans turned bad again (₹1.34L Cr re-defaulted). Total distressed assets (NPL + rescheduled + written-off) reached ₹7.57L Cr by Dec 2024. The new BB policy allows rescheduling for up to 10 years with 2% down payment — 300+ companies applied for ₹2L Cr in restructuring in 2025 alone."
       />
 
       {/* 9. BB USD Buy/Sell */}
@@ -268,7 +268,7 @@ export default function BankingPage() {
 
       <InsightPanel
         tier={1}
-        content="BB's forex operations reveal the BDT's true market pressure. When BB sells significantly more USD than it buys, it's defending the taka — depleting reserves in the process. The recent narrowing of the buy-sell gap (from a net sell of $570M to $200M) signals reduced FX market stress and stabilizing import demand."
+        content="BB's forex operations underwent a dramatic reversal. After selling $28B from mid-2021 to mid-2025 to defend the taka, BB became a net buyer from July 2025 — purchasing $4.3B in just 7 months through competitive auctions. This was enabled by record remittances, import moderation, and the IMF-mandated market-based exchange rate. Reserves recovered from under $20B to $35.1B."
       />
     </div>
   )
