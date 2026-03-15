@@ -45,7 +45,7 @@ export default function SettingsPage() {
         <div className="mt-3 space-y-1 text-xs text-slate-500">
           <p>Version 2.0.0</p>
           <p>AI powered by Claude Opus 4.6</p>
-          <p>Curated by Adnan Rashid</p>
+          <p>Human-directed, AI-assisted intelligence.</p>
         </div>
       </div>
     </div>
