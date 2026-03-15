@@ -1,6 +1,21 @@
 {
-  "lastUpdated": "2026-03-12T18:00:00+06:00",
+  "lastUpdated": "2026-03-15T13:19:53.061Z",
   "commentaries": [
+    {
+      "id": "2026-W03",
+      "weekEnding": "2026-03-15",
+      "title": "# Bangladesh Fixed Income Weekly: Rates Rally Extends but Long-End Demand Remain",
+      "body": "# Bangladesh Fixed Income Weekly: Rates Rally Extends but Long-End Demand Remains Fragile\n\n**Week ending March 10, 2026**\n\nBangladesh government securities posted broad-based gains this week, with yields declining 8-11 basis points across both the bill and bond segments as the market prices in an increasingly dovish monetary trajectory. The 364-day T-bill cleared at 10.07%, down 11 basis points, with a healthy 1.75x bid-cover ratio, while the 91-day bill printed at 9.85% with the week's strongest coverage at 1.92x—signaling robust front-end demand and growing conviction that Bangladesh Bank's next move is a cut.\n\nThe bond segment told a more nuanced story. The 5-year BGTB cleared at 10.82% with a respectable 1.6x cover, but the 10-year auction revealed persistent duration hesitancy—a tepid 1.4x bid-cover ratio forced 10% devolvement onto primary dealers, even as the cutoff fell 10 basis points to 11.15%. With CPI still running at 9.13%, real return compression at the long end is clearly testing investor appetite.\n\nThe curve presents notable distortions. The 2-year yield at 11.95% sits sharply above the 5-year at 10.82%, creating a pronounced inversion in the belly that suggests either mispricing or acute term premium dislocation. Meanwhile, the 15-year at 12.68% trades well through where a smooth interpolation would place it relative to the 10-year and 20-year, steepening the ultra-long segment aggressively.\n\nWith the repo rate corridor still anchoring the front end and reserves steady at $21.2 billion despite a stable taka at 119.5, the macro backdrop supports further easing expectations. However, until devolvement clears and the belly inversion resolves, duration extension should remain selective. Watch the April inflation print—any break below 9% could catalyze the next leg of the rally.",
+      "keyPoints": [
+        "364D T-Bill: 10.07% (-11bps)",
+        "91D T-Bill: 9.85% (-10bps)",
+        "10Y BGTB: 11.15% (-10bps)",
+        "5Y BGTB: 10.82% (-8bps)"
+      ],
+      "curveShapeNote": "Based on 8 tenors",
+      "outlook": "",
+      "attribution": "Human-directed, AI-assisted intelligence."
+    },
     {
       "id": "2026-W11",
       "weekEnding": "2026-03-12",

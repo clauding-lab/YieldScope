@@ -1,0 +1,10 @@
+{
+  "shape": "humped",
+  "interpretation": "The curve is broadly upward-sloping but exhibits a hump, with the 2Y yield (11.95%) exceeding the 5Y (10.82%) and 10Y (11.15%), suggesting near-term stress. The 91D-364D segment shows inversion (364D at 10.07% below 182D at 10.2%), reflecting tight banking sector liquidity and aggressive BB repo rate (10%). Elevated short-to-medium term yields indicate persistent inflation expectations (likely 9-10%+) and banks' reluctance to lock in medium-tenor government paper amid liquidity pressure from high CRR compliance and AD ratio constraints.",
+  "implications": [
+    "The 2Y bulge signals market expectation of prolonged BB monetary tightening, with banks demanding a premium for liquidity sacrifice in the 1-2Y segment",
+    "The 130bps 10Y-91D spread is compressed versus historical norms, indicating fiscal credibility concerns and inflation risk premia suppressing real demand for longer tenors",
+    "Banking sector liquidity remains structurally tight — the SDF-Repo corridor (250bps) and yields persistently above repo suggest heavy reliance on standing facilities, pressuring NIM and limiting primary dealer appetite for new issuances"
+  ],
+  "generatedAt": "2026-03-15T13:20:02.769Z"
+}
