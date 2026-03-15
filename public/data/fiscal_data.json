@@ -1,0 +1,47 @@
+{
+  "lastUpdated": "2026-03-10T12:00:00+06:00",
+  "fiscalYear": "FY26",
+  "revenue": {
+    "budgetTargetCrore": 480000,
+    "ytdCollectedCrore": 267500,
+    "collectionRatioPct": 55.7,
+    "asOfMonth": "2026-01",
+    "monthly": [
+      { "month": "2025-07", "collectedCrore": 28500, "targetCrore": 40000 },
+      { "month": "2025-08", "collectedCrore": 30200, "targetCrore": 40000 },
+      { "month": "2025-09", "collectedCrore": 32100, "targetCrore": 40000 },
+      { "month": "2025-10", "collectedCrore": 35800, "targetCrore": 40000 },
+      { "month": "2025-11", "collectedCrore": 38400, "targetCrore": 40000 },
+      { "month": "2025-12", "collectedCrore": 54000, "targetCrore": 40000 },
+      { "month": "2026-01", "collectedCrore": 48500, "targetCrore": 40000 }
+    ]
+  },
+  "adp": {
+    "allocationCrore": 265000,
+    "implementedCrore": 56100,
+    "implementationRatePct": 21.2,
+    "historicalRates": [
+      { "fiscalYear": "FY22", "ratePct": 88.5 },
+      { "fiscalYear": "FY23", "ratePct": 85.2 },
+      { "fiscalYear": "FY24", "ratePct": 82.0 },
+      { "fiscalYear": "FY25", "ratePct": 79.8 },
+      { "fiscalYear": "FY26", "ratePct": 21.2 }
+    ]
+  },
+  "debt": {
+    "totalDebtLakhCrore": 21.5,
+    "domesticDebtLakhCrore": 14.2,
+    "externalDebtLakhCrore": 7.3,
+    "debtToGdpPct": 38.5,
+    "interestToRevenuePct": 20.0,
+    "asOfDate": "2025-12-31",
+    "quarterly": [
+      { "quarter": "Q1-FY25", "totalLakhCr": 19.8, "domesticLakhCr": 13.0, "externalLakhCr": 6.8, "debtGdpPct": 37.2 },
+      { "quarter": "Q2-FY25", "totalLakhCr": 20.1, "domesticLakhCr": 13.3, "externalLakhCr": 6.8, "debtGdpPct": 37.5 },
+      { "quarter": "Q3-FY25", "totalLakhCr": 20.5, "domesticLakhCr": 13.6, "externalLakhCr": 6.9, "debtGdpPct": 37.8 },
+      { "quarter": "Q4-FY25", "totalLakhCr": 20.9, "domesticLakhCr": 13.8, "externalLakhCr": 7.1, "debtGdpPct": 38.0 },
+      { "quarter": "Q1-FY26", "totalLakhCr": 21.2, "domesticLakhCr": 14.0, "externalLakhCr": 7.2, "debtGdpPct": 38.2 },
+      { "quarter": "Q2-FY26", "totalLakhCr": 21.5, "domesticLakhCr": 14.2, "externalLakhCr": 7.3, "debtGdpPct": 38.5 }
+    ]
+  }
+}
