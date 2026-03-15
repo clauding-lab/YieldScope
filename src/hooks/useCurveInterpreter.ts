@@ -1,11 +1,21 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import type { YieldData, PolicyData, CurveInterpretation } from '../types'
 import { interpretCurveShape } from '../services/aiService'
+import { loadData } from '../services/dataLoader'
 
 export function useCurveInterpreter() {
   const [interpretation, setInterpretation] = useState<CurveInterpretation | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Load pre-generated interpretation on mount
+  useEffect(() => {
+    loadData<CurveInterpretation>('curve_interpretation.json')
+      .then(data => {
+        if (data?.interpretation) setInterpretation(data)
+      })
+      .catch(() => { /* no pre-generated data available */ })
+  }, [])
 
   const interpret = useCallback(async (
     yieldData: YieldData,

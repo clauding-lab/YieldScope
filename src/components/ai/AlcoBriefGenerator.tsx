@@ -1,8 +1,15 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { DataTimestamp } from '../ui/DataTimestamp'
 import { useAIContext } from '../../contexts/AIContext'
 import { generateAlcoBrief } from '../../services/alcoBrief'
+import { loadData } from '../../services/dataLoader'
 import type { YieldData, AuctionData, MacroData, MoneySupplyData, PolicyData, FiscalData, CommodityData } from '../../types'
+
+interface PreGeneratedBrief {
+  brief: string
+  generatedAt: string
+  attribution: string
+}
 
 interface AlcoBriefGeneratorProps {
   yieldData: YieldData | null
@@ -22,6 +29,18 @@ export function AlcoBriefGenerator({
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedAt, setGeneratedAt] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  // Load pre-generated brief on mount
+  useEffect(() => {
+    loadData<PreGeneratedBrief>('alco_brief.json')
+      .then(data => {
+        if (data?.brief) {
+          setBrief(data.brief)
+          setGeneratedAt(data.generatedAt)
+        }
+      })
+      .catch(() => { /* no pre-generated brief */ })
+  }, [])
 
   const handleGenerate = useCallback(async () => {
     if (!isConfigured) return
@@ -56,7 +75,7 @@ export function AlcoBriefGenerator({
         {generatedAt && <DataTimestamp lastUpdated={generatedAt} compact />}
       </div>
 
-      {!isConfigured ? (
+      {!brief && !isConfigured ? (
         <div className="text-center py-4">
           <p className="text-xs text-slate-400">Configure your API key in Settings to use the ALCO Brief Generator.</p>
           <p className="text-[10px] text-slate-500 mt-1">Requires Claude Opus 4.6 API access.</p>
