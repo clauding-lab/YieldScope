@@ -52,7 +52,7 @@ export function SmartAlertsBanner() {
         </h2>
         <span className="text-[10px] text-slate-500">{alerts.length} active</span>
       </div>
-      <div className="space-y-2">
+      <div className="grid grid-cols-2 gap-2">
         {alerts.map((alert) => (
           <AlertCard key={alert.id} alert={alert} />
         ))}
@@ -64,7 +64,7 @@ export function SmartAlertsBanner() {
 function AlertCard({ alert }: { alert: SmartAlert }) {
   return (
     <div
-      className={`rounded-lg border p-3 ${SEVERITY_STYLES[alert.severity]}`}
+      className={`rounded-lg border p-2.5 ${SEVERITY_STYLES[alert.severity]}`}
     >
       <div className="flex items-start gap-2">
         <span className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${SEVERITY_DOT[alert.severity]}`} />
