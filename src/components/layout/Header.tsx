@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useYieldData } from '../../hooks/useYieldData'
 import { differenceInHours } from 'date-fns'
 
-const ADMIN_PASSWORD = 'yieldscope2026'
+const ADMIN_PASSWORD = 'yieldscope2008$'
 
 export function Header() {
   const [showPasswordModal, setShowPasswordModal] = useState(false)
