@@ -96,29 +96,3 @@ export async function explainAnomaly(anomaly: Anomaly, context: string): Promise
 
   return response.content[0].type === 'text' ? response.content[0].text : ''
 }
-
-export async function askYieldScope(
-  question: string,
-  yieldData?: YieldData | null,
-  auctionData?: AuctionData | null,
-  policyData?: PolicyData | null,
-  history: Array<{ role: 'user' | 'assistant'; content: string }> = [],
-): Promise<string> {
-  if (!client) throw new Error('AI client not initialized. Please add your API key in Settings.')
-
-  const context = buildDataContext(yieldData, auctionData, policyData)
-
-  const messages: Array<{ role: 'user' | 'assistant'; content: string }> = [
-    ...history,
-    { role: 'user', content: question },
-  ]
-
-  const response = await client.messages.create({
-    model: 'claude-opus-4-6',
-    max_tokens: 300,
-    system: `You are YieldScope AI, a Bangladesh government securities market assistant. Answer questions using the provided market data. Keep responses under 100 words. Be precise with numbers. If you don't have data to answer, say so.\n\nCurrent market data:\n${context}`,
-    messages,
-  })
-
-  return response.content[0].type === 'text' ? response.content[0].text : ''
-}

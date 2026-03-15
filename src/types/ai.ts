@@ -48,12 +48,6 @@ export interface AnomalyAlert {
   generatedAt: string
 }
 
-export interface ChatMessage {
-  role: 'user' | 'assistant'
-  content: string
-  timestamp: string
-}
-
 export interface AIConfig {
   apiKey: string | null
   isConfigured: boolean

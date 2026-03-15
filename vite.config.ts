@@ -12,14 +12,16 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons/*.png'],
       manifest: {
-        name: 'YieldScope - BD Treasury Yield Dashboard',
+        name: 'YieldScope 2.0 - Fixed Income Intelligence',
         short_name: 'YieldScope',
-        description: "Bangladesh's Fixed Income Intelligence Platform",
+        description: "Bangladesh's definitive fixed income & macroeconomic intelligence platform",
         theme_color: '#0f172a',
         background_color: '#0f172a',
         display: 'standalone',
+        orientation: 'portrait',
         start_url: '/YieldScope/',
         scope: '/YieldScope/',
+        categories: ['finance', 'business'],
         icons: [
           {
             src: 'icons/icon-192x192.png',
@@ -41,14 +43,16 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        navigateFallback: '/YieldScope/index.html',
         runtimeCaching: [
           {
             urlPattern: /\/data\/.*\.json$/,
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'yieldscope-data',
+              cacheName: 'yieldscope-data-v2',
               expiration: {
-                maxAgeSeconds: 86400, // 24 hours
+                maxAgeSeconds: 86400,
+                maxEntries: 30,
               },
             },
           },
@@ -59,6 +63,18 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': '/src',
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-ai': ['@anthropic-ai/sdk'],
+          'vendor-charts': ['recharts'],
+          'vendor-date': ['date-fns'],
+        },
+      },
     },
   },
 })

@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import { useYieldData } from '../../hooks/useYieldData'
+import { differenceInHours } from 'date-fns'
 
 export function Header() {
   return (
@@ -15,6 +17,7 @@ export function Header() {
         <h1 className="text-lg font-semibold tracking-tight">
           <span className="text-accent">Yield</span>
           <span className="text-slate-300">Scope</span>
+          <span className="text-[10px] text-slate-600 ml-1.5 font-normal">v2.0</span>
         </h1>
       </div>
       <div className="flex items-center gap-3">
@@ -31,10 +34,37 @@ export function Header() {
 }
 
 function DataFreshnessDot() {
+  const { data } = useYieldData()
+
+  if (!data?.lastUpdated) {
+    return (
+      <div className="flex items-center gap-1.5 text-xs text-slate-500">
+        <div className="w-2 h-2 rounded-full bg-slate-600" />
+        <span>No data</span>
+      </div>
+    )
+  }
+
+  const hoursAgo = differenceInHours(new Date(), new Date(data.lastUpdated))
+
+  let dotColor = 'bg-emerald-400'
+  let label = 'Live'
+
+  if (hoursAgo >= 72) {
+    dotColor = 'bg-red-400 animate-pulse'
+    label = 'Stale'
+  } else if (hoursAgo >= 24) {
+    dotColor = 'bg-amber-400 animate-pulse'
+    label = `${Math.floor(hoursAgo / 24)}d ago`
+  } else if (hoursAgo >= 1) {
+    dotColor = 'bg-emerald-400'
+    label = `${hoursAgo}h ago`
+  }
+
   return (
     <div className="flex items-center gap-1.5 text-xs text-slate-500">
-      <div className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
-      <span>Sample data</span>
+      <div className={`w-2 h-2 rounded-full ${dotColor}`} />
+      <span>{label}</span>
     </div>
   )
 }
