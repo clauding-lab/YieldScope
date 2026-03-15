@@ -6,11 +6,11 @@
       "cpiHeadlineYoY": 9.13,
       "cpiFoodYoY": 9.30,
       "cpiNonFoodYoY": 9.01,
-      "usdBdtRate": 119.50,
-      "usdBdtChange30d": -0.8,
-      "bbFxReservesBn": 21.2,
-      "excessLiquidityCrore": 185000,
-      "advanceDepositRatio": 78.5,
+      "usdBdtRate": 121.20,
+      "usdBdtChange30d": -0.3,
+      "bbFxReservesBn": 35.1,
+      "excessLiquidityCrore": 335000,
+      "advanceDepositRatio": 75.8,
       "callMoneyRate": 9.80
     },
     {
@@ -18,11 +18,11 @@
       "cpiHeadlineYoY": 8.58,
       "cpiFoodYoY": 8.29,
       "cpiNonFoodYoY": 8.81,
-      "usdBdtRate": 120.30,
-      "usdBdtChange30d": -0.5,
-      "bbFxReservesBn": 20.8,
-      "excessLiquidityCrore": 172000,
-      "advanceDepositRatio": 79.0,
+      "usdBdtRate": 121.50,
+      "usdBdtChange30d": -0.4,
+      "bbFxReservesBn": 34.2,
+      "excessLiquidityCrore": 328000,
+      "advanceDepositRatio": 76.2,
       "callMoneyRate": 9.75
     },
     {
@@ -30,11 +30,11 @@
       "cpiHeadlineYoY": 8.35,
       "cpiFoodYoY": 8.10,
       "cpiNonFoodYoY": 8.55,
-      "usdBdtRate": 120.80,
-      "usdBdtChange30d": -0.3,
-      "bbFxReservesBn": 20.5,
-      "excessLiquidityCrore": 165000,
-      "advanceDepositRatio": 79.5,
+      "usdBdtRate": 121.90,
+      "usdBdtChange30d": -0.5,
+      "bbFxReservesBn": 33.5,
+      "excessLiquidityCrore": 321255,
+      "advanceDepositRatio": 76.8,
       "callMoneyRate": 9.85
     }
   ]
