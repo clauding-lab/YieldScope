@@ -88,7 +88,7 @@ export default function BankingPage() {
       <div className="grid grid-cols-3 gap-2">
         <SummaryBox label="Credit Growth" value={`${latest.privateCreditGrowthBanks.toFixed(1)}%`} sub="Banks" color="text-sky-400" />
         <SummaryBox label="NPL Rate" value={`${latest.nplPctBanks.toFixed(1)}%`} sub="Banks" color="text-red-400" />
-        <SummaryBox label="Excess Liq." value={`Tk${(latest.excessLiquidityBanksCrore / 100000).toFixed(1)}L Cr`} sub="Banks" color="text-emerald-400" />
+        <SummaryBox label="Excess Liq." value={`৳${(latest.excessLiquidityBanksCrore / 100000).toFixed(1)}L Cr`} sub="Banks" color="text-emerald-400" />
       </div>
 
       {/* 1. Private Sector Credit Growth */}
@@ -123,7 +123,7 @@ export default function BankingPage() {
 
       <InsightPanel
         tier={1}
-        content="When credit growth outpaces deposit growth, the banking system's structural liquidity declines. Currently, deposit growth (12.0%) far exceeds credit growth (7.1%), creating a massive liquidity surplus — banks' excess liquid assets surged 64% to Tk3.35L Cr. But over 70% sits in government securities, not deployable for productive lending. Rising NPLs (30.5%) make banks reluctant to lend."
+        content="When credit growth outpaces deposit growth, the banking system's structural liquidity declines. Currently, deposit growth (12.0%) far exceeds credit growth (7.1%), creating a massive liquidity surplus — banks' excess liquid assets surged 64% to ৳3.35L Cr. But over 70% sits in government securities, not deployable for productive lending. Rising NPLs (30.5%) make banks reluctant to lend."
       />
 
       {/* 3. Banking Sector Liquidity */}
@@ -143,7 +143,7 @@ export default function BankingPage() {
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
             <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}K`} />
-            <Tooltip {...TOOLTIP_STYLE} formatter={(v: number, name: string) => [`Tk${v.toLocaleString()} Cr`, name]} />
+            <Tooltip {...TOOLTIP_STYLE} formatter={(v: number, name: string) => [`৳${v.toLocaleString()} Cr`, name]} />
             <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '10px' }} />
             <Area type="monotone" dataKey="excessLiquidityBanksCrore" name="Banks" stroke="#38bdf8" strokeWidth={2} fill="url(#liqBanksGrad)" dot={DOT_BANKS} activeDot={{ ...ACTIVE_DOT, fill: '#38bdf8' }} />
             <Area type="monotone" dataKey="excessLiquidityNBFIsCrore" name="NBFIs" stroke="#f59e0b" strokeWidth={2} fill="url(#liqNbfiGrad)" dot={DOT_NBFI} activeDot={{ ...ACTIVE_DOT, fill: '#f59e0b' }} />
@@ -158,7 +158,7 @@ export default function BankingPage() {
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
             <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}K`} />
-            <Tooltip {...TOOLTIP_STYLE} formatter={(v: number) => [`Tk${v.toLocaleString()} Cr`, 'Net Borrowing']} />
+            <Tooltip {...TOOLTIP_STYLE} formatter={(v: number) => [`৳${v.toLocaleString()} Cr`, 'Net Borrowing']} />
             <Bar dataKey="govtBorrowingNetCrore" name="Net Borrowing" fill="#a78bfa" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
@@ -166,7 +166,7 @@ export default function BankingPage() {
 
       <InsightPanel
         tier={1}
-        content="Government borrowing from banks swung dramatically — from net repayment in early FY26 to Tk62,000 Cr net borrowing by February 2026 (nearly 5x YoY). A Tk33,542 Cr spike in just two weeks (Dec 2025) was driven by election spending and bank recapitalization. This crowds out private credit and absorbs the excess liquidity banks have parked in government securities."
+        content="Government borrowing from banks swung dramatically — from net repayment in early FY26 to ৳62,000 Cr net borrowing by February 2026 (nearly 5x YoY). A ৳33,542 Cr spike in just two weeks (Dec 2025) was driven by election spending and bank recapitalization. This crowds out private credit and absorbs the excess liquidity banks have parked in government securities."
       />
 
       {/* 5. Loan Disbursement by Category */}
@@ -176,7 +176,7 @@ export default function BankingPage() {
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
             <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}K`} />
-            <Tooltip {...TOOLTIP_STYLE} formatter={(v: number, name: string) => [`Tk${v.toLocaleString()} Cr`, name]} />
+            <Tooltip {...TOOLTIP_STYLE} formatter={(v: number, name: string) => [`৳${v.toLocaleString()} Cr`, name]} />
             <Legend iconType="square" iconSize={8} wrapperStyle={{ fontSize: '10px' }} />
             <Bar dataKey="smeLoanDisbursementCrore" name="SME" fill="#10b981" radius={[3, 3, 0, 0]} />
             <Bar dataKey="consumerLoanDisbursementCrore" name="Consumer" fill="#f59e0b" radius={[3, 3, 0, 0]} />
@@ -238,7 +238,7 @@ export default function BankingPage() {
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
             <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}K`} />
-            <Tooltip {...TOOLTIP_STYLE} formatter={(v: number, name: string) => [`Tk${v.toLocaleString()} Cr`, name]} />
+            <Tooltip {...TOOLTIP_STYLE} formatter={(v: number, name: string) => [`৳${v.toLocaleString()} Cr`, name]} />
             <Legend iconType="square" iconSize={8} wrapperStyle={{ fontSize: '10px' }} />
             <Bar dataKey="rescheduledLoanBanksCrore" name="Banks" fill="#ef4444" radius={[3, 3, 0, 0]} />
             <Bar dataKey="rescheduledLoanNBFIsCrore" name="NBFIs" fill="#f59e0b" radius={[3, 3, 0, 0]} />
@@ -248,7 +248,7 @@ export default function BankingPage() {
 
       <InsightPanel
         tier={1}
-        content="Rescheduled loans mask the true extent of NPLs. 38.42% of rescheduled loans turned bad again (Tk1.34L Cr re-defaulted). Total distressed assets (NPL + rescheduled + written-off) reached Tk7.57L Cr by Dec 2024. The new BB policy allows rescheduling for up to 10 years with 2% down payment — 300+ companies applied for Tk2L Cr in restructuring in 2025 alone."
+        content="Rescheduled loans mask the true extent of NPLs. 38.42% of rescheduled loans turned bad again (৳1.34L Cr re-defaulted). Total distressed assets (NPL + rescheduled + written-off) reached ৳7.57L Cr by Dec 2024. The new BB policy allows rescheduling for up to 10 years with 2% down payment — 300+ companies applied for ৳2L Cr in restructuring in 2025 alone."
       />
 
       {/* 9. BB USD Buy/Sell */}
