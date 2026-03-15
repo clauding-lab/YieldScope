@@ -1,0 +1,137 @@
+{
+  "lastUpdated": "2026-03-15T18:00:00+06:00",
+  "monthly": [
+    {
+      "date": "2024-03",
+      "privateCreditGrowthBanks": 10.6, "privateCreditGrowthNBFIs": 5.2,
+      "privateDepositGrowthBanks": 9.8, "privateDepositGrowthNBFIs": 4.5,
+      "excessLiquidityBanksCrore": 215000, "excessLiquidityNBFIsCrore": 12000,
+      "govtBorrowingNetCrore": 18500,
+      "smeLoanDisbursementCrore": 14200, "consumerLoanDisbursementCrore": 8500, "industrialLoanDisbursementCrore": 22000,
+      "exportBnUsd": 4.5, "importBnUsd": 5.8,
+      "nplPctBanks": 10.1, "nplPctNBFIs": 22.5,
+      "rescheduledLoanBanksCrore": 145000, "rescheduledLoanNBFIsCrore": 28000,
+      "bbUsdBuyMnUsd": 320, "bbUsdSellMnUsd": 580
+    },
+    {
+      "date": "2024-06",
+      "privateCreditGrowthBanks": 9.84, "privateCreditGrowthNBFIs": 4.8,
+      "privateDepositGrowthBanks": 9.2, "privateDepositGrowthNBFIs": 4.1,
+      "excessLiquidityBanksCrore": 195000, "excessLiquidityNBFIsCrore": 10500,
+      "govtBorrowingNetCrore": 22000,
+      "smeLoanDisbursementCrore": 13800, "consumerLoanDisbursementCrore": 8200, "industrialLoanDisbursementCrore": 21000,
+      "exportBnUsd": 4.8, "importBnUsd": 6.1,
+      "nplPctBanks": 11.1, "nplPctNBFIs": 24.0,
+      "rescheduledLoanBanksCrore": 155000, "rescheduledLoanNBFIsCrore": 30000,
+      "bbUsdBuyMnUsd": 280, "bbUsdSellMnUsd": 620
+    },
+    {
+      "date": "2024-07",
+      "privateCreditGrowthBanks": 10.13, "privateCreditGrowthNBFIs": 4.5,
+      "privateDepositGrowthBanks": 9.0, "privateDepositGrowthNBFIs": 3.8,
+      "excessLiquidityBanksCrore": 185000, "excessLiquidityNBFIsCrore": 9800,
+      "govtBorrowingNetCrore": 24500,
+      "smeLoanDisbursementCrore": 12500, "consumerLoanDisbursementCrore": 7800, "industrialLoanDisbursementCrore": 19500,
+      "exportBnUsd": 3.9, "importBnUsd": 5.5,
+      "nplPctBanks": 12.6, "nplPctNBFIs": 25.5,
+      "rescheduledLoanBanksCrore": 160000, "rescheduledLoanNBFIsCrore": 31500,
+      "bbUsdBuyMnUsd": 250, "bbUsdSellMnUsd": 650
+    },
+    {
+      "date": "2024-09",
+      "privateCreditGrowthBanks": 9.20, "privateCreditGrowthNBFIs": 4.0,
+      "privateDepositGrowthBanks": 8.5, "privateDepositGrowthNBFIs": 3.5,
+      "excessLiquidityBanksCrore": 172000, "excessLiquidityNBFIsCrore": 9200,
+      "govtBorrowingNetCrore": 28000,
+      "smeLoanDisbursementCrore": 11800, "consumerLoanDisbursementCrore": 7200, "industrialLoanDisbursementCrore": 18000,
+      "exportBnUsd": 4.2, "importBnUsd": 5.6,
+      "nplPctBanks": 16.9, "nplPctNBFIs": 28.2,
+      "rescheduledLoanBanksCrore": 170000, "rescheduledLoanNBFIsCrore": 33000,
+      "bbUsdBuyMnUsd": 210, "bbUsdSellMnUsd": 700
+    },
+    {
+      "date": "2024-12",
+      "privateCreditGrowthBanks": 7.28, "privateCreditGrowthNBFIs": 3.2,
+      "privateDepositGrowthBanks": 9.5, "privateDepositGrowthNBFIs": 3.0,
+      "excessLiquidityBanksCrore": 165000, "excessLiquidityNBFIsCrore": 8500,
+      "govtBorrowingNetCrore": 32000,
+      "smeLoanDisbursementCrore": 10500, "consumerLoanDisbursementCrore": 6800, "industrialLoanDisbursementCrore": 16500,
+      "exportBnUsd": 4.6, "importBnUsd": 5.4,
+      "nplPctBanks": 21.0, "nplPctNBFIs": 30.5,
+      "rescheduledLoanBanksCrore": 185000, "rescheduledLoanNBFIsCrore": 36000,
+      "bbUsdBuyMnUsd": 180, "bbUsdSellMnUsd": 750
+    },
+    {
+      "date": "2025-03",
+      "privateCreditGrowthBanks": 7.57, "privateCreditGrowthNBFIs": 2.8,
+      "privateDepositGrowthBanks": 10.2, "privateDepositGrowthNBFIs": 2.5,
+      "excessLiquidityBanksCrore": 158000, "excessLiquidityNBFIsCrore": 7800,
+      "govtBorrowingNetCrore": 35000,
+      "smeLoanDisbursementCrore": 10200, "consumerLoanDisbursementCrore": 6500, "industrialLoanDisbursementCrore": 15800,
+      "exportBnUsd": 4.8, "importBnUsd": 5.3,
+      "nplPctBanks": 25.8, "nplPctNBFIs": 32.0,
+      "rescheduledLoanBanksCrore": 200000, "rescheduledLoanNBFIsCrore": 40000,
+      "bbUsdBuyMnUsd": 200, "bbUsdSellMnUsd": 680
+    },
+    {
+      "date": "2025-06",
+      "privateCreditGrowthBanks": 6.40, "privateCreditGrowthNBFIs": 2.3,
+      "privateDepositGrowthBanks": 10.8, "privateDepositGrowthNBFIs": 2.2,
+      "excessLiquidityBanksCrore": 152000, "excessLiquidityNBFIsCrore": 7200,
+      "govtBorrowingNetCrore": 38500,
+      "smeLoanDisbursementCrore": 9800, "consumerLoanDisbursementCrore": 6200, "industrialLoanDisbursementCrore": 14500,
+      "exportBnUsd": 5.1, "importBnUsd": 5.5,
+      "nplPctBanks": 30.2, "nplPctNBFIs": 34.5,
+      "rescheduledLoanBanksCrore": 225000, "rescheduledLoanNBFIsCrore": 45000,
+      "bbUsdBuyMnUsd": 220, "bbUsdSellMnUsd": 640
+    },
+    {
+      "date": "2025-09",
+      "privateCreditGrowthBanks": 6.29, "privateCreditGrowthNBFIs": 1.9,
+      "privateDepositGrowthBanks": 11.5, "privateDepositGrowthNBFIs": 1.8,
+      "excessLiquidityBanksCrore": 160000, "excessLiquidityNBFIsCrore": 6800,
+      "govtBorrowingNetCrore": 42000,
+      "smeLoanDisbursementCrore": 9500, "consumerLoanDisbursementCrore": 5800, "industrialLoanDisbursementCrore": 13800,
+      "exportBnUsd": 5.3, "importBnUsd": 5.7,
+      "nplPctBanks": 35.73, "nplPctNBFIs": 38.2,
+      "rescheduledLoanBanksCrore": 250000, "rescheduledLoanNBFIsCrore": 50000,
+      "bbUsdBuyMnUsd": 250, "bbUsdSellMnUsd": 600
+    },
+    {
+      "date": "2025-12",
+      "privateCreditGrowthBanks": 6.10, "privateCreditGrowthNBFIs": 1.5,
+      "privateDepositGrowthBanks": 12.0, "privateDepositGrowthNBFIs": 1.5,
+      "excessLiquidityBanksCrore": 172000, "excessLiquidityNBFIsCrore": 6500,
+      "govtBorrowingNetCrore": 45000,
+      "smeLoanDisbursementCrore": 9200, "consumerLoanDisbursementCrore": 5500, "industrialLoanDisbursementCrore": 13200,
+      "exportBnUsd": 5.5, "importBnUsd": 5.9,
+      "nplPctBanks": 34.5, "nplPctNBFIs": 37.8,
+      "rescheduledLoanBanksCrore": 270000, "rescheduledLoanNBFIsCrore": 54000,
+      "bbUsdBuyMnUsd": 280, "bbUsdSellMnUsd": 560
+    },
+    {
+      "date": "2026-01",
+      "privateCreditGrowthBanks": 6.58, "privateCreditGrowthNBFIs": 1.8,
+      "privateDepositGrowthBanks": 12.5, "privateDepositGrowthNBFIs": 1.6,
+      "excessLiquidityBanksCrore": 178000, "excessLiquidityNBFIsCrore": 6200,
+      "govtBorrowingNetCrore": 46000,
+      "smeLoanDisbursementCrore": 9000, "consumerLoanDisbursementCrore": 5300, "industrialLoanDisbursementCrore": 12800,
+      "exportBnUsd": 5.4, "importBnUsd": 5.8,
+      "nplPctBanks": 33.8, "nplPctNBFIs": 37.0,
+      "rescheduledLoanBanksCrore": 280000, "rescheduledLoanNBFIsCrore": 56000,
+      "bbUsdBuyMnUsd": 300, "bbUsdSellMnUsd": 540
+    },
+    {
+      "date": "2026-02",
+      "privateCreditGrowthBanks": 7.10, "privateCreditGrowthNBFIs": 2.0,
+      "privateDepositGrowthBanks": 13.0, "privateDepositGrowthNBFIs": 1.7,
+      "excessLiquidityBanksCrore": 185000, "excessLiquidityNBFIsCrore": 6000,
+      "govtBorrowingNetCrore": 47500,
+      "smeLoanDisbursementCrore": 9300, "consumerLoanDisbursementCrore": 5500, "industrialLoanDisbursementCrore": 13000,
+      "exportBnUsd": 5.6, "importBnUsd": 6.0,
+      "nplPctBanks": 33.2, "nplPctNBFIs": 36.5,
+      "rescheduledLoanBanksCrore": 285000, "rescheduledLoanNBFIsCrore": 57000,
+      "bbUsdBuyMnUsd": 320, "bbUsdSellMnUsd": 520
+    }
+  ]
+}

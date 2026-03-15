@@ -8,6 +8,7 @@ const YieldAuctionsPage = lazy(() => import('./pages/YieldAuctionsPage'))
 const LiquidityPage = lazy(() => import('./pages/LiquidityPage'))
 const MacroExternalPage = lazy(() => import('./pages/MacroExternalPage'))
 const FiscalSovereignPage = lazy(() => import('./pages/FiscalSovereignPage'))
+const BankingPage = lazy(() => import('./pages/BankingPage'))
 const IntelligencePage = lazy(() => import('./pages/IntelligencePage'))
 const SettingsPage = lazy(() => import('./pages/SettingsPage'))
 
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/liquidity" element={<LiquidityPage />} />
           <Route path="/macro" element={<MacroExternalPage />} />
           <Route path="/fiscal" element={<FiscalSovereignPage />} />
+          <Route path="/banking" element={<BankingPage />} />
           <Route path="/intelligence" element={<IntelligencePage />} />
           <Route path="/settings" element={<SettingsPage />} />
           {/* Legacy route redirects */}
