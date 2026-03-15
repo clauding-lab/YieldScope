@@ -1,0 +1,65 @@
+{
+  "lastUpdated": "2026-03-10T12:00:00+06:00",
+  "monthly": [
+    {
+      "month": "2025-09",
+      "creditGrowthYoY": 10.2,
+      "depositGrowthYoY": 9.8,
+      "creditDepositGap": 0.4,
+      "privateSectorCreditGrowth": 9.8,
+      "publicSectorCreditGrowth": 12.5,
+      "totalCreditOutstandingLakhCr": 18.2,
+      "totalDepositLakhCr": 22.5
+    },
+    {
+      "month": "2025-10",
+      "creditGrowthYoY": 10.0,
+      "depositGrowthYoY": 9.5,
+      "creditDepositGap": 0.5,
+      "privateSectorCreditGrowth": 9.5,
+      "publicSectorCreditGrowth": 12.8,
+      "totalCreditOutstandingLakhCr": 18.4,
+      "totalDepositLakhCr": 22.6
+    },
+    {
+      "month": "2025-11",
+      "creditGrowthYoY": 9.8,
+      "depositGrowthYoY": 9.2,
+      "creditDepositGap": 0.6,
+      "privateSectorCreditGrowth": 9.2,
+      "publicSectorCreditGrowth": 13.0,
+      "totalCreditOutstandingLakhCr": 18.5,
+      "totalDepositLakhCr": 22.7
+    },
+    {
+      "month": "2025-12",
+      "creditGrowthYoY": 9.5,
+      "depositGrowthYoY": 9.0,
+      "creditDepositGap": 0.5,
+      "privateSectorCreditGrowth": 8.9,
+      "publicSectorCreditGrowth": 13.2,
+      "totalCreditOutstandingLakhCr": 18.6,
+      "totalDepositLakhCr": 22.9
+    },
+    {
+      "month": "2026-01",
+      "creditGrowthYoY": 9.3,
+      "depositGrowthYoY": 8.8,
+      "creditDepositGap": 0.5,
+      "privateSectorCreditGrowth": 8.6,
+      "publicSectorCreditGrowth": 13.5,
+      "totalCreditOutstandingLakhCr": 18.7,
+      "totalDepositLakhCr": 23.0
+    },
+    {
+      "month": "2026-02",
+      "creditGrowthYoY": 9.1,
+      "depositGrowthYoY": 8.5,
+      "creditDepositGap": 0.6,
+      "privateSectorCreditGrowth": 8.4,
+      "publicSectorCreditGrowth": 13.8,
+      "totalCreditOutstandingLakhCr": 18.8,
+      "totalDepositLakhCr": 23.1
+    }
+  ]
+}

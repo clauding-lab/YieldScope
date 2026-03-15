@@ -3,9 +3,14 @@ import { useAuctionData } from '../hooks/useAuctionData'
 import { usePolicyData } from '../hooks/usePolicyData'
 import { useWeeklyCommentary } from '../hooks/useWeeklyCommentary'
 import { useAnomalyDetector } from '../hooks/useAnomalyDetector'
+import { useMacroData } from '../hooks/useMacroData'
+import { useMoneySupplyData } from '../hooks/useMoneySupplyData'
+import { useFiscalData } from '../hooks/useFiscalData'
+import { useCommodityData } from '../hooks/useCommodityData'
 import { WeeklyCommentaryCard } from '../components/ai/WeeklyCommentaryCard'
 import { AnomalyBanner } from '../components/ai/AnomalyBanner'
 import { CurveInterpreter } from '../components/ai/CurveInterpreter'
+import { AlcoBriefGenerator } from '../components/ai/AlcoBriefGenerator'
 import { RateCorridorChart } from '../components/charts/RateCorridorChart'
 import { TransmissionSpread } from '../components/policy/TransmissionSpread'
 import { PolicyTimeline } from '../components/policy/PolicyTimeline'
@@ -21,6 +26,10 @@ export default function IntelligencePage() {
   const { data: auctionData } = useAuctionData()
   const { data: policyData, isLoading: policyLoading } = usePolicyData()
   const { data: commentaryData } = useWeeklyCommentary()
+  const { data: macroData } = useMacroData()
+  const { data: moneySupplyData } = useMoneySupplyData()
+  const { data: fiscalData } = useFiscalData()
+  const { data: commodityData } = useCommodityData()
   const { anomalies } = useAnomalyDetector(
     auctionData,
     yieldData,
@@ -46,13 +55,24 @@ export default function IntelligencePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-slate-100">Intelligence</h1>
-          <p className="text-xs text-slate-500">AI-powered analysis, policy tracker, peer benchmarking</p>
+          <p className="text-xs text-slate-500">AI analysis, ALCO brief, policy tracker, peer benchmarking</p>
         </div>
         <DataTimestamp lastUpdated={yieldData?.lastUpdated ?? null} compact />
       </div>
 
       {/* Smart Alerts (cross-tab) */}
       <AnomalyBanner anomalies={anomalies} />
+
+      {/* ALCO Brief Generator — Tier 2 AI */}
+      <AlcoBriefGenerator
+        yieldData={yieldData}
+        auctionData={auctionData}
+        macroData={macroData}
+        moneySupplyData={moneySupplyData}
+        policyData={policyData}
+        fiscalData={fiscalData}
+        commodityData={commodityData}
+      />
 
       {/* Weekly Commentary */}
       {latestCommentary && (
@@ -70,7 +90,7 @@ export default function IntelligencePage() {
           <RateCorridorChart policyData={policyData} tbill91dYield={latestYield.yields['91D']} />
           <InsightPanel
             tier={1}
-            content="Policy transmission is the central question in any easing cycle: when BB cuts rates, do market rates actually follow? A wide gap between the 91D T-bill and the repo rate means transmission is poor — BB has cut, but the market hasn't fully followed. As this gap narrows, it means the easing is working its way through the system."
+            content="Policy transmission is the central question in any easing cycle: when BB cuts rates, do market rates actually follow? A wide gap between the 91D T-bill and the repo rate means transmission is poor. As this gap narrows, it means the easing is working its way through the system."
           />
         </>
       )}
@@ -102,15 +122,10 @@ export default function IntelligencePage() {
           <PeerYieldOverlay comparisons={peerComparisons} />
           <InsightPanel
             tier={1}
-            content="Bangladesh sits between India (lower, flatter curve) and Pakistan (higher, steeper curve) in absolute yield levels. This maps directly to sovereign risk perception. India trades tight because of deep markets and high reserves. Pakistan trades wide because of IMF dependency and serial currency crises. Bangladesh's positioning reflects better fundamentals than Pakistan but without India's institutional depth."
+            content="Bangladesh sits between India (lower, flatter curve) and Pakistan (higher, steeper curve) in absolute yield levels. This maps directly to sovereign risk perception. India trades tight because of deep markets and high reserves. Pakistan trades wide because of IMF dependency and serial currency crises."
           />
 
           <RealYieldComparison comparisons={peerComparisons} />
-          <InsightPanel
-            tier={1}
-            content="Real yields are what matter after inflation eats your returns. Bangladesh offers positive real yields across the curve but thin. India offers higher real yields despite lower nominal rates because its inflation is much better controlled. Pakistan's negative real yields mean investors literally lose purchasing power holding government paper."
-          />
-
           <FxAdjustedReturns curves={peerData.curves} />
         </>
       )}
