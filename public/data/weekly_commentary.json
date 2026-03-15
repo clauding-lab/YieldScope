@@ -1,34 +1,36 @@
 {
-  "lastUpdated": "2026-03-15T13:19:53.061Z",
+  "lastUpdated": "2026-03-15T18:00:00+06:00",
   "commentaries": [
     {
-      "id": "2026-W03",
+      "id": "2026-W11",
       "weekEnding": "2026-03-15",
-      "title": "# Bangladesh Fixed Income Weekly: Rates Rally Extends but Long-End Demand Remain",
-      "body": "# Bangladesh Fixed Income Weekly: Rates Rally Extends but Long-End Demand Remains Fragile\n\n**Week ending March 10, 2026**\n\nBangladesh government securities posted broad-based gains this week, with yields declining 8-11 basis points across both the bill and bond segments as the market prices in an increasingly dovish monetary trajectory. The 364-day T-bill cleared at 10.07%, down 11 basis points, with a healthy 1.75x bid-cover ratio, while the 91-day bill printed at 9.85% with the week's strongest coverage at 1.92x—signaling robust front-end demand and growing conviction that Bangladesh Bank's next move is a cut.\n\nThe bond segment told a more nuanced story. The 5-year BGTB cleared at 10.82% with a respectable 1.6x cover, but the 10-year auction revealed persistent duration hesitancy—a tepid 1.4x bid-cover ratio forced 10% devolvement onto primary dealers, even as the cutoff fell 10 basis points to 11.15%. With CPI still running at 9.13%, real return compression at the long end is clearly testing investor appetite.\n\nThe curve presents notable distortions. The 2-year yield at 11.95% sits sharply above the 5-year at 10.82%, creating a pronounced inversion in the belly that suggests either mispricing or acute term premium dislocation. Meanwhile, the 15-year at 12.68% trades well through where a smooth interpolation would place it relative to the 10-year and 20-year, steepening the ultra-long segment aggressively.\n\nWith the repo rate corridor still anchoring the front end and reserves steady at $21.2 billion despite a stable taka at 119.5, the macro backdrop supports further easing expectations. However, until devolvement clears and the belly inversion resolves, duration extension should remain selective. Watch the April inflation print—any break below 9% could catalyze the next leg of the rally.",
+      "title": "Rates Rally Extends but Curve Distortions Deepen",
+      "body": "Bangladesh government securities posted broad-based gains this week, with yields declining 8–15 basis points across most tenors. The front end continues to lead the rally as the market prices in a dovish pivot from Bangladesh Bank.\n\n**Bill Segment: Strong Demand, Sixth Consecutive Weekly Decline**\n\n- 364D T-bill cleared at 10.07%, down 11bps — marking the sixth consecutive weekly decline and the longest streak since pre-tightening\n- 91D T-bill printed at 9.85%, now firmly below the 10% repo rate for the first time this cycle, with bid-cover at 1.92x\n- 182D cleared at 10.20% with 1.75x coverage — solid demand across the entire bill curve\n\n**Bond Segment: Duration Hesitancy Persists**\n\n- 5Y BGTB cleared at 10.82% with a respectable 1.6x cover\n- 10Y auction revealed continued reluctance — a tepid 1.4x bid-cover forced 10% devolvement (৳200 Cr) onto primary dealers, even as the cutoff fell 10bps to 11.15%\n- 20Y BGTB auction saw ৳250 Cr devolvement with only 1.1x bid-cover — institutional buyers remain unwilling to extend duration with CPI at 9.13% compressing real returns\n\n**Curve Shape: Three Major Distortions**\n\nThe curve presents severe anomalies that ALCO desks must navigate carefully:\n\n- **182D/364D inversion**: 182D at 10.20% trades through 364D at 10.07% — a 13bp inversion suggesting front-end supply/demand imbalance\n- **2Y/5Y belly inversion**: The 2Y at 11.95% sits a massive 113bps above the 5Y at 10.82% — the most pronounced belly inversion in recent memory, pointing to acute term premium dislocation or mispricing\n- **15Y/20Y kink**: The 15Y at 12.68% trades 103bps above the 20Y at 11.65%, creating a sharp ultra-long hump that defies smooth interpolation\n\n**Macro Backdrop**\n\nThe supportive environment for easing remains intact:\n\n- Repo rate corridor at 10% (SDF 7.50% – SLF 11.50%) anchors the front end\n- FX reserves at $35.1 billion — a dramatic recovery from under $20B a year ago — with BB now a net USD buyer ($4.3B purchased since July 2025)\n- USD/BDT stable at 121.20, taka broadly flat\n- Excess banking sector liquidity at ৳3.35 lakh crore, with over 70% parked in government securities\n- Call money rate at 9.80%, below the repo rate\n\n**Watchpoint**: The 2Y/5Y inversion is the market's biggest puzzle. Until devolvement clears at the long end and the belly normalises, duration extension should remain selective. The April inflation print is the key catalyst — any break below 9% could trigger the next leg of the rally and finally draw buyers into the 10Y+ segment.",
       "keyPoints": [
-        "364D T-Bill: 10.07% (-11bps)",
-        "91D T-Bill: 9.85% (-10bps)",
-        "10Y BGTB: 11.15% (-10bps)",
-        "5Y BGTB: 10.82% (-8bps)"
+        "364D T-Bill: 10.07% (-11bps) — sixth consecutive weekly decline",
+        "91D T-Bill: 9.85% — now below the 10% repo rate",
+        "10Y BGTB: 11.15% (-10bps) with 10% devolvement",
+        "2Y/5Y belly inversion at 113bps — largest in recent memory",
+        "15Y/20Y kink: 103bps — ultra-long segment distorted",
+        "FX reserves: $35.1B, BB net buyer of $4.3B since Jul 2025"
       ],
-      "curveShapeNote": "Based on 8 tenors",
-      "outlook": "",
+      "curveShapeNote": "Severely distorted — three inversions (182D/364D, 2Y/5Y, 15Y/20Y). Not a normal curve.",
+      "outlook": "Duration extension should remain selective until belly inversion resolves. Watch April CPI — a break below 9% could catalyze the next rally leg.",
       "attribution": "Human-directed, AI-assisted intelligence."
     },
     {
-      "id": "2026-W11",
-      "weekEnding": "2026-03-12",
-      "title": "Yields Drift Lower as Liquidity Builds",
-      "body": "The Bangladesh government securities curve continued its gradual descent this week, with the belly of the curve (2Y-5Y) leading the rally. The 364-day T-bill cutoff fell 11bps to 10.07%, marking the sixth consecutive weekly decline and the longest streak since the pre-tightening era. The 91-day bill, the system's liquidity barometer, touched 9.85% — firmly below the repo rate floor for the first time in this cycle. Sunday's T-bill auction saw bid-cover ratios above 1.7x across tenors, while Tuesday's bond auction told a more nuanced story: the 5Y cleared comfortably at 1.6x, but the 10Y saw modest devolvement of 200 Cr. Banks remain comfortable extending to five years but hesitate at the long end. The 10Y-91D spread narrowed to 130bps from 135bps last week — a slow but persistent flattening that suggests the market is pricing in further BB cuts. With excess liquidity now at BDT 185,000 Cr and climbing, next week's T-bill auction should see continued compression. Watch the 20Y for signs that institutional buyers are finally extending duration.",
+      "id": "2026-W10",
+      "weekEnding": "2026-03-10",
+      "title": "Front End Breaks Below Repo as Easing Bets Build",
+      "body": "The 91D T-bill broke below 10% for the first time since Bangladesh Bank's tightening cycle began, signaling the market is now pricing rate cuts as a near certainty. Meanwhile, excess liquidity continues to build — banks are flush with deposits but reluctant to lend given NPLs at 31.8%. Government borrowing absorbed some liquidity in recent weeks but not enough to prevent the structural surplus from growing.\n\n**Key Moves**\n\n- 91D fell to 9.90%, breaching the psychological 10% level\n- 364D at 10.12%, down 16bps from a month ago\n- 5Y at 10.87%, the belly continues to compress faster than the long end\n- 10Y steady at 11.20% — long-end remains sticky\n\nThe market is in a classic two-speed mode: aggressive front-end buying versus cautious long-end positioning. Until inflation convincingly breaks below 9%, expect this pattern to persist.",
       "keyPoints": [
-        "364D yield down 11bps to 10.07% — sixth consecutive weekly decline",
-        "91D at 9.85%, now below the repo rate floor",
-        "10Y saw 200 Cr devolvement (10%), long-end remains sticky",
-        "10Y-91D spread compressed to 130bps"
+        "91D T-Bill breaks below 10% for first time this cycle",
+        "364D at 10.12% — 16bps lower than a month ago",
+        "10Y sticky at 11.20% — duration buyers remain cautious",
+        "Excess liquidity at ৳3.35L Cr and climbing"
       ],
-      "curveShapeNote": "Normal upward-sloping with mild flattening in the 10Y-20Y segment. The short end is moving faster than the long end.",
-      "outlook": "Expect continued downward pressure on the short end as excess liquidity persists. The long end needs a catalyst — either a clear signal from BB on further cuts or a shift in institutional appetite.",
+      "curveShapeNote": "Front-end rally outpacing the long end — curve steepening with belly distortion.",
+      "outlook": "The 91D sub-10% print is the clearest signal yet that markets expect BB to cut. Position for continued front-end compression.",
       "attribution": "Human-directed, AI-assisted intelligence."
     }
   ]

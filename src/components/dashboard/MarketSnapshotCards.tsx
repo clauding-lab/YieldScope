@@ -10,6 +10,12 @@ export function MarketSnapshotCards() {
   const { data: moneySupplyData } = useMoneySupplyData()
   const { data: macroData } = useMacroData()
 
+  // Sort macro snapshots chronologically (oldest first) — JSON stores newest-first
+  const sortedMacro = useMemo(() => {
+    if (!macroData?.snapshots?.length) return []
+    return [...macroData.snapshots].sort((a, b) => a.date.localeCompare(b.date))
+  }, [macroData])
+
   const snapshots = useMemo<MarketSnapshot[]>(() => {
     const cards: MarketSnapshot[] = []
 
@@ -86,10 +92,10 @@ export function MarketSnapshotCards() {
     }
 
     // 5. CPI Inflation
-    if (macroData?.snapshots?.length) {
-      const latest = macroData.snapshots[macroData.snapshots.length - 1]
-      const prev = macroData.snapshots.length > 1 ? macroData.snapshots[macroData.snapshots.length - 2] : null
-      const sparkline = macroData.snapshots.slice(-6).map(d => d.cpiHeadlineYoY)
+    if (sortedMacro.length) {
+      const latest = sortedMacro[sortedMacro.length - 1]
+      const prev = sortedMacro.length > 1 ? sortedMacro[sortedMacro.length - 2] : null
+      const sparkline = sortedMacro.slice(-6).map(d => d.cpiHeadlineYoY)
       cards.push({
         label: 'CPI Inflation',
         value: latest.cpiHeadlineYoY,
@@ -98,15 +104,15 @@ export function MarketSnapshotCards() {
         changeDirection: prev ? (latest.cpiHeadlineYoY > prev.cpiHeadlineYoY ? 'up' : latest.cpiHeadlineYoY < prev.cpiHeadlineYoY ? 'down' : 'flat') : 'flat',
         sparkline,
         source: 'BBS monthly',
-        lastUpdated: macroData.lastUpdated,
+        lastUpdated: macroData?.lastUpdated ?? '',
       })
     }
 
     // 6. FX Reserves
-    if (macroData?.snapshots?.length) {
-      const latest = macroData.snapshots[macroData.snapshots.length - 1]
-      const prev = macroData.snapshots.length > 1 ? macroData.snapshots[macroData.snapshots.length - 2] : null
-      const sparkline = macroData.snapshots.slice(-6).map(d => d.bbFxReservesBn)
+    if (sortedMacro.length) {
+      const latest = sortedMacro[sortedMacro.length - 1]
+      const prev = sortedMacro.length > 1 ? sortedMacro[sortedMacro.length - 2] : null
+      const sparkline = sortedMacro.slice(-6).map(d => d.bbFxReservesBn)
       cards.push({
         label: 'FX Reserves',
         value: latest.bbFxReservesBn,
@@ -115,12 +121,12 @@ export function MarketSnapshotCards() {
         changeDirection: prev ? (latest.bbFxReservesBn > prev.bbFxReservesBn ? 'up' : latest.bbFxReservesBn < prev.bbFxReservesBn ? 'down' : 'flat') : 'flat',
         sparkline,
         source: 'BB publications',
-        lastUpdated: macroData.lastUpdated,
+        lastUpdated: macroData?.lastUpdated ?? '',
       })
     }
 
     return cards
-  }, [yieldData, moneySupplyData, macroData])
+  }, [yieldData, moneySupplyData, sortedMacro, macroData])
 
   if (snapshots.length === 0) {
     return (
