@@ -108,22 +108,21 @@ export function AlcoBriefGenerator({
       ) : (
         <div className="space-y-3">
           {/* Brief content */}
-          <div className="prose prose-sm prose-invert max-w-none">
-            {brief.split('\n\n').map((para, i) => {
-              if (para.startsWith('##')) {
-                return <h3 key={i} className="text-sm font-semibold text-slate-200 mt-3 mb-1">{para.replace(/^#+\s*/, '')}</h3>
-              }
-              if (para.startsWith('- ') || para.startsWith('* ')) {
-                return (
-                  <ul key={i} className="text-xs text-slate-300 space-y-0.5 ml-3 list-disc">
-                    {para.split('\n').map((line, j) => (
-                      <li key={j}>{line.replace(/^[-*]\s*/, '')}</li>
-                    ))}
-                  </ul>
-                )
-              }
-              return <p key={i} className="text-xs text-slate-300 leading-relaxed">{para}</p>
-            })}
+          <div className="max-w-none space-y-3">
+            {brief
+              .replace(/^#[^\n]*\n/gm, '') // strip markdown titles
+              .replace(/^---\n?/gm, '')    // strip horizontal rules
+              .split('\n\n')
+              .filter(p => p.trim())
+              .map((para, i) => (
+                <p key={i} className="text-xs text-slate-300 leading-relaxed">
+                  {para.split(/(\*\*[^*]+\*\*)/).map((part, j) =>
+                    part.startsWith('**') && part.endsWith('**')
+                      ? <strong key={j} className="text-slate-100 font-semibold">{part.slice(2, -2)}</strong>
+                      : <span key={j}>{part}</span>
+                  )}
+                </p>
+              ))}
           </div>
 
           {/* Actions */}

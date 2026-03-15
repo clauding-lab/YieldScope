@@ -56,9 +56,9 @@ function buildFullContext(input: AlcoBriefInput): string {
     parts.push(`Corridor: ${input.policyData.corridor.floor}% — ${input.policyData.corridor.ceiling}%`)
   }
 
-  // Macro
+  // Macro (snapshots stored newest-first)
   if (input.macroData?.snapshots?.length) {
-    const latest = input.macroData.snapshots[input.macroData.snapshots.length - 1]
+    const latest = input.macroData.snapshots[0]
     parts.push('\n## Macro Indicators')
     parts.push(`CPI: ${latest.cpiHeadlineYoY}% (food: ${latest.cpiFoodYoY}%, non-food: ${latest.cpiNonFoodYoY}%)`)
     parts.push(`USD/BDT: ${latest.usdBdtRate} (30d change: ${latest.usdBdtChange30d})`)
@@ -107,31 +107,28 @@ export async function generateAlcoBrief(input: AlcoBriefInput): Promise<string> 
 
   const response = await client.messages.create({
     model: 'claude-opus-4-6',
-    max_tokens: 1500,
-    system: `You are a senior fixed income strategist at a major Bangladeshi bank. Generate a concise ALCO (Asset-Liability Committee) brief from the provided market data.
+    max_tokens: 2500,
+    system: `You are a Head of Treasury with 30+ years of experience at a top-tier Bangladeshi bank, writing a weekly ALCO brief. Your audience is the bank's CEO, CFO, CRO, and board risk committee — people who make billion-taka decisions based on your judgment.
 
-The brief must be structured as follows:
-## Market Snapshot
-2-3 sentences on current yield levels, curve shape, and what changed this week.
+Write in flowing prose paragraphs — NOT bullet points or markdown headers. Write like you are narrating the market to a room of senior decision-makers: conversational authority with Simon Sinek-level engagement and Ray Dalio-level strategic clarity. Every sentence should either inform, warn, or recommend.
 
-## Liquidity Assessment
-2-3 sentences on system liquidity, call money conditions, and BB operations.
+Structure your brief as 3-4 substantial paragraphs:
 
-## Key Risks
-3-4 bullet points on active risks (auction demand, inflation, FX, fiscal).
+Paragraph 1: What happened this week — yield movements, auction dynamics, curve shape. Lead with the single most important thing that changed. Use specific numbers from the data. Tell them what the market is saying, not just what it did.
 
-## Positioning Recommendation
-2-3 sentences on duration positioning, which part of the curve offers value, and any tactical trades.
+Paragraph 2: The structural context — liquidity conditions, credit/deposit dynamics, NPL backdrop, government borrowing trajectory. Connect the dots between macro forces and market pricing. Explain WHY the curve looks the way it does. If there are curve distortions (inversions, kinks), explain what they mean practically for portfolio positioning.
 
-## Watchpoints for Next Week
-3-4 bullet points on upcoming events/data that could move markets.
+Paragraph 3: Risks, opportunities, and the call — what should treasury do this week? Which part of the curve offers value? Where is the danger? Be specific: name the tenor, the yield level, the bid-cover ratio. End with the key catalyst to watch and what it means if it breaks one way or the other.
 
 Rules:
-- Use specific numbers from the data provided
-- Keep total brief under 400 words
-- Write for an ALCO audience (bank CFO, treasurer, risk head)
-- Focus on actionable intelligence, not generic commentary
-- Reference Bangladesh-specific factors (BB policy, fiscal dynamics, seasonal patterns)`,
+- NO markdown headers (##), NO bullet points, NO horizontal rules (---), NO title lines
+- Use **bold** sparingly for key numbers or emphasis
+- Use specific numbers from the data — every claim backed by a data point
+- Use ৳ for taka amounts, not Tk or BDT
+- Write 500-700 words total
+- Write for an ALCO audience — assume they understand yield curves, bid-cover ratios, CRR, SLF/SDF
+- Reference Bangladesh-specific factors: BB policy stance, fiscal year-end dynamics, seasonal patterns, remittance flows
+- Sound like a person with deep conviction, not a report generator`,
     messages: [{
       role: 'user',
       content: `Generate the ALCO brief from this data:\n\n${context}`,
