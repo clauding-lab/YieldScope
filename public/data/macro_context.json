@@ -1,41 +1,41 @@
 {
-  "lastUpdated": "2026-03-12T18:00:00+06:00",
+  "lastUpdated": "2026-03-15T18:00:00+06:00",
   "snapshots": [
     {
       "date": "2026-03-01",
-      "cpiHeadlineYoY": 8.5,
-      "cpiFoodYoY": 9.2,
-      "cpiNonFoodYoY": 7.8,
+      "cpiHeadlineYoY": 9.13,
+      "cpiFoodYoY": 9.30,
+      "cpiNonFoodYoY": 9.01,
       "usdBdtRate": 119.50,
       "usdBdtChange30d": -0.8,
       "bbFxReservesBn": 21.2,
       "excessLiquidityCrore": 185000,
       "advanceDepositRatio": 78.5,
-      "callMoneyRate": 8.15
+      "callMoneyRate": 9.80
     },
     {
       "date": "2026-02-01",
-      "cpiHeadlineYoY": 8.8,
-      "cpiFoodYoY": 9.5,
-      "cpiNonFoodYoY": 8.0,
+      "cpiHeadlineYoY": 8.58,
+      "cpiFoodYoY": 8.29,
+      "cpiNonFoodYoY": 8.81,
       "usdBdtRate": 120.30,
       "usdBdtChange30d": -0.5,
       "bbFxReservesBn": 20.8,
       "excessLiquidityCrore": 172000,
       "advanceDepositRatio": 79.0,
-      "callMoneyRate": 8.25
+      "callMoneyRate": 9.75
     },
     {
       "date": "2026-01-01",
-      "cpiHeadlineYoY": 9.1,
-      "cpiFoodYoY": 9.8,
-      "cpiNonFoodYoY": 8.2,
+      "cpiHeadlineYoY": 8.35,
+      "cpiFoodYoY": 8.10,
+      "cpiNonFoodYoY": 8.55,
       "usdBdtRate": 120.80,
       "usdBdtChange30d": -0.3,
       "bbFxReservesBn": 20.5,
       "excessLiquidityCrore": 165000,
       "advanceDepositRatio": 79.5,
-      "callMoneyRate": 8.40
+      "callMoneyRate": 9.85
     }
   ]
 }
