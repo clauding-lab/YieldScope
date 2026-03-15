@@ -8,17 +8,19 @@ interface InflationTrackerProps {
 }
 
 export function InflationTracker({ snapshots, lastUpdated }: InflationTrackerProps) {
-  const latest = snapshots[snapshots.length - 1]
-  const prev = snapshots.length > 1 ? snapshots[snapshots.length - 2] : null
+  // Sort chronologically (oldest → newest) so chart reads left-to-right
+  const sorted = useMemo(() => [...snapshots].sort((a, b) => a.date.localeCompare(b.date)), [snapshots])
+  const latest = sorted[sorted.length - 1]
+  const prev = sorted.length > 1 ? sorted[sorted.length - 2] : null
 
   const chartData = useMemo(() => {
-    return snapshots.map(s => ({
+    return sorted.map(s => ({
       date: s.date,
       headline: s.cpiHeadlineYoY,
       food: s.cpiFoodYoY,
       nonFood: s.cpiNonFoodYoY,
     }))
-  }, [snapshots])
+  }, [sorted])
 
   // Simple bar chart SVG
   const barWidth = 280

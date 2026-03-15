@@ -8,11 +8,12 @@ interface FxReservesPanelProps {
 }
 
 export function FxReservesPanel({ snapshots, lastUpdated }: FxReservesPanelProps) {
-  const latest = snapshots[snapshots.length - 1]
-  const prev = snapshots.length > 1 ? snapshots[snapshots.length - 2] : null
+  const sorted = useMemo(() => [...snapshots].sort((a, b) => a.date.localeCompare(b.date)), [snapshots])
+  const latest = sorted[sorted.length - 1]
+  const prev = sorted.length > 1 ? sorted[sorted.length - 2] : null
 
   const sparklinePoints = useMemo(() => {
-    const data = snapshots.map(s => s.bbFxReservesBn)
+    const data = sorted.map(s => s.bbFxReservesBn)
     if (data.length < 2) return ''
     const min = Math.min(...data) * 0.95
     const max = Math.max(...data) * 1.05

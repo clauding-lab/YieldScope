@@ -27,7 +27,8 @@ export default function MacroExternalPage() {
   }
 
   const snapshots = macroData?.snapshots ?? []
-  const latestSnapshot = snapshots[snapshots.length - 1]
+  const sortedSnapshots = [...snapshots].sort((a, b) => a.date.localeCompare(b.date))
+  const latestSnapshot = sortedSnapshots[sortedSnapshots.length - 1]
 
   return (
     <div className="py-4 space-y-4">
