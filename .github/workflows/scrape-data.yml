@@ -6,6 +6,8 @@ on:
     - cron: '0 13 * * 2'
     # Thursday 19:00 BST (13:00 UTC) — scrape Tuesday T-Bond results
     - cron: '0 13 * * 4'
+    # 1st of each month 10:00 BST (04:00 UTC) — monthly banking data update
+    - cron: '0 4 1 * *'
   workflow_dispatch:
 
 permissions:
@@ -55,6 +57,13 @@ jobs:
       # Update yield curve from latest auction data
       - name: Update yield curve
         run: node scripts/update-yield-curve.mjs
+
+      # Update banking sector data (monthly — 1st of each month or manual)
+      - name: Update banking data
+        if: github.event.schedule == '0 4 1 * *' || github.event_name == 'workflow_dispatch'
+        run: node scripts/update-banking-data.mjs
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       # Generate AI analysis (autopsy + weekly commentary)
       - name: Generate AI analysis
