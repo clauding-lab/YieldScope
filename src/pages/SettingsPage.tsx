@@ -1,22 +1,25 @@
 import { APIKeySetup } from '../components/ai/APIKeySetup'
+import { AdminDataEntry } from '../components/admin/AdminDataEntry'
 import { invalidateCache } from '../services/dataLoader'
 
 export default function SettingsPage() {
   function handleClearCache() {
     invalidateCache()
-    localStorage.removeItem('yieldscope:portfolios')
     window.location.reload()
   }
 
   return (
-    <div className="px-4 py-6 space-y-6">
+    <div className="py-4 space-y-6">
       <div>
         <h1 className="text-xl font-bold text-slate-100">Settings</h1>
-        <p className="text-sm text-slate-400">Configure AI features and app preferences</p>
+        <p className="text-sm text-slate-400">Configure AI features, manage data, and app preferences</p>
       </div>
 
       {/* API Key */}
       <APIKeySetup />
+
+      {/* Admin Data Entry Panel */}
+      <AdminDataEntry />
 
       {/* Cache */}
       <div className="rounded-xl bg-slate-800 p-4">
@@ -36,11 +39,11 @@ export default function SettingsPage() {
       <div className="rounded-xl bg-slate-800 p-4">
         <h3 className="text-sm font-medium text-slate-300 mb-2">About YieldScope</h3>
         <p className="text-xs text-slate-400 leading-relaxed">
-          Bangladesh's Fixed Income Intelligence Platform. Visualizes government securities yield curves,
-          tracks auction results, and provides AI-powered market analysis.
+          Bangladesh's definitive fixed income and macroeconomic intelligence platform.
+          Combines real-time data visualization with AI-powered contextual analysis.
         </p>
         <div className="mt-3 space-y-1 text-xs text-slate-500">
-          <p>Version 0.2.0 (Phase 2)</p>
+          <p>Version 2.0.0</p>
           <p>AI powered by Claude Opus 4.6</p>
           <p>Curated by Adnan Rashid</p>
         </div>
