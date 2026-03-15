@@ -1,4 +1,15 @@
 import { useMemo } from 'react'
+import {
+  AreaChart,
+  Area,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts'
 import { DataTimestamp } from '../ui/DataTimestamp'
 import type { MacroSnapshot } from '../../types'
 
@@ -7,27 +18,33 @@ interface FxReservesPanelProps {
   lastUpdated: string
 }
 
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+function formatMonth(date: string) {
+  const m = parseInt(date.slice(5, 7), 10) - 1
+  return MONTH_NAMES[m] ?? date.slice(5, 7)
+}
+
 export function FxReservesPanel({ snapshots, lastUpdated }: FxReservesPanelProps) {
   const sorted = useMemo(() => [...snapshots].sort((a, b) => a.date.localeCompare(b.date)), [snapshots])
   const latest = sorted[sorted.length - 1]
   const prev = sorted.length > 1 ? sorted[sorted.length - 2] : null
 
-  const sparklinePoints = useMemo(() => {
-    const data = sorted.map(s => s.bbFxReservesBn)
-    if (data.length < 2) return ''
-    const min = Math.min(...data) * 0.95
-    const max = Math.max(...data) * 1.05
-    const range = max - min || 1
-    const w = 200
-    const h = 50
-    return data.map((v, i) => {
-      const x = (i / (data.length - 1)) * w
-      const y = h - ((v - min) / range) * h
-      return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`
-    }).join(' ')
-  }, [snapshots])
+  const reserveData = useMemo(() => {
+    return sorted.map(s => ({
+      month: formatMonth(s.date),
+      reserves: s.bbFxReservesBn,
+    }))
+  }, [sorted])
 
-  const importCoverMonths = latest.bbFxReservesBn / 6.5 // rough monthly import ~$6.5bn
+  const fxData = useMemo(() => {
+    return sorted.map(s => ({
+      month: formatMonth(s.date),
+      rate: s.usdBdtRate,
+    }))
+  }, [sorted])
+
+  const importCoverMonths = latest.bbFxReservesBn / 6.5
 
   return (
     <div className="rounded-xl bg-slate-800/80 border border-slate-700/50 p-4">
@@ -59,7 +76,7 @@ export function FxReservesPanel({ snapshots, lastUpdated }: FxReservesPanelProps
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mb-3">
+      <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="rounded-lg bg-slate-900/50 p-2">
           <p className="text-[10px] text-slate-500">Import Cover</p>
           <p className="text-sm font-semibold text-slate-300 tabular-nums">{importCoverMonths.toFixed(1)} months</p>
@@ -70,15 +87,94 @@ export function FxReservesPanel({ snapshots, lastUpdated }: FxReservesPanelProps
         </div>
       </div>
 
-      {/* Sparkline */}
-      {sparklinePoints && (
-        <div className="mt-2">
-          <p className="text-[10px] text-slate-500 mb-1">Reserve Trend</p>
-          <svg viewBox="0 0 200 50" className="w-full h-12">
-            <path d={sparklinePoints} fill="none" stroke="#38bdf8" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        </div>
-      )}
+      {/* Reserve Trend — Interactive Area Chart */}
+      <div className="mb-4">
+        <p className="text-[10px] text-slate-500 mb-2">Reserve Trend ($B)</p>
+        <ResponsiveContainer width="100%" height={140}>
+          <AreaChart data={reserveData} margin={{ top: 5, right: 5, left: -15, bottom: 5 }}>
+            <defs>
+              <linearGradient id="reserveGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#38bdf8" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+            <XAxis
+              dataKey="month"
+              tick={{ fill: '#94a3b8', fontSize: 10 }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <YAxis
+              tick={{ fill: '#94a3b8', fontSize: 10 }}
+              axisLine={false}
+              tickLine={false}
+              tickFormatter={(v: number) => `$${v}`}
+              domain={['auto', 'auto']}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#1e293b',
+                border: '1px solid #475569',
+                borderRadius: '8px',
+                fontSize: '12px',
+              }}
+              labelStyle={{ color: '#94a3b8', fontWeight: 600 }}
+              formatter={(value: number) => [`$${value.toFixed(2)}B`, 'Reserves']}
+            />
+            <Area
+              type="monotone"
+              dataKey="reserves"
+              stroke="#38bdf8"
+              strokeWidth={2}
+              fill="url(#reserveGradient)"
+              dot={{ r: 4, fill: '#38bdf8', stroke: '#1e293b', strokeWidth: 2 }}
+              activeDot={{ r: 6, fill: '#38bdf8', stroke: '#fff', strokeWidth: 2 }}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* USD/BDT Trend — Interactive Line Chart */}
+      <div>
+        <p className="text-[10px] text-slate-500 mb-2">USD/BDT Rate Trend</p>
+        <ResponsiveContainer width="100%" height={140}>
+          <LineChart data={fxData} margin={{ top: 5, right: 5, left: -5, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+            <XAxis
+              dataKey="month"
+              tick={{ fill: '#94a3b8', fontSize: 10 }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <YAxis
+              tick={{ fill: '#94a3b8', fontSize: 10 }}
+              axisLine={false}
+              tickLine={false}
+              domain={['auto', 'auto']}
+              tickFormatter={(v: number) => v.toFixed(1)}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#1e293b',
+                border: '1px solid #475569',
+                borderRadius: '8px',
+                fontSize: '12px',
+              }}
+              labelStyle={{ color: '#94a3b8', fontWeight: 600 }}
+              formatter={(value: number) => [`৳${value.toFixed(2)}`, 'USD/BDT']}
+            />
+            <Line
+              type="monotone"
+              dataKey="rate"
+              stroke="#f59e0b"
+              strokeWidth={2}
+              dot={{ r: 4, fill: '#f59e0b', stroke: '#1e293b', strokeWidth: 2 }}
+              activeDot={{ r: 6, fill: '#f59e0b', stroke: '#fff', strokeWidth: 2 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   )
 }

@@ -1,4 +1,15 @@
 import { useMemo } from 'react'
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+  ReferenceLine,
+} from 'recharts'
 import { DataTimestamp } from '../ui/DataTimestamp'
 import type { MacroSnapshot } from '../../types'
 
@@ -7,25 +18,26 @@ interface InflationTrackerProps {
   lastUpdated: string
 }
 
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+function formatMonth(date: string) {
+  const m = parseInt(date.slice(5, 7), 10) - 1
+  return MONTH_NAMES[m] ?? date.slice(5, 7)
+}
+
 export function InflationTracker({ snapshots, lastUpdated }: InflationTrackerProps) {
-  // Sort chronologically (oldest → newest) so chart reads left-to-right
   const sorted = useMemo(() => [...snapshots].sort((a, b) => a.date.localeCompare(b.date)), [snapshots])
   const latest = sorted[sorted.length - 1]
   const prev = sorted.length > 1 ? sorted[sorted.length - 2] : null
 
   const chartData = useMemo(() => {
     return sorted.map(s => ({
-      date: s.date,
-      headline: s.cpiHeadlineYoY,
-      food: s.cpiFoodYoY,
-      nonFood: s.cpiNonFoodYoY,
+      month: formatMonth(s.date),
+      Food: s.cpiFoodYoY,
+      'Non-Food': s.cpiNonFoodYoY,
+      Headline: s.cpiHeadlineYoY,
     }))
   }, [sorted])
-
-  // Simple bar chart SVG
-  const barWidth = 280
-  const barHeight = 120
-  const maxVal = Math.max(...chartData.map(d => Math.max(d.headline, d.food, d.nonFood))) * 1.1
 
   return (
     <div className="rounded-xl bg-slate-800/80 border border-slate-700/50 p-4">
@@ -59,62 +71,52 @@ export function InflationTracker({ snapshots, lastUpdated }: InflationTrackerPro
         />
       </div>
 
-      {/* Chart */}
-      <svg viewBox={`0 0 ${barWidth} ${barHeight}`} className="w-full" preserveAspectRatio="xMidYMid meet">
-        {chartData.map((d, i) => {
-          const groupWidth = barWidth / chartData.length
-          const x = i * groupWidth + groupWidth * 0.15
-          const bw = groupWidth * 0.2
-
-          return (
-            <g key={d.date}>
-              <rect
-                x={x}
-                y={barHeight - (d.food / maxVal) * barHeight}
-                width={bw}
-                height={(d.food / maxVal) * barHeight}
-                fill="#f59e0b"
-                opacity={0.7}
-                rx={1}
-              />
-              <rect
-                x={x + bw + 1}
-                y={barHeight - (d.nonFood / maxVal) * barHeight}
-                width={bw}
-                height={(d.nonFood / maxVal) * barHeight}
-                fill="#10b981"
-                opacity={0.7}
-                rx={1}
-              />
-              <rect
-                x={x + (bw + 1) * 2}
-                y={barHeight - (d.headline / maxVal) * barHeight}
-                width={bw}
-                height={(d.headline / maxVal) * barHeight}
-                fill="#38bdf8"
-                opacity={0.8}
-                rx={1}
-              />
-              <text
-                x={x + groupWidth * 0.35 - groupWidth * 0.15}
-                y={barHeight - 2}
-                className="fill-slate-500"
-                fontSize="7"
-                textAnchor="middle"
-              >
-                {d.date.slice(5, 7)}
-              </text>
-            </g>
-          )
-        })}
-      </svg>
-
-      {/* Legend */}
-      <div className="flex items-center gap-4 mt-2 text-[10px]">
-        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-amber-500" /> Food</span>
-        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-emerald-500" /> Non-Food</span>
-        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-sky-400" /> Headline</span>
-      </div>
+      {/* Interactive Chart */}
+      <ResponsiveContainer width="100%" height={200}>
+        <BarChart data={chartData} margin={{ top: 5, right: 5, left: -15, bottom: 5 }} barCategoryGap="20%">
+          <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+          <XAxis
+            dataKey="month"
+            tick={{ fill: '#94a3b8', fontSize: 11 }}
+            axisLine={false}
+            tickLine={false}
+          />
+          <YAxis
+            tick={{ fill: '#94a3b8', fontSize: 10 }}
+            axisLine={false}
+            tickLine={false}
+            tickFormatter={(v: number) => `${v}%`}
+            domain={['auto', 'auto']}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: '#1e293b',
+              border: '1px solid #475569',
+              borderRadius: '8px',
+              fontSize: '12px',
+            }}
+            labelStyle={{ color: '#94a3b8', fontWeight: 600, marginBottom: 4 }}
+            itemStyle={{ padding: '1px 0' }}
+            formatter={(value: number) => [`${value.toFixed(2)}%`]}
+            cursor={{ fill: 'rgba(148, 163, 184, 0.08)' }}
+          />
+          <Legend
+            iconType="square"
+            iconSize={8}
+            wrapperStyle={{ fontSize: '10px', color: '#94a3b8' }}
+          />
+          <ReferenceLine
+            y={7}
+            stroke="#ef4444"
+            strokeDasharray="4 4"
+            strokeWidth={1}
+            label={{ value: 'BB Target 7%', position: 'right', fill: '#ef4444', fontSize: 9 }}
+          />
+          <Bar dataKey="Food" fill="#f59e0b" radius={[3, 3, 0, 0]} />
+          <Bar dataKey="Non-Food" fill="#10b981" radius={[3, 3, 0, 0]} />
+          <Bar dataKey="Headline" fill="#38bdf8" radius={[3, 3, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   )
 }
