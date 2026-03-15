@@ -1,6 +1,24 @@
 {
-  "lastUpdated": "2026-03-15T00:00:00+06:00",
+  "lastUpdated": "2026-03-15T12:53:03.762Z",
   "circulars": [
+    {
+      "id": "circ-2026-03-15-64",
+      "date": "2026-03-15",
+      "title": "Bank Template",
+      "category": "banking_regulation",
+      "pdfUrl": "https://www.bb.org.bd../../../../../mediaroom/circulars/psd/TSA_Bank Template.xlsx",
+      "summary": null,
+      "impactOnYields": null
+    },
+    {
+      "id": "circ-2026-03-15-0",
+      "date": "2026-03-15",
+      "title": "Download",
+      "category": "other",
+      "pdfUrl": "https://www.bb.org.bd/mediaroom/circulars/brpd/mar152026brpd-19e.pdf",
+      "summary": null,
+      "impactOnYields": null
+    },
     {
       "id": "circ-2026-01-15-repo",
       "date": "2026-01-15",
