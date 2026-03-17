@@ -127,7 +127,20 @@ async function generateWeeklyCommentary() {
     const weekNum = Math.ceil((now.getDate() + new Date(now.getFullYear(), now.getMonth(), 1).getDay()) / 7)
     const weekId = `${now.getFullYear()}-W${String(weekNum).padStart(2, '0')}`
     const weekEnding = now.toISOString().split('T')[0]
-    const firstSentence = body.split('.')[0] || 'Weekly Market Commentary'
+    // Generate a concise title (ask Claude for a 6-8 word headline)
+    let title = 'Weekly Market Commentary'
+    try {
+      const titleResp = await client.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 50,
+        messages: [{
+          role: 'user',
+          content: `Write a 6-8 word headline summarizing this weekly fixed income commentary. Return ONLY the headline, no quotes, no explanation:\n\n${body.substring(0, 500)}`,
+        }],
+      })
+      const titleText = titleResp.content[0]?.type === 'text' ? titleResp.content[0].text.trim() : ''
+      if (titleText && titleText.length < 80) title = titleText
+    } catch { /* fallback to default */ }
 
     let commentaryData = await safeLoadJson(COMMENTARY_PATH)
     if (!commentaryData) {
@@ -142,7 +155,7 @@ async function generateWeeklyCommentary() {
     commentaryData.commentaries.unshift({
       id: weekId,
       weekEnding,
-      title: firstSentence.substring(0, 80),
+      title,
       body: body.trim(),
       keyPoints: thisWeekAuctions.map(a =>
         `${a.tenor} ${a.type}: ${a.cutoffYield}% (${a.yieldChangeBps > 0 ? '+' : ''}${a.yieldChangeBps}bps)`
