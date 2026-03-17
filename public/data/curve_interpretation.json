@@ -1,10 +1,10 @@
 {
   "shape": "humped",
-  "interpretation": "The curve is broadly upward-sloping but exhibits a hump, with the 2Y yield (11.95%) exceeding the 5Y (10.82%) and 10Y (11.15%), while the 15Y (12.68%) peaks above 20Y (11.65%). The 2Y bulge reflects acute near-term inflation expectations and tight banking sector liquidity as BB maintains a restrictive repo rate at 10%. The 364D dip below 182D signals segmented demand in T-bill auctions. The 130bps 10Y-91D spread suggests compressed term premium amid persistent inflationary pressures and fiscal borrowing concerns.",
+  "interpretation": "The curve is broadly upward-sloping but exhibits a hump, with the 2Y yield (11.95%) exceeding the 5Y (10.82%) and 10Y (11.15%), while the 15Y peaks at 12.68%. The 364D dip below 182D suggests near-term liquidity pockets. Elevated short-end yields above the 10% repo rate reflect tight banking sector liquidity and BB's contractionary stance to combat persistent inflation (hovering ~10%). The 2Y bulge indicates market expectations of prolonged monetary tightening before eventual easing, while the steep long end prices in fiscal supply pressure from large NSD/T-bond issuance.",
   "implications": [
-    "Elevated 2Y yields signal market expectation that BB will maintain or tighten policy rates longer, with inflation remaining above target in the near term",
-    "Banking sector liquidity stress is concentrated in the 1-2Y segment, likely driven by AD ratio pressures and government domestic borrowing crowding out",
-    "The inverted 15Y-20Y segment suggests limited long-end demand and potential pension/insurance sector absorption constraints, creating reinvestment risk for institutional portfolios"
+    "Banks face negative carry funding government securities at short tenors, compressing NIM and discouraging primary dealer participation in 1-5Y segments",
+    "The 2Y hump signals market expectation that BB will maintain or raise the repo rate through mid-2027, with inflation unlikely to retreat to the 6% target soon",
+    "Steep 10Y-20Y segment (50bps) reflects fiscal deficit financing concerns and duration risk premium amid uncertainty over government borrowing plans and potential sovereign rating pressures"
   ],
-  "generatedAt": "2026-03-17T10:00:21.008Z"
+  "generatedAt": "2026-03-17T16:45:30.762Z"
 }
