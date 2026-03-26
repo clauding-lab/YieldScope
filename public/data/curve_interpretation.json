@@ -1,10 +1,10 @@
 {
   "shape": "humped",
-  "interpretation": "The curve is broadly upward-sloping but exhibits a hump, with the 2Y yield (11.95%) exceeding the 5Y (10.82%) and 10Y (11.15%), while the 15Y (12.68%) peaks highest. The 364D dip below 182D and the 2Y bulge suggest near-term liquidity stress and tight banking sector conditions. Yields trading above the 10% repo rate across all tenors reflect persistent inflationary expectations and BB's contractionary stance. The inverted 1Y-2Y segment signals market anxiety over near-term monetary tightening.",
+  "interpretation": "The curve is broadly upward-sloping but exhibits a hump, with the 2Y yield (11.95%) exceeding the 5Y (10.82%) and 10Y (11.15%), while the 15Y (12.68%) peaks highest. The 2Y anomaly likely reflects acute banking sector liquidity stress and aggressive BB tightening expectations, as the repo rate at 10% anchors the short end. Persistent inflation (hovering ~10%) drives elevated term premia. The 364D dip below 182D signals near-term uncertainty around BB monetary policy trajectory.",
   "implications": [
-    "Banking sector liquidity remains strained, with demand for short-to-medium term government borrowing pushing 2Y yields abnormally high relative to the mid-curve",
-    "Elevated inflation expectations persist beyond BB's comfort zone, keeping the entire curve above the policy repo rate and limiting room for near-term easing",
-    "The 15Y-20Y steepness and 2Y hump suggest fiscal supply pressure from government borrowing and uncertainty around medium-term debt sustainability"
+    "The 2Y bulge suggests banks face severe short-to-medium-term funding pressure, likely bidding up 2Y yields amid tight CRR constraints and deposit competition",
+    "The 130bps 10Y-91D spread indicates modest term premium, reflecting market expectations that BB may maintain restrictive policy longer to combat sticky inflation",
+    "Segmented demand across tenors — AD banks concentrated in shorter maturities while provident/insurance funds anchor the long end — is distorting the curve shape"
   ],
-  "generatedAt": "2026-03-24T16:41:05.164Z"
+  "generatedAt": "2026-03-26T14:22:15.245Z"
 }
