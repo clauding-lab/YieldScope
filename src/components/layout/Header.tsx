@@ -1,7 +1,5 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useYieldData } from '../../hooks/useYieldData'
-import { differenceInHours } from 'date-fns'
 
 const ADMIN_PASSWORD = 'yieldscope2008$'
 
@@ -27,7 +25,6 @@ export function Header() {
           </h1>
         </div>
         <div className="flex items-center gap-4">
-          <DataFreshnessDot />
           <button
             onClick={() => setShowPasswordModal(true)}
             className="text-slate-500 hover:text-slate-300 transition-colors p-1"
@@ -109,38 +106,3 @@ function AdminPasswordModal({ onClose }: { onClose: () => void }) {
   )
 }
 
-function DataFreshnessDot() {
-  const { data } = useYieldData()
-
-  if (!data?.lastUpdated) {
-    return (
-      <div className="flex items-center gap-2 text-sm text-slate-500">
-        <div className="w-2.5 h-2.5 rounded-full bg-slate-600" />
-        <span>No data</span>
-      </div>
-    )
-  }
-
-  const hoursAgo = differenceInHours(new Date(), new Date(data.lastUpdated))
-
-  let dotColor = 'bg-emerald-400'
-  let label = 'Live'
-
-  if (hoursAgo >= 72) {
-    dotColor = 'bg-red-400 animate-pulse'
-    label = 'Stale'
-  } else if (hoursAgo >= 24) {
-    dotColor = 'bg-amber-400 animate-pulse'
-    label = `${Math.floor(hoursAgo / 24)}d ago`
-  } else if (hoursAgo >= 1) {
-    dotColor = 'bg-emerald-400'
-    label = `${hoursAgo}h ago`
-  }
-
-  return (
-    <div className="flex items-center gap-2 text-sm text-slate-500">
-      <div className={`w-2.5 h-2.5 rounded-full ${dotColor}`} />
-      <span>{label}</span>
-    </div>
-  )
-}
