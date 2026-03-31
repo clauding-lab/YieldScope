@@ -1,10 +1,10 @@
 {
   "shape": "humped",
-  "interpretation": "The curve is broadly upward-sloping but exhibits a hump, with the 2Y yield (11.95%) exceeding the 5Y (10.82%) and 10Y (11.15%), while the 15Y (12.68%) peaks highest. The 2Y anomaly likely reflects acute banking sector liquidity stress and aggressive BB tightening expectations, as the repo rate at 10% anchors the short end. Persistent inflation (hovering ~10%) drives elevated term premia. The 364D dip below 182D signals near-term uncertainty around BB monetary policy trajectory.",
+  "interpretation": "The curve is broadly upward-sloping but exhibits a notable hump: the 2Y yield (11.95%) exceeds the 5Y (10.82%) and 10Y (11.15%), while the 364D dips below 182D, signaling distortions. The 2Y anomaly likely reflects tight banking sector liquidity and aggressive T-bill rollover pressure. With the repo rate at 10% and short-end yields near/above policy rates, BB's contractionary stance to combat persistent inflation (hovering ~10%) is evident. The steep long end (15Y at 12.68%) prices in sustained fiscal borrowing and inflation risk.",
   "implications": [
-    "The 2Y bulge suggests banks face severe short-to-medium-term funding pressure, likely bidding up 2Y yields amid tight CRR constraints and deposit competition",
-    "The 130bps 10Y-91D spread indicates modest term premium, reflecting market expectations that BB may maintain restrictive policy longer to combat sticky inflation",
-    "Segmented demand across tenors — AD banks concentrated in shorter maturities while provident/insurance funds anchor the long end — is distorting the curve shape"
+    "Elevated 2Y yields suggest acute liquidity stress in the banking sector, with banks demanding premium for intermediate-term government lending over deploying funds in credit markets",
+    "BB is unlikely to ease the repo rate soon given short-end yields anchored near 10% and persistent inflationary pressures, maintaining a tight monetary corridor",
+    "The steep 10Y-20Y segment signals market expectations of heavy long-term government borrowing to finance fiscal deficits, embedding a significant term and inflation risk premium"
   ],
-  "generatedAt": "2026-03-26T14:22:15.245Z"
+  "generatedAt": "2026-03-31T14:22:45.471Z"
 }
