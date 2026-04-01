@@ -1,10 +1,10 @@
 {
   "shape": "humped",
-  "interpretation": "The curve is broadly upward-sloping but exhibits a notable hump: the 2Y yield (11.95%) exceeds the 5Y (10.82%) and 10Y (11.15%), while the 364D dips below 182D, signaling distortions. The 2Y anomaly likely reflects tight banking sector liquidity and aggressive T-bill rollover pressure. With the repo rate at 10% and short-end yields near/above policy rates, BB's contractionary stance to combat persistent inflation (hovering ~10%) is evident. The steep long end (15Y at 12.68%) prices in sustained fiscal borrowing and inflation risk.",
+  "interpretation": "The curve is broadly upward-sloping but exhibits a hump, with the 2Y yield (11.95%) exceeding the 5Y (10.82%) and 10Y (11.15%), while the 15Y (12.68%) peaks above the 20Y (11.65%). The 91D-364D segment shows a dip at 364D (10.07% vs 182D 10.20%), suggesting near-term liquidity tightness. Yields above the 10% repo rate across all tenors reflect persistent inflationary expectations and tight banking sector liquidity. The BB's elevated repo rate anchors the short end, while the 2Y bulge signals market stress around medium-term inflation and fiscal borrowing pressures.",
   "implications": [
-    "Elevated 2Y yields suggest acute liquidity stress in the banking sector, with banks demanding premium for intermediate-term government lending over deploying funds in credit markets",
-    "BB is unlikely to ease the repo rate soon given short-end yields anchored near 10% and persistent inflationary pressures, maintaining a tight monetary corridor",
-    "The steep 10Y-20Y segment signals market expectations of heavy long-term government borrowing to finance fiscal deficits, embedding a significant term and inflation risk premium"
+    "The 2Y yield spike above longer tenors suggests banks are demanding a premium for medium-term government debt amid tight liquidity and heavy T-bond issuance by MoF",
+    "Persistent yields 100-250bps above the repo rate indicate BB's monetary tightening is transmitting but inflation expectations remain unanchored, limiting near-term rate cut prospects",
+    "The inverted 2Y-5Y segment may discourage bank participation in medium-tenor auctions, potentially pushing MoF toward shorter-duration borrowing and increasing rollover risk"
   ],
-  "generatedAt": "2026-03-31T14:22:45.471Z"
+  "generatedAt": "2026-04-01T08:21:32.284Z"
 }
