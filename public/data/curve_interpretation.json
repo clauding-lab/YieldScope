@@ -1,10 +1,10 @@
 {
   "shape": "humped",
-  "interpretation": "The curve is broadly upward-sloping but exhibits a hump, with the 2Y yield (11.95%) exceeding the 5Y (10.82%) and 10Y (11.15%), while the 15Y (12.68%) peaks above the 20Y (11.65%). The 91D-364D segment shows a dip at 364D (10.07% vs 182D 10.20%), suggesting near-term liquidity tightness. Yields above the 10% repo rate across all tenors reflect persistent inflationary expectations and tight banking sector liquidity. The BB's elevated repo rate anchors the short end, while the 2Y bulge signals market stress around medium-term inflation and fiscal borrowing pressures.",
+  "interpretation": "The curve is broadly upward-sloping but exhibits a hump, with the 2Y yield (11.95%) exceeding the 5Y (10.82%) and 10Y (11.15%), while the 15Y (12.68%) peaks highest. The 2Y anomaly likely reflects tight banking sector liquidity and aggressive re-pricing around BB's 10% repo rate amid persistent inflation (9%+ range). The 364D dip below 182D suggests uneven demand at auctions. The 130bps 10Y-91D spread indicates moderate term premium, compressed by inflation expectations and AD/AS liquidity management challenges.",
   "implications": [
-    "The 2Y yield spike above longer tenors suggests banks are demanding a premium for medium-term government debt amid tight liquidity and heavy T-bond issuance by MoF",
-    "Persistent yields 100-250bps above the repo rate indicate BB's monetary tightening is transmitting but inflation expectations remain unanchored, limiting near-term rate cut prospects",
-    "The inverted 2Y-5Y segment may discourage bank participation in medium-tenor auctions, potentially pushing MoF toward shorter-duration borrowing and increasing rollover risk"
+    "The 2Y hump signals banks are demanding significant premium for medium-term lock-up amid liquidity stress and uncertain BB tightening trajectory",
+    "Inverted segments (364D < 182D, 2Y > 5Y) suggest fragmented demand and possible market expectation of eventual policy easing beyond 2 years",
+    "Steep long-end (15Y at 12.68%) reflects fiscal deficit concerns and inflation risk premium as government borrowing remains elevated"
   ],
-  "generatedAt": "2026-04-01T08:21:32.284Z"
+  "generatedAt": "2026-04-02T14:18:42.988Z"
 }
