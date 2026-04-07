@@ -1,10 +1,10 @@
 {
   "shape": "humped",
-  "interpretation": "The curve is broadly upward-sloping but exhibits a hump, with the 2Y yield (11.95%) exceeding the 5Y (10.82%) and 10Y (11.15%), while the 15Y (12.68%) peaks highest. The 2Y anomaly likely reflects tight banking sector liquidity and aggressive re-pricing around BB's 10% repo rate amid persistent inflation (9%+ range). The 364D dip below 182D suggests uneven demand at auctions. The 130bps 10Y-91D spread indicates moderate term premium, compressed by inflation expectations and AD/AS liquidity management challenges.",
+  "interpretation": "The curve is broadly upward-sloping but exhibits a hump, with the 2Y yield (11.95%) exceeding the 5Y (10.82%) and 10Y (11.15%), while the 15Y peaks at 12.68%. The 364D dip below 182D suggests near-term liquidity unevenness. Yields above the 10% repo rate reflect tight banking sector liquidity and persistent inflationary pressures. The 2Y bulge indicates market expectations of prolonged BB tightening before eventual easing, with banks competing aggressively for term funding amid stressed advance-deposit ratios.",
   "implications": [
-    "The 2Y hump signals banks are demanding significant premium for medium-term lock-up amid liquidity stress and uncertain BB tightening trajectory",
-    "Inverted segments (364D < 182D, 2Y > 5Y) suggest fragmented demand and possible market expectation of eventual policy easing beyond 2 years",
-    "Steep long-end (15Y at 12.68%) reflects fiscal deficit concerns and inflation risk premium as government borrowing remains elevated"
+    "Elevated short-to-medium term yields signal banks face acute liquidity stress, with AD ratios constraining lending capacity and driving up government borrowing costs",
+    "The 2Y hump above longer tenors suggests the market prices BB maintaining hawkish policy through FY26 to anchor inflation expectations before a gradual easing cycle",
+    "The steep 15Y-20Y segment and wide 10Y-91D spread (130bps) indicate fiscal supply concerns from growing budget deficits and investor demand for significant term premia on longer-dated sovereign exposure"
   ],
-  "generatedAt": "2026-04-02T14:18:42.988Z"
+  "generatedAt": "2026-04-07T14:26:27.147Z"
 }
