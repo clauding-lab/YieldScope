@@ -1,10 +1,10 @@
 {
   "shape": "humped",
-  "interpretation": "The curve is broadly upward-sloping but exhibits a hump, with the 2Y yield (11.95%) exceeding the 5Y (10.82%) and 10Y (11.15%), while the 15Y peaks at 12.68%. The 364D dip below 182D suggests near-term liquidity unevenness. Yields above the 10% repo rate reflect tight banking sector liquidity and persistent inflationary pressures. The 2Y bulge indicates market expectations of prolonged BB tightening before eventual easing, with banks competing aggressively for term funding amid stressed advance-deposit ratios.",
+  "interpretation": "The curve is broadly upward-sloping but exhibits a hump, with the 2Y yield (11.95%) exceeding the 5Y (10.82%) and 10Y (11.15%), while the 15Y (12.68%) peaks above the 20Y (11.65%). The 2Y anomaly suggests acute near-term liquidity stress in the banking sector, likely driven by tight BB monetary stance (repo at 10%) amid persistent inflation. The 364D dip below 182D reflects segmented demand in T-bill auctions. The 130bps 10Y-91D spread signals modest term premium compressed by inflation expectations remaining elevated.",
   "implications": [
-    "Elevated short-to-medium term yields signal banks face acute liquidity stress, with AD ratios constraining lending capacity and driving up government borrowing costs",
-    "The 2Y hump above longer tenors suggests the market prices BB maintaining hawkish policy through FY26 to anchor inflation expectations before a gradual easing cycle",
-    "The steep 15Y-20Y segment and wide 10Y-91D spread (130bps) indicate fiscal supply concerns from growing budget deficits and investor demand for significant term premia on longer-dated sovereign exposure"
+    "Banking sector liquidity remains strained at the short end, with banks bidding aggressively on 2Y instruments to lock in rates, anticipating prolonged tight monetary policy from Bangladesh Bank",
+    "The inverted segment between 2Y and 5Y suggests market expectations of an eventual policy rate easing cycle beyond 2 years, though persistent inflation (likely above BB's comfort zone) delays the pivot",
+    "Irregular demand across tenors reflects a fragmented fixed-income market with limited secondary trading, where auction-specific dynamics and AD bank ALM needs distort the curve shape"
   ],
-  "generatedAt": "2026-04-07T14:26:27.147Z"
+  "generatedAt": "2026-04-09T14:50:33.400Z"
 }
