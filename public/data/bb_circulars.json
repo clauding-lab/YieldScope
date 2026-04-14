@@ -1,6 +1,15 @@
 {
-  "lastUpdated": "2026-04-09T14:50:20.245Z",
+  "lastUpdated": "2026-04-14T14:45:52.818Z",
   "circulars": [
+    {
+      "id": "circ-2026-04-14-0",
+      "date": "2026-04-14",
+      "title": "Download",
+      "category": "other",
+      "pdfUrl": "https://www.bb.org.bd/mediaroom/circulars/dmd/apr132026dmd03.pdf",
+      "summary": null,
+      "impactOnYields": null
+    },
     {
       "id": "circ-2026-04-09-0",
       "date": "2026-04-09",
