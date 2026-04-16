@@ -1,10 +1,10 @@
 {
   "shape": "humped",
-  "interpretation": "The curve is broadly upward-sloping but exhibits a notable hump: the 2Y yield (11.95%) exceeds the 5Y (10.82%) and 10Y (11.15%), while the 364D dips below 182D, creating short-end distortion. This reflects tight banking sector liquidity driving up near-term borrowing costs, with BB's repo rate at 10% anchoring the front end. Elevated inflation expectations and fiscal borrowing pressure push the long end higher. The 2Y bulge suggests banks are demanding a premium for medium-term government paper amid uncertain monetary policy trajectory.",
+  "interpretation": "The curve is broadly upward-sloping but exhibits a hump, with the 2Y yield (11.95%) exceeding the 5Y (10.82%) and 10Y (11.15%), while the 15Y (12.68%) peaks highest. The 2Y anomaly likely reflects tight banking sector liquidity and aggressive re-pricing around BB's 10% repo rate amid persistent inflation (8-10% range). The 364D dip below 182D suggests near-term rate cut expectations. The steep long end reflects fiscal deficit concerns and inflation risk premium in a shallow government bond market.",
   "implications": [
-    "Tight BDT liquidity and aggressive BB tightening are pressuring the 1-2Y segment, signaling banks prefer ultra-short or long-duration over medium tenors",
-    "The 130bps 10Y-91D spread with a humped mid-section suggests market expectations that BB may hold rates high near-term before eventual easing, creating inversion risk at the belly",
-    "Persistent double-digit yields across the curve indicate elevated inflation expectations and heavy government domestic borrowing, crowding out private sector credit growth"
+    "The 2Y bulge signals banks are demanding premium for medium-term liquidity lock-up amid CRR constraints and advance-deposit ratio pressures",
+    "BB's 250bps repo-SDF corridor and elevated short-end yields suggest monetary tightening is biting but inflation expectations remain unanchored beyond 2 years",
+    "The steep 10Y-20Y segment (50bps) indicates growing term premium driven by fiscal financing concerns and limited institutional demand depth for ultra-long tenors"
   ],
-  "generatedAt": "2026-04-14T14:46:02.963Z"
+  "generatedAt": "2026-04-16T14:49:49.523Z"
 }
