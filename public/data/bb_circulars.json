@@ -1,6 +1,15 @@
 {
-  "lastUpdated": "2026-04-23T15:08:29.862Z",
+  "lastUpdated": "2026-04-28T15:15:09.741Z",
   "circulars": [
+    {
+      "id": "circ-2026-04-28-0",
+      "date": "2026-04-28",
+      "title": "Download",
+      "category": "other",
+      "pdfUrl": "https://www.bb.org.bd/mediaroom/circulars/brpd-2/apr282026brpd-201e.pdf",
+      "summary": null,
+      "impactOnYields": null
+    },
     {
       "id": "circ-2026-04-23-0",
       "date": "2026-04-23",
