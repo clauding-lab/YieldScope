@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
-import { Delta, SectionTitle, Sparkline, Tabs } from '../components/primitives'
+import { Delta, DemoBadge, SectionTitle, Sparkline, Tabs } from '../components/primitives'
 import { AreaChart, YieldCurve } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useYields } from '../hooks/useYields'
@@ -83,7 +83,10 @@ function YieldsCurveTab() {
       </div>
 
       <div style={{ padding: '24px 22px 24px' }}>
-        <div className="eyebrow" style={{ marginBottom: 12 }}>Tenor ladder</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <div className="eyebrow">Tenor ladder</div>
+          <DemoBadge />
+        </div>
         <div className="card-flat">
           {tenorLadder.map((row, i, arr) => (
             <div
@@ -158,7 +161,10 @@ function YieldsAuctionsTab() {
   return (
     <>
       <div style={{ padding: '0 22px 18px' }}>
-        <div className="eyebrow" style={{ marginBottom: 12 }}>Upcoming · Week 23</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <div className="eyebrow">Upcoming · Week 23</div>
+          <DemoBadge />
+        </div>
         <div className="card-flat">
           {UPCOMING.map((a, i, arr) => (
             <div
@@ -186,7 +192,10 @@ function YieldsAuctionsTab() {
       </div>
 
       <div style={{ padding: '20px 22px 24px' }}>
-        <div className="eyebrow" style={{ marginBottom: 12 }}>Recent results</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <div className="eyebrow">Recent results</div>
+          <DemoBadge />
+        </div>
         <div className="card-flat">
           {FX.auctions.map((a, i, arr) => (
             <div
@@ -299,7 +308,10 @@ function YieldsDesktop() {
       <div style={{ padding: '32px 48px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
-            <div className="eyebrow" style={{ marginBottom: 6 }}>Sovereign yield curve</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <div className="eyebrow">Sovereign yield curve</div>
+              <DemoBadge />
+            </div>
             <h3 className="display" style={{ fontSize: 28, margin: 0 }}>11 tenors · 5 overlays</h3>
           </div>
         </div>
@@ -311,7 +323,10 @@ function YieldsDesktop() {
       <div style={{ padding: '32px 48px 48px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 18 }}>
           <div>
-            <div className="eyebrow" style={{ marginBottom: 6 }}>Recent auctions · Week 22</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <div className="eyebrow">Recent auctions · Week 22</div>
+              <DemoBadge />
+            </div>
             <h3 className="display" style={{ fontSize: 24, margin: 0 }}>Six prints</h3>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>

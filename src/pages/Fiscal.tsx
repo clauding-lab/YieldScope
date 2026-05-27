@@ -1,7 +1,7 @@
 import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
 import { useFiscal } from '../hooks/useFiscal'
-import { Bar, ListRow, SectionTitle } from '../components/primitives'
+import { Bar, DemoBadge, ListRow, SectionTitle } from '../components/primitives'
 import { AreaChart, Donut, DonutLegend, DotMatrix, RadialGauge } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import type { DonutSegment } from '../components/charts/Donut'
@@ -25,7 +25,10 @@ function FiscalMobile() {
       <SectionTitle kicker="Sovereign balance sheet" title="Fiscal" />
 
       <div style={{ padding: '0 22px 28px' }}>
-        <div className="caption">Fiscal pressure · composite</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+          <div className="caption">Fiscal pressure · composite</div>
+          <DemoBadge />
+        </div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginTop: 4 }}>
           <span className="serif-num" style={{ fontSize: 64, color: 'var(--warn)' }}>68</span>
           <span className="caption">/ 100</span>
@@ -89,7 +92,10 @@ function FiscalMobile() {
       </div>
 
       <div style={{ padding: '0 22px 28px' }}>
-        <div className="eyebrow" style={{ marginBottom: 12 }}>Public debt / GDP</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <div className="eyebrow">Public debt / GDP</div>
+          <DemoBadge />
+        </div>
         <AreaChart data={F.debtHist} w={346} h={90} color="var(--neg)" />
       </div>
     </>
@@ -118,7 +124,10 @@ function FiscalDesktop() {
           <RadialGauge value={68} max={100} label="Fiscal pressure · 0–100" thresholds={[33, 66]} size={280} />
         </div>
         <div>
-          <div className="eyebrow" style={{ marginBottom: 8 }}>Fiscal pressure index</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <div className="eyebrow">Fiscal pressure index</div>
+            <DemoBadge />
+          </div>
           <h2 className="display" style={{ fontSize: 36, margin: 0, color: 'var(--warn)' }}>Elevated.</h2>
           <p className="body" style={{ marginTop: 14, fontSize: 16, lineHeight: 1.55, color: 'var(--ink)', maxWidth: 540 }}>
             The index climbed from 54 at the end of FY25 — revenue undershoot, rising debt service, and active
@@ -137,7 +146,10 @@ function FiscalDesktop() {
 
       <div style={{ padding: '36px 48px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 32 }}>
         <div>
-          <div className="eyebrow" style={{ marginBottom: 14 }}>Revenue · YTD composition</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+            <div className="eyebrow">Revenue · YTD composition</div>
+            <DemoBadge />
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
             <Donut
               size={140}
@@ -161,7 +173,10 @@ function FiscalDesktop() {
           </div>
         </div>
         <div>
-          <div className="eyebrow" style={{ marginBottom: 10 }}>Public debt / GDP</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <div className="eyebrow">Public debt / GDP</div>
+            <DemoBadge />
+          </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span className="serif-num" style={{ fontSize: 44, color: 'var(--neg)' }}>{F.debtToGdp}</span>
             <span className="caption">%</span>
@@ -177,7 +192,10 @@ function FiscalDesktop() {
           </div>
         </div>
         <div>
-          <div className="eyebrow" style={{ marginBottom: 10 }}>Ways & Means · BB</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <div className="eyebrow">Ways & Means · BB</div>
+            <DemoBadge />
+          </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span className="serif-num" style={{ fontSize: 44, color: 'var(--warn)' }}>46</span>
             <span className="caption">% of limit</span>
@@ -193,7 +211,10 @@ function FiscalDesktop() {
       <div style={{ height: 1, background: 'var(--line)', margin: '0 48px' }} />
 
       <div style={{ padding: '36px 48px 48px' }}>
-        <div className="eyebrow" style={{ marginBottom: 18 }}>Gross issuance calendar · next 12 weeks</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18 }}>
+          <div className="eyebrow">Gross issuance calendar · next 12 weeks</div>
+          <DemoBadge />
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 8 }}>
           {Array.from({ length: 12 }, (_, i) => {
             const week = `W${23 + i}`

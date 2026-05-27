@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
-import { Delta, ListRow, SectionTitle, Sparkline } from '../components/primitives'
+import { Delta, DemoBadge, ListRow, SectionTitle, Sparkline } from '../components/primitives'
 import { AreaChart, Heatmap } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useMacro } from '../hooks/useMacro'
@@ -234,7 +234,10 @@ function MacroDesktop() {
         }}
       >
         <div>
-          <div className="eyebrow" style={{ marginBottom: 14 }}>Commodity exposure · import bill</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+            <div className="eyebrow">Commodity exposure · import bill</div>
+            <DemoBadge />
+          </div>
           <div className="card-flat">
             {COMMODITIES.map((c, i, arr) => (
               <div
@@ -260,7 +263,10 @@ function MacroDesktop() {
           </div>
         </div>
         <div>
-          <div className="eyebrow" style={{ marginBottom: 14 }}>USD / BDT · mid-rate</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+            <div className="eyebrow">USD / BDT · mid-rate</div>
+            <DemoBadge />
+          </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
             <span className="serif-num" style={{ fontSize: 56 }}>{data?.usdBdt?.toFixed(2) ?? '—'}</span>
             <Delta value={0.04} size="md" />

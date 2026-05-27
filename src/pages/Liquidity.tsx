@@ -1,7 +1,7 @@
 import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
 import { useLiquidity } from '../hooks/useLiquidity'
-import { Bar, Delta, ListRow, SectionTitle } from '../components/primitives'
+import { Bar, Delta, DemoBadge, ListRow, SectionTitle } from '../components/primitives'
 import { AreaChart, BarChart, Heatmap } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 
@@ -244,7 +244,10 @@ function LiquidityDesktop() {
           </div>
         </div>
         <div>
-          <div className="eyebrow" style={{ marginBottom: 10 }}>Money supply · M2 YoY</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <div className="eyebrow">Money supply · M2 YoY</div>
+            <DemoBadge />
+          </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span className="serif-num" style={{ fontSize: 48 }}>8.4</span>
             <span className="caption">%</span>
@@ -255,7 +258,10 @@ function LiquidityDesktop() {
           </div>
         </div>
         <div>
-          <div className="eyebrow" style={{ marginBottom: 10 }}>Reserve utilisation</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <div className="eyebrow">Reserve utilisation</div>
+            <DemoBadge />
+          </div>
           {[
             { lbl: 'CRR',         v: 92, t: [0.7, 0.9] as [number, number] },
             { lbl: 'SLR',         v: 86, t: [0.7, 0.9] as [number, number] },
@@ -278,7 +284,10 @@ function LiquidityDesktop() {
       <div style={{ padding: '36px 48px 48px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 18 }}>
           <div>
-            <div className="eyebrow" style={{ marginBottom: 6 }}>Call money · intraday this week</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <div className="eyebrow">Call money · intraday this week</div>
+              <DemoBadge />
+            </div>
             <h3 className="display" style={{ fontSize: 22, margin: 0 }}>Pressure builds at the open</h3>
           </div>
           <div className="caption">Rates %, by hour</div>

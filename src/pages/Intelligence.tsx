@@ -1,6 +1,6 @@
 import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
-import { ListRow, SectionTitle } from '../components/primitives'
+import { DemoBadge, ListRow, SectionTitle } from '../components/primitives'
 import { Timeline } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 
@@ -48,6 +48,9 @@ function IntelMobile() {
   return (
     <>
       <SectionTitle kicker="Weekly read · drafted by Claude" title="Briefings" />
+      <div style={{ padding: '0 22px 12px' }}>
+        <DemoBadge />
+      </div>
 
       <div style={{ padding: '0 22px 24px' }}>
         <h2 className="display" style={{ fontSize: 28, margin: 0, lineHeight: 1.2 }}>
@@ -142,6 +145,9 @@ function IntelDesktop() {
   return (
     <>
       <DesktopHeader section="Briefings" breadcrumb="YieldScope · Weekly read & ALCO log" />
+      <div style={{ padding: '0 48px' }}>
+        <DemoBadge />
+      </div>
 
       <div style={{ padding: '40px 48px 0', display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 56 }}>
         <div>
