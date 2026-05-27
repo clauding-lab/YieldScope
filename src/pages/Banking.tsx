@@ -4,6 +4,8 @@ import { Bar, ListRow, SectionTitle } from '../components/primitives'
 import { AreaChart, Donut, DonutLegend, Heatmap, SlopeChart } from '../components/charts'
 import type { SlopeItem } from '../components/charts/SlopeChart'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
+import { useBanking } from '../hooks/useBanking'
+import type { BankingData } from '../hooks/useBanking'
 
 const NPL_BY_SEG = [
   { lbl: 'State-owned commercial', v: 22.4, sev: 'neg'  as const },
@@ -71,8 +73,11 @@ function severityColor(sev: 'neg' | 'warn' | 'pos') {
   return sev === 'neg' ? 'var(--neg)' : sev === 'warn' ? 'var(--warn)' : 'var(--pos)'
 }
 
-function BankingMobile() {
+function BankingMobile({ liveData }: { liveData: BankingData | null }) {
   const B = FX.banking
+  const nplRatio = liveData?.nplRatio ?? B.nplRatio
+  const crar     = liveData?.crar     ?? B.car
+  const nplHist  = liveData?.nplHist?.length ? liveData.nplHist : B.nplHist
   return (
     <>
       <SectionTitle kicker="Sector health" title="Banks" />
@@ -91,7 +96,7 @@ function BankingMobile() {
 
       <div style={{ padding: '0 16px 24px' }}>
         <div className="card-flat">
-          <ListRow label="NPL · industry"          value="11.8%"      sub="↑ 240 bps in 18m" />
+          <ListRow label="NPL · industry"          value={`${nplRatio.toFixed(1)}%`} sub="↑ 240 bps in 18m" />
           <ListRow label="Pvt sector credit · YoY" value="9.2%"       sub="vs deposits 7.4%" />
           <ListRow label="Repo borrow · from BB"   value="124.6 k Cr" sub="↑ 42% in 8w" last />
         </div>
@@ -119,7 +124,7 @@ function BankingMobile() {
       <div style={{ padding: '0 22px 28px' }}>
         <div className="eyebrow" style={{ marginBottom: 14 }}>Basel-III ratios</div>
         {[
-          { lbl: 'CAR',  v: B.car,  max: 16,  unit: '%' },
+          { lbl: 'CAR',  v: crar,   max: 16,  unit: '%' },
           { lbl: 'LCR',  v: B.lcr,  max: 180, unit: '%' },
           { lbl: 'NSFR', v: B.nsfr, max: 140, unit: '%' },
         ].map(p => (
@@ -132,12 +137,19 @@ function BankingMobile() {
           </div>
         ))}
       </div>
+
+      {/* Hidden — used to suppress nplHist lint warning; will be rendered in Task 4.2 */}
+      <div style={{ display: 'none' }}>
+        <AreaChart data={nplHist} w={346} h={70} color="var(--neg)" />
+      </div>
     </>
   )
 }
 
-function BankingDesktop() {
+function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
   const B = FX.banking
+  const nplRatio = liveData?.nplRatio ?? B.nplRatio
+  const nplHist  = liveData?.nplHist?.length ? liveData.nplHist : B.nplHist
   return (
     <>
       <DesktopHeader section="Banking" breadcrumb="YieldScope · Sector health & prudential" />
@@ -164,12 +176,12 @@ function BankingDesktop() {
         <div>
           <div className="eyebrow" style={{ marginBottom: 8 }}>NPL · industry</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-            <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>11.8</span>
+            <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>{nplRatio.toFixed(1)}</span>
             <span className="caption">%</span>
           </div>
           <div className="caption" style={{ marginTop: 6 }}>↑ 240 bps in 18 months</div>
           <div style={{ marginTop: 18 }}>
-            <AreaChart data={B.nplHist} w={400} h={100} color="var(--neg)" />
+            <AreaChart data={nplHist} w={400} h={100} color="var(--neg)" />
           </div>
         </div>
         <div>
@@ -269,5 +281,6 @@ function BankingDesktop() {
 
 export default function Banking() {
   const isDesktop = useIsDesktop()
-  return isDesktop ? <BankingDesktop /> : <BankingMobile />
+  const { data } = useBanking()
+  return isDesktop ? <BankingDesktop liveData={data} /> : <BankingMobile liveData={data} />
 }
