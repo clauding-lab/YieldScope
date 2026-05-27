@@ -44,20 +44,14 @@ export async function fetchSeries(
     .from(tableFor(metricId))
     .select('metric_id, as_of, value')
     .eq('metric_id', metricId)
-    .order('as_of', { ascending: false })
-    .limit(limit)
 
   if (sinceISO) {
-    query = client
-      .from(tableFor(metricId))
-      .select('metric_id, as_of, value')
-      .eq('metric_id', metricId)
-      .gte('as_of', sinceISO)
-      .order('as_of', { ascending: false })
-      .limit(limit)
+    query = query.gte('as_of', sinceISO)
   }
 
   const { data, error } = await query
+    .order('as_of', { ascending: false })
+    .limit(limit)
   if (error || !data) return []
 
   return (data as { as_of: string; value: number }[])

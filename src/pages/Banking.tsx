@@ -77,7 +77,6 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
   const B = FX.banking
   const nplRatio = liveData?.nplRatio ?? B.nplRatio
   const crar     = liveData?.crar     ?? B.car
-  const nplHist  = liveData?.nplHist?.length ? liveData.nplHist : B.nplHist
   return (
     <>
       <SectionTitle kicker="Sector health" title="Banks" />
@@ -147,10 +146,6 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
         ))}
       </div>
 
-      {/* Hidden — used to suppress nplHist lint warning; will be rendered in Task 4.2 */}
-      <div style={{ display: 'none' }}>
-        <AreaChart data={nplHist} w={346} h={70} color="var(--neg)" />
-      </div>
     </>
   )
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { fetchLatest } from '../lib/econdelta'
 import { METRIC } from '../lib/econdelta-metrics'
+import { spreadBps } from '../lib/yieldMath'
 
 export interface YieldsData {
   yields: {
@@ -44,16 +45,12 @@ export function useYields(): UseYieldsResult {
         const v5y  = y5y?.value  ?? null
         const v10y = y10y?.value ?? null
 
-        const spread = v91 != null && v10y != null
-          ? Math.round((v10y - v91) * 100)
-          : null
-
         setState({
           loading: false,
           error: null,
           data: {
             yields: { '91D': v91, '182D': v182, '364D': v364, '5Y': v5y, '10Y': v10y },
-            spread10Y_91D_bps: spread,
+            spread10Y_91D_bps: spreadBps(v10y, v91),
             asOf: y91?.asOf ?? y10y?.asOf ?? null,
           },
         })

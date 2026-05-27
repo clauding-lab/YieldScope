@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { fetchLatest } from '../lib/econdelta'
 import { METRIC } from '../lib/econdelta-metrics'
+import { spreadBps } from '../lib/yieldMath'
 
 export interface DashboardData {
   tbill91: number | null
@@ -36,9 +37,6 @@ export function useDashboard(): UseDashboardResult {
 
         const v91  = t91?.value  ?? null
         const v10y = t10?.value  ?? null
-        const spread = v91 != null && v10y != null
-          ? Math.round((v10y - v91) * 100)
-          : null
 
         setState({
           loading: false,
@@ -48,7 +46,7 @@ export function useDashboard(): UseDashboardResult {
             tbond10:           v10y,
             callMoney:         call?.value ?? null,
             cpiHeadline:       cpi?.value ?? null,
-            spread10Y_91D_bps: spread,
+            spread10Y_91D_bps: spreadBps(v10y, v91),
             asOf:              t91?.asOf ?? call?.asOf ?? cpi?.asOf ?? null,
           },
         })
