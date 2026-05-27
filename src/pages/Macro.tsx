@@ -4,6 +4,7 @@ import { FX } from '../data/fixtures'
 import { Delta, ListRow, SectionTitle, Sparkline } from '../components/primitives'
 import { AreaChart, Heatmap } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
+import { useMacro } from '../hooks/useMacro'
 
 const CPI_ROWS = ['Food', 'Non-food', 'Core', 'Headline']
 const CPI_COLS = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr']
@@ -36,6 +37,7 @@ const COMMODITIES: { c: string; v: string; u: string; d: number; spark: number[]
 ]
 
 function MacroMobile() {
+  const { data } = useMacro()
   const M = FX.macro
   return (
     <>
@@ -44,7 +46,7 @@ function MacroMobile() {
       <div style={{ padding: '0 22px 28px' }}>
         <div className="caption">CPI · headline · April</div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginTop: 4 }}>
-          <span className="serif-num" style={{ fontSize: 64 }}>9.20</span>
+          <span className="serif-num" style={{ fontSize: 64 }}>{data?.cpiHeadline?.toFixed(2) ?? '—'}</span>
           <span className="caption">% YoY</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
@@ -52,7 +54,7 @@ function MacroMobile() {
           <span className="caption">target 7.50 · gap 170 bps</span>
         </div>
         <div style={{ marginTop: 18 }}>
-          <AreaChart data={M.cpiHist} w={346} h={80} color="var(--accent)" />
+          <AreaChart data={data?.cpiHist?.length ? data.cpiHist : M.cpiHist} w={346} h={80} color="var(--accent)" />
         </div>
       </div>
 
@@ -61,7 +63,7 @@ function MacroMobile() {
           <ListRow
             label="Food"
             value="9.40%"
-            sub={<Sparkline data={M.foodHist} w={80} h={16} color="var(--neg)" /> as ReactNode}
+            sub={<Sparkline data={data?.foodHist?.length ? data.foodHist : M.foodHist} w={80} h={16} color="var(--neg)" /> as ReactNode}
           />
           <ListRow
             label="Core"
@@ -71,7 +73,7 @@ function MacroMobile() {
           <ListRow
             label="Non-food"
             value="8.60%"
-            sub={<Sparkline data={[9.0, 8.95, 8.9, 8.8, 8.75, 8.7, 8.65, 8.6]} w={80} h={16} color="var(--pos)" /> as ReactNode}
+            sub={<Sparkline data={data?.nonFoodHist?.length ? data.nonFoodHist : [9.0, 8.95, 8.9, 8.8, 8.75, 8.7, 8.65, 8.6]} w={80} h={16} color="var(--pos)" /> as ReactNode}
             last
           />
         </div>
@@ -82,7 +84,7 @@ function MacroMobile() {
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <span className="serif-num" style={{ fontSize: 36, color: 'var(--neg)' }}>20.84</span>
+              <span className="serif-num" style={{ fontSize: 36, color: 'var(--neg)' }}>{data?.fxReservesUsdBn?.toFixed(2) ?? '—'}</span>
               <span className="caption">USD bn</span>
             </div>
             <div className="caption" style={{ marginTop: 4 }}>Below USD 21bn floor</div>
@@ -93,7 +95,7 @@ function MacroMobile() {
           </div>
         </div>
         <div style={{ marginTop: 16 }}>
-          <AreaChart data={M.fxResHist} w={346} h={80} color="var(--neg)" />
+          <AreaChart data={data?.fxResHist?.length ? data.fxResHist : M.fxResHist} w={346} h={80} color="var(--neg)" />
         </div>
       </div>
 
@@ -128,6 +130,7 @@ function MacroMobile() {
 }
 
 function MacroDesktop() {
+  const { data } = useMacro()
   const M = FX.macro
   return (
     <>
@@ -144,20 +147,20 @@ function MacroDesktop() {
         <div>
           <div className="eyebrow" style={{ marginBottom: 8 }}>Inflation · April</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-            <span className="serif-num" style={{ fontSize: 72 }}>9.20</span>
+            <span className="serif-num" style={{ fontSize: 72 }}>{data?.cpiHeadline?.toFixed(2) ?? '—'}</span>
             <span className="caption">% YoY</span>
           </div>
           <p style={{ marginTop: 14, fontSize: 20, lineHeight: 1.4, color: 'var(--ink)' }}>
             Eight consecutive months of cooling. Food easing faster than core. Target 7.50 · gap 170 bps.
           </p>
           <div style={{ marginTop: 20 }}>
-            <AreaChart data={M.cpiHist} w={540} h={140} color="var(--accent)" />
+            <AreaChart data={data?.cpiHist?.length ? data.cpiHist : M.cpiHist} w={540} h={140} color="var(--accent)" />
           </div>
         </div>
         <div>
           <div className="eyebrow" style={{ marginBottom: 8 }}>FX reserves · BPM6</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-            <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>20.84</span>
+            <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>{data?.fxReservesUsdBn?.toFixed(2) ?? '—'}</span>
             <span className="caption">USD bn</span>
           </div>
           <p style={{ marginTop: 14, fontSize: 20, lineHeight: 1.4, color: 'var(--ink)' }}>
@@ -165,7 +168,7 @@ function MacroDesktop() {
             threshold. Review due W24.
           </p>
           <div style={{ marginTop: 20 }}>
-            <AreaChart data={M.fxResHist} w={540} h={140} color="var(--neg)" />
+            <AreaChart data={data?.fxResHist?.length ? data.fxResHist : M.fxResHist} w={540} h={140} color="var(--neg)" />
           </div>
         </div>
       </div>
@@ -259,7 +262,7 @@ function MacroDesktop() {
         <div>
           <div className="eyebrow" style={{ marginBottom: 14 }}>USD / BDT · mid-rate</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-            <span className="serif-num" style={{ fontSize: 56 }}>119.62</span>
+            <span className="serif-num" style={{ fontSize: 56 }}>{data?.usdBdt?.toFixed(2) ?? '—'}</span>
             <Delta value={0.04} size="md" />
           </div>
           <div style={{ display: 'flex', gap: 24, marginTop: 8 }}>
