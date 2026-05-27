@@ -1,23 +1,21 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AppShell } from './components/layout/AppShell'
-import DashboardPage from './pages/DashboardPage'
 
-// Code-split heavy pages
-const YieldAuctionsPage = lazy(() => import('./pages/YieldAuctionsPage'))
-const LiquidityPage = lazy(() => import('./pages/LiquidityPage'))
-const MacroExternalPage = lazy(() => import('./pages/MacroExternalPage'))
-const FiscalSovereignPage = lazy(() => import('./pages/FiscalSovereignPage'))
-const BankingPage = lazy(() => import('./pages/BankingPage'))
-const IntelligencePage = lazy(() => import('./pages/IntelligencePage'))
-const SettingsPage = lazy(() => import('./pages/SettingsPage'))
+const Dashboard    = lazy(() => import('./pages/Dashboard'))
+const Yields       = lazy(() => import('./pages/Yields'))
+const Liquidity    = lazy(() => import('./pages/Liquidity'))
+const Macro        = lazy(() => import('./pages/Macro'))
+const Fiscal       = lazy(() => import('./pages/Fiscal'))
+const Banking      = lazy(() => import('./pages/Banking'))
+const Intelligence = lazy(() => import('./pages/Intelligence'))
 
 function PageLoader() {
   return (
-    <div className="py-6 space-y-4">
-      <div className="h-8 bg-slate-800 rounded animate-pulse" />
-      <div className="h-48 bg-slate-800 rounded-xl animate-pulse" />
-      <div className="h-32 bg-slate-800 rounded-xl animate-pulse" />
+    <div style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ height: 32, background: 'var(--paper-2)', borderRadius: 8 }} />
+      <div style={{ height: 192, background: 'var(--paper-2)', borderRadius: 14 }} />
+      <div style={{ height: 128, background: 'var(--paper-2)', borderRadius: 14 }} />
     </div>
   )
 }
@@ -27,19 +25,15 @@ export default function App() {
     <AppShell>
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/yields" element={<YieldAuctionsPage />} />
-          <Route path="/liquidity" element={<LiquidityPage />} />
-          <Route path="/macro" element={<MacroExternalPage />} />
-          <Route path="/fiscal" element={<FiscalSovereignPage />} />
-          <Route path="/banking" element={<BankingPage />} />
-          <Route path="/intelligence" element={<IntelligencePage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          {/* Legacy route redirects */}
-          <Route path="/auctions" element={<Navigate to="/yields" replace />} />
-          <Route path="/simulator" element={<Navigate to="/" replace />} />
-          <Route path="/policy" element={<Navigate to="/intelligence" replace />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/"             element={<Dashboard />} />
+          <Route path="/yields"       element={<Yields />} />
+          <Route path="/liquidity"    element={<Liquidity />} />
+          <Route path="/macro"        element={<Macro />} />
+          <Route path="/fiscal"       element={<Fiscal />} />
+          <Route path="/banking"      element={<Banking />} />
+          <Route path="/intelligence" element={<Intelligence />} />
+          <Route path="/auctions"     element={<Navigate to="/yields" replace />} />
+          <Route path="*"             element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
     </AppShell>

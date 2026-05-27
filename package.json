@@ -1,7 +1,7 @@
 {
   "name": "yieldscope",
   "private": true,
-  "version": "2.0.0",
+  "version": "3.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,26 +10,26 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.78.0",
-    "date-fns": "^4.1.0",
-    "html-to-image": "^1.11.13",
-    "lightweight-charts": "^5.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.1.0",
-    "recharts": "^2.15.0"
+    "react-router-dom": "^7.1.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@tailwindcss/postcss": "^4.0.0",
     "@tailwindcss/vite": "^4.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.0",
     "autoprefixer": "^10.4.0",
-    "cheerio": "^1.2.0",
+    "eslint": "^10.4.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.6.0",
     "postcss": "^8.4.0",
     "tailwindcss": "^4.0.0",
     "typescript": "~5.7.0",
+    "typescript-eslint": "^8.60.0",
     "vite": "^6.0.0",
     "vite-plugin-pwa": "^0.21.0"
   }

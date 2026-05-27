@@ -1,19 +1,22 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import { AIProvider } from './contexts/AIContext'
 import { ErrorBoundary } from './components/layout/ErrorBoundary'
-import './styles/globals.css'
+import { ThemeProvider } from './theme/ThemeProvider'
 import App from './App'
+import './styles/globals.css'
 
-createRoot(document.getElementById('root')!).render(
+const rootEl = document.getElementById('root')
+if (!rootEl) throw new Error('Root element #root not found')
+
+createRoot(rootEl).render(
   <StrictMode>
-    <ErrorBoundary>
-      <BrowserRouter basename="/YieldScope">
-        <AIProvider>
+    <ThemeProvider>
+      <ErrorBoundary>
+        <BrowserRouter basename="/YieldScope">
           <App />
-        </AIProvider>
-      </BrowserRouter>
-    </ErrorBoundary>
+        </BrowserRouter>
+      </ErrorBoundary>
+    </ThemeProvider>
   </StrictMode>,
 )

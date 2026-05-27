@@ -20,27 +20,35 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('[YieldScope Error]', error, errorInfo)
+    console.error('[YieldScope]', error, errorInfo)
   }
 
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-dvh bg-slate-950 text-slate-100 flex items-center justify-center p-6">
-          <div className="max-w-sm text-center space-y-4">
-            <div className="text-4xl">!</div>
-            <h1 className="text-lg font-bold text-red-400">Something went wrong</h1>
-            <p className="text-sm text-slate-400">
-              {this.state.error?.message || 'An unexpected error occurred.'}
-            </p>
+        <div
+          style={{
+            minHeight: '100dvh',
+            background: 'var(--bg)',
+            color: 'var(--ink)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 24,
+          }}
+        >
+          <div style={{ maxWidth: 360, textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <h1 className="display" style={{ fontSize: 22, margin: 0, color: 'var(--neg)' }}>Something went wrong</h1>
+            <p className="body" style={{ fontSize: 14 }}>{this.state.error?.message ?? 'An unexpected error occurred.'}</p>
             <button
+              type="button"
+              className="btn btn-primary"
               onClick={() => {
                 this.setState({ hasError: false, error: null })
                 window.location.reload()
               }}
-              className="px-4 py-2 text-xs font-medium bg-slate-800 border border-slate-700 rounded-lg hover:bg-slate-700 transition-colors"
             >
-              Reload App
+              Reload
             </button>
           </div>
         </div>

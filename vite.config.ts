@@ -15,48 +15,22 @@ export default defineConfig({
         name: 'YieldScope - Bangladesh ALCO Intelligence',
         short_name: 'YieldScope',
         description: 'Bangladesh ALCO Intelligence Platform',
-        theme_color: '#0f172a',
-        background_color: '#0f172a',
+        theme_color: '#14171C',
+        background_color: '#14171C',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/YieldScope/',
         scope: '/YieldScope/',
         categories: ['finance', 'business'],
         icons: [
-          {
-            src: 'icons/icon-192x192.png',
-            sizes: '192x192',
-            type: 'image/png',
-          },
-          {
-            src: 'icons/icon-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-          },
-          {
-            src: 'icons/icon-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'maskable',
-          },
+          { src: 'icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'icons/icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         navigateFallback: '/YieldScope/index.html',
-        runtimeCaching: [
-          {
-            urlPattern: /\/data\/.*\.json$/,
-            handler: 'StaleWhileRevalidate',
-            options: {
-              cacheName: 'yieldscope-data-v2',
-              expiration: {
-                maxAgeSeconds: 86400,
-                maxEntries: 30,
-              },
-            },
-          },
-        ],
       },
     }),
   ],
@@ -70,9 +44,6 @@ export default defineConfig({
       output: {
         manualChunks: {
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-ai': ['@anthropic-ai/sdk'],
-          'vendor-charts': ['recharts'],
-          'vendor-date': ['date-fns'],
         },
       },
     },

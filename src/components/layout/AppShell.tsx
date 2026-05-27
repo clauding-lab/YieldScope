@@ -1,20 +1,59 @@
 import type { ReactNode } from 'react'
-import { Header } from './Header'
+import { useIsDesktop } from '../../lib/hooks'
 import { BottomNav } from './BottomNav'
-import { OfflineBanner } from './OfflineBanner'
-import { InstallPrompt } from './InstallPrompt'
+import { DesktopSideNav } from './DesktopSideNav'
+import { MobileHeader } from './MobileHeader'
 
 interface AppShellProps {
   children: ReactNode
 }
 
 export function AppShell({ children }: AppShellProps) {
+  const isDesktop = useIsDesktop()
+
+  if (isDesktop) {
+    return (
+      <div
+        style={{
+          minHeight: '100dvh',
+          display: 'flex',
+          background: 'var(--bg)',
+          color: 'var(--ink)',
+        }}
+      >
+        <DesktopSideNav />
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'auto',
+            minWidth: 0,
+          }}
+        >
+          {children}
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-dvh bg-slate-950 text-slate-100 flex flex-col">
-      <Header />
-      <OfflineBanner />
-      <InstallPrompt />
-      <main className="flex-1 overflow-y-auto pb-20 px-4">
+    <div
+      style={{
+        minHeight: '100dvh',
+        display: 'flex',
+        flexDirection: 'column',
+        background: 'var(--bg)',
+        color: 'var(--ink)',
+      }}
+    >
+      <MobileHeader />
+      <main
+        style={{
+          flex: 1,
+          paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
+        }}
+      >
         {children}
       </main>
       <BottomNav />
