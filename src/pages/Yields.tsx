@@ -4,6 +4,7 @@ import { FX } from '../data/fixtures'
 import { Delta, SectionTitle, Sparkline, Tabs } from '../components/primitives'
 import { AreaChart, YieldCurve } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
+import { useYields } from '../hooks/useYields'
 
 type YieldsTab = 'curve' | 'series' | 'auctions'
 type TenorKey = '91D' | '182D' | '364D' | '2Y' | '5Y' | '10Y'
@@ -17,12 +18,6 @@ const TENOR_LADDER: { tenor: string; yld: number; delta: number }[] = [
   { tenor: '10Y',  yld: 12.18, delta: -0.02 },
   { tenor: '15Y',  yld: 12.31, delta:  0.00 },
   { tenor: '20Y',  yld: 12.40, delta:  0.00 },
-]
-
-const SPREADS = [
-  { lbl: '10y – 91d', v: '+76',  u: 'bps' },
-  { lbl: '5y – 2y',   v: '+19',  u: 'bps' },
-  { lbl: '91d – SDF', v: '+492', u: 'bps' },
 ]
 
 const HISTORY_SERIES: Record<TenorKey, number[]> = {
@@ -41,6 +36,24 @@ const UPCOMING = [
 ]
 
 function YieldsCurveTab() {
+  const { data } = useYields()
+
+  const liveYields = data?.yields ?? {} as Record<string, number | null | undefined>
+  const tenorLadder = TENOR_LADDER.map(row => {
+    const live = (liveYields as Record<string, number | null | undefined>)[row.tenor]
+    return live != null ? { ...row, yld: live } : row
+  })
+
+  const slopeLabel = data?.spread10Y_91D_bps != null
+    ? `+${data.spread10Y_91D_bps}`
+    : '+76'
+
+  const liveSpreads = [
+    { lbl: '10y – 91d', v: slopeLabel, u: 'bps' },
+    { lbl: '5y – 2y',   v: '+19',      u: 'bps' },
+    { lbl: '91d – SDF', v: '+492',     u: 'bps' },
+  ]
+
   return (
     <>
       <div style={{ padding: '0 22px 28px' }}>
@@ -48,7 +61,7 @@ function YieldsCurveTab() {
           <div>
             <div className="eyebrow">Slope 10y over 91d</div>
             <div className="serif-num" style={{ fontSize: 40, color: 'var(--accent)' }}>
-              +76 <span className="caption" style={{ marginLeft: 4 }}>bps</span>
+              {slopeLabel} <span className="caption" style={{ marginLeft: 4 }}>bps</span>
             </div>
           </div>
           <span className="caption">Flatter by 12 bps · last month</span>
@@ -59,7 +72,7 @@ function YieldsCurveTab() {
       <div style={{ padding: '0 22px 16px' }}>
         <div className="eyebrow" style={{ marginBottom: 10 }}>Spreads</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
-          {SPREADS.map(s => (
+          {liveSpreads.map(s => (
             <div key={s.lbl}>
               <div className="caption">{s.lbl}</div>
               <div className="serif-num" style={{ fontSize: 24, marginTop: 4 }}>{s.v}</div>
@@ -72,7 +85,7 @@ function YieldsCurveTab() {
       <div style={{ padding: '24px 22px 24px' }}>
         <div className="eyebrow" style={{ marginBottom: 12 }}>Tenor ladder</div>
         <div className="card-flat">
-          {TENOR_LADDER.map((row, i, arr) => (
+          {tenorLadder.map((row, i, arr) => (
             <div
               key={row.tenor}
               style={{
@@ -229,6 +242,14 @@ function YieldsMobile() {
 }
 
 function YieldsDesktop() {
+  const { data } = useYields()
+
+  const slopeLabel = data?.spread10Y_91D_bps != null
+    ? `+${data.spread10Y_91D_bps}`
+    : '+76'
+  const yield91d = data?.yields['91D']?.toFixed(2) ?? '11.42'
+  const yield10y = data?.yields['10Y']?.toFixed(2) ?? '12.18'
+
   return (
     <>
       <DesktopHeader section="Yields" breadcrumb="YieldScope · Sovereign curve & auctions" />
@@ -244,7 +265,7 @@ function YieldsDesktop() {
         <div>
           <div className="eyebrow" style={{ marginBottom: 6 }}>Slope 10y over 91d</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginTop: 4 }}>
-            <span className="serif-num" style={{ fontSize: 60, color: 'var(--accent)' }}>+76</span>
+            <span className="serif-num" style={{ fontSize: 60, color: 'var(--accent)' }}>{slopeLabel}</span>
             <span className="caption">bps</span>
           </div>
           <div className="caption" style={{ marginTop: 6 }}>Flatter by 12 bps vs last month</div>
@@ -252,7 +273,7 @@ function YieldsDesktop() {
         <div>
           <div className="eyebrow" style={{ marginBottom: 6 }}>Front-end · 91d</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginTop: 4 }}>
-            <span className="serif-num" style={{ fontSize: 60 }}>11.42</span>
+            <span className="serif-num" style={{ fontSize: 60 }}>{yield91d}</span>
             <span className="caption">%</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6 }}>
@@ -263,7 +284,7 @@ function YieldsDesktop() {
         <div>
           <div className="eyebrow" style={{ marginBottom: 6 }}>Long-end · 10y</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginTop: 4 }}>
-            <span className="serif-num" style={{ fontSize: 60 }}>12.18</span>
+            <span className="serif-num" style={{ fontSize: 60 }}>{yield10y}</span>
             <span className="caption">%</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6 }}>
