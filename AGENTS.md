@@ -28,7 +28,9 @@ Owner: solo dev (Adnan, Bangladesh, UTC+6). Vibe-coded — Adnan directs AI agen
 │   │   ├── charts/                   Hand-rolled SVG: AreaChart, YieldCurve (scrubbable), Heatmap, Timeline, BarChart, Donut, RadialGauge, DotMatrix, SlopeChart, Candle
 │   │   └── layout/                   AppShell (responsive), MobileHeader, DesktopHeader, BottomNav (floating glass pill), DesktopSideNav (collapsible pin/hover), ErrorBoundary
 │   └── pages/                        Dashboard, Yields, Liquidity, Macro, Fiscal, Banking, Intelligence — each has Mobile + Desktop sub-layouts
-├── docs/superpowers/plans/           Implementation plans (e.g., the EconDelta swap plan)
+├── docs/
+│   ├── superpowers/plans/            Implementation plans (e.g., the EconDelta swap plan)
+│   └── econdelta-wishlist.md         Catalog of placeholder panels + 4 effort tiers for live data
 ├── public/                           favicon.svg, icons/ (PWA)
 ├── index.html                        Vite entry, `<html class="theme-slate">` default
 ├── vite.config.ts                    Base `/YieldScope/`, PWA manifest, vendor-react chunk
@@ -97,12 +99,13 @@ Numbered, named, and specific enough to keep a fresh AI session from stepping on
 6. **PWA `theme_color` / `background_color` must match the `:root` background of the default palette** (Slate, `#14171C`). Set in `vite.config.ts` PWA manifest AND `index.html` `<meta name="theme-color">`. If you change the default palette, update both.
 7. **No AI / Anthropic SDK in client code (yet).** v2.0 had `dangerouslyAllowBrowser: true` with a hardcoded model ID (`claude-opus-4-6`, which doesn't exist) — every call silently 404'd for 2+ months. v3.0 deliberately drops the SDK. If AI features re-enter scope, do it behind a server-side proxy and centralize the model ID in ONE place.
 8. **No `process.exit(0)` on errors in scripts.** v2.0 scripts swallowed every failure with exit-0, masking errors from CI. Use `process.exit(1)` (or just throw) so failures show as red in GitHub Actions.
-9. **`scripts/*.mjs`, `.github/workflows/scrape-data.yml`, `.github/workflows/update-app.yml` are STALE.** They reference removed deps (`@anthropic-ai/sdk`, `cheerio`) and will fail at runtime. They're left in place pending explicit user sign-off to delete (they're tracked files). Don't try to revive them — the work belongs in the EconDelta swap.
+9. **`scripts/*.mjs`, `.github/workflows/scrape-data.yml`, `.github/workflows/update-app.yml` are STALE and DISABLED.** They reference removed deps (`@anthropic-ai/sdk`, `cheerio`) and will fail at runtime. Both workflows were disabled via `gh workflow disable` on 2026-05-28 (they were firing cron commits against `public/data/*.json` files that v3.0 deleted). Files remain in the repo pending explicit user sign-off to delete (tracked files). Don't try to revive them — the work belongs in the EconDelta swap.
 10. **Admin password gates are forbidden.** v2.0 had `const ADMIN_PASSWORD = 'yieldscope2008$'` in `Header.tsx` — visible in View Source, security theater. v3.0 removed Settings entirely. If a settings UI is needed later, do it without any client-side "password" gate.
 11. **Vite plugin order matters: `react()` BEFORE `tailwindcss()` BEFORE `VitePWA()`.** Reordering can break HMR or PWA precaching. The current order in `vite.config.ts` is correct.
 12. **CSS `@import url(...)` for Google Fonts must come BEFORE `@import "tailwindcss"`** in `src/styles/globals.css`. Tailwind 4's import expands into rules, so a later `@import` violates the CSS spec ("@import rules must precede all rules"). The build warns about this; keep the Google Fonts import on line 1.
 13. **`useId()` must have its `:` characters stripped before being used as an HTML `id` attribute.** SVG `<linearGradient id={…}>` rejects colons. Pattern: `const id = useId().replace(/[:]/g, '')`. See `Sparkline.tsx`, `AreaChart.tsx`.
 14. **Lazy page imports use **default** export.** `App.tsx` does `lazy(() => import('./pages/Dashboard'))` which requires `export default function Dashboard()`. Don't switch pages to named exports without updating `App.tsx`.
+15. **No silent fixture fallback. Live or `—`, never `?? 'literal'`.** When a hook returns null because EconDelta has no row yet, render `—` (or hide the chart/sub-element) — NEVER fall back to a hardcoded value. The v3.0 honesty pass (2026-05-28, PR #2) stripped 7+ silent fallbacks across Dashboard/Yields/Banking/Fiscal that were rendering hardcoded `'9.34'` / `'11.42'` / `'12.18'` / `'9.20'` / `'+76'` / `B.nplRatio` / `F.revenuePct` when EconDelta returned null. Same dishonesty class as v2.0's hallucinated macro pipeline, different mechanism. For non-live content that's intentionally placeholder, attach `<DemoBadge />` (the grey "Demo data" chip) so the reader knows it's not real. See `docs/econdelta-wishlist.md` for the tiered backlog of panels that should eventually become live.
 
 ## Communication & timezone
 
