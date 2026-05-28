@@ -7,11 +7,13 @@ vi.mock('../lib/econdelta', () => ({
   isLiveDataAvailable: () => true,
 }))
 
-import { fetchLatest } from '../lib/econdelta'
+import { fetchLatest, fetchSeries } from '../lib/econdelta'
 import { useYields } from './useYields'
 
 beforeEach(() => {
   vi.mocked(fetchLatest).mockReset()
+  vi.mocked(fetchSeries).mockReset()
+  vi.mocked(fetchSeries).mockResolvedValue([])
 })
 
 describe('useYields', () => {
@@ -54,5 +56,22 @@ describe('useYields', () => {
     const { result } = renderHook(() => useYields())
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.error).not.toBeNull()
+  })
+
+  it('exposes per-tenor historical series', async () => {
+    vi.mocked(fetchLatest).mockResolvedValue(null)
+    vi.mocked(fetchSeries).mockImplementation(async (id) => {
+      if (id === 'bill_bond_rates')   return [{ asOf: '2026-05-25', value: 11.40 }, { asOf: '2026-05-26', value: 11.42 }]
+      if (id === 'tbond_10y_yield')   return [{ asOf: '2026-05-20', value: 12.16 }, { asOf: '2026-05-21', value: 12.18 }]
+      return []
+    })
+
+    const { result } = renderHook(() => useYields())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    const d = result.current.data!
+    expect(d.series['91D']).toEqual([11.40, 11.42])
+    expect(d.series['10Y']).toEqual([12.16, 12.18])
+    expect(d.series['182D']).toEqual([])
   })
 })
