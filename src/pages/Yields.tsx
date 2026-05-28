@@ -46,12 +46,12 @@ function YieldsCurveTab() {
 
   const slopeLabel = data?.spread10Y_91D_bps != null
     ? `+${data.spread10Y_91D_bps}`
-    : '+76'
+    : '—'
 
   const liveSpreads = [
-    { lbl: '10y – 91d', v: slopeLabel, u: 'bps' },
-    { lbl: '5y – 2y',   v: '+19',      u: 'bps' },
-    { lbl: '91d – SDF', v: '+492',     u: 'bps' },
+    { lbl: '10y – 91d', v: slopeLabel, u: 'bps', demo: false },
+    { lbl: '5y – 2y',   v: '+19',      u: 'bps', demo: true  },
+    { lbl: '91d – SDF', v: '+492',     u: 'bps', demo: true  },
   ]
 
   return (
@@ -74,7 +74,10 @@ function YieldsCurveTab() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
           {liveSpreads.map(s => (
             <div key={s.lbl}>
-              <div className="caption">{s.lbl}</div>
+              <div className="caption" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                {s.lbl}
+                {s.demo && <DemoBadge />}
+              </div>
               <div className="serif-num" style={{ fontSize: 24, marginTop: 4 }}>{s.v}</div>
               <div className="caption">{s.u}</div>
             </div>
@@ -124,6 +127,10 @@ function YieldsHistoryTab() {
 
   return (
     <>
+      <div style={{ padding: '0 22px 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div className="eyebrow">History</div>
+        <DemoBadge />
+      </div>
       <div style={{ padding: '0 22px 18px', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         {(Object.keys(HISTORY_SERIES) as TenorKey[]).map(t => (
           <button
@@ -255,9 +262,9 @@ function YieldsDesktop() {
 
   const slopeLabel = data?.spread10Y_91D_bps != null
     ? `+${data.spread10Y_91D_bps}`
-    : '+76'
-  const yield91d = data?.yields['91D']?.toFixed(2) ?? '11.42'
-  const yield10y = data?.yields['10Y']?.toFixed(2) ?? '12.18'
+    : '—'
+  const yield91d = data?.yields['91D']?.toFixed(2) ?? '—'
+  const yield10y = data?.yields['10Y']?.toFixed(2) ?? '—'
 
   return (
     <>

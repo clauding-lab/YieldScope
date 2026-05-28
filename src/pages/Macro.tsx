@@ -22,12 +22,28 @@ function cpiColor(v: number) {
   return { bg: `rgba(146, 176, 149, ${0.18 + (1 - pct) * 0.25})`, fg: 'var(--pos)' }
 }
 
-const BOP_ITEMS: { lbl: string; v: string; u: string; d: string; spark: number[]; col: string }[] = [
-  { lbl: 'Remittances',  v: '28.4', u: 'USD bn', d: '+8.2% YoY',     spark: FX.macro.remitHist,  col: 'var(--pos)' },
-  { lbl: 'Exports',      v: '54.8', u: 'USD bn', d: '+4.2% YoY',     spark: FX.macro.exportHist, col: 'var(--pos)' },
-  { lbl: 'Imports',      v: '68.1', u: 'USD bn', d: '−2.4% YoY',     spark: FX.macro.importHist, col: 'var(--neg)' },
-  { lbl: 'Current acct', v: '−2.8', u: 'USD bn', d: '−1.9% of GDP',  spark: [-4.2, -3.8, -3.4, -3.2, -3.0, -2.9, -2.8, -2.8], col: 'var(--neg)' },
-]
+interface BopItem {
+  lbl: string
+  v: string
+  u: string
+  d: string
+  spark: number[]
+  col: string
+  demo?: boolean
+}
+
+function fmtUsdBn(n: number | null | undefined): string {
+  return n != null ? n.toFixed(2) : '—'
+}
+
+function buildBopItems(data: ReturnType<typeof useMacro>['data']): BopItem[] {
+  return [
+    { lbl: 'Remittances',  v: fmtUsdBn(data?.remitMonthlyUsdBn),  u: 'USD bn · monthly', d: '',  spark: FX.macro.remitHist,  col: 'var(--pos)', demo: true },
+    { lbl: 'Exports',      v: fmtUsdBn(data?.exportMonthlyUsdBn), u: 'USD bn · monthly', d: '',  spark: FX.macro.exportHist, col: 'var(--pos)', demo: true },
+    { lbl: 'Imports',      v: fmtUsdBn(data?.importMonthlyUsdBn), u: 'USD bn · monthly', d: '',  spark: FX.macro.importHist, col: 'var(--neg)', demo: true },
+    { lbl: 'Current acct', v: '−2.8', u: 'USD bn', d: '−1.9% of GDP', spark: [-4.2, -3.8, -3.4, -3.2, -3.0, -2.9, -2.8, -2.8], col: 'var(--neg)', demo: true },
+  ]
+}
 
 const COMMODITIES: { c: string; v: string; u: string; d: number; spark: number[] }[] = [
   { c: 'Brent',    v: '84.20', u: 'USD/bbl',   d:  1.4, spark: [78, 80, 82, 81, 83, 84, 83.5, 84.20] },
@@ -38,7 +54,8 @@ const COMMODITIES: { c: string; v: string; u: string; d: number; spark: number[]
 
 function MacroMobile() {
   const { data } = useMacro()
-  const M = FX.macro
+  const bopItems = buildBopItems(data)
+  const fmtPct = (n: number | null | undefined) => n != null ? `${n.toFixed(2)}%` : '—'
   return (
     <>
       <SectionTitle kicker="Inflation · reserves · BoP" title="Macro" />
@@ -49,31 +66,28 @@ function MacroMobile() {
           <span className="serif-num" style={{ fontSize: 64 }}>{data?.cpiHeadline?.toFixed(2) ?? '—'}</span>
           <span className="caption">% YoY</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
-          <Delta value={-0.18} invert size="md" />
-          <span className="caption">target 7.50 · gap 170 bps</span>
-        </div>
-        <div style={{ marginTop: 18 }}>
-          <AreaChart data={data?.cpiHist?.length ? data.cpiHist : M.cpiHist} w={346} h={80} color="var(--accent)" />
-        </div>
+        {data?.cpiHist?.length ? (
+          <div style={{ marginTop: 18 }}>
+            <AreaChart data={data.cpiHist} w={346} h={80} color="var(--accent)" />
+          </div>
+        ) : null}
       </div>
 
       <div style={{ padding: '0 16px 24px' }}>
         <div className="card-flat">
           <ListRow
             label="Food"
-            value="9.40%"
-            sub={<Sparkline data={data?.foodHist?.length ? data.foodHist : M.foodHist} w={80} h={16} color="var(--neg)" /> as ReactNode}
+            value={fmtPct(data?.cpiFood)}
+            sub={data?.foodHist?.length ? <Sparkline data={data.foodHist} w={80} h={16} color="var(--neg)" /> as ReactNode : undefined}
           />
           <ListRow
-            label="Core"
-            value="7.62%"
-            sub={<Sparkline data={M.coreHist} w={80} h={16} color="var(--info)" /> as ReactNode}
+            label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>Core <DemoBadge /></span> as ReactNode}
+            value="—"
           />
           <ListRow
             label="Non-food"
-            value="8.60%"
-            sub={<Sparkline data={data?.nonFoodHist?.length ? data.nonFoodHist : [9.0, 8.95, 8.9, 8.8, 8.75, 8.7, 8.65, 8.6]} w={80} h={16} color="var(--pos)" /> as ReactNode}
+            value={fmtPct(data?.cpiNonFood)}
+            sub={data?.nonFoodHist?.length ? <Sparkline data={data.nonFoodHist} w={80} h={16} color="var(--pos)" /> as ReactNode : undefined}
             last
           />
         </div>
@@ -87,21 +101,22 @@ function MacroMobile() {
               <span className="serif-num" style={{ fontSize: 36, color: 'var(--neg)' }}>{data?.fxReservesUsdBn?.toFixed(2) ?? '—'}</span>
               <span className="caption">USD bn</span>
             </div>
-            <div className="caption" style={{ marginTop: 4 }}>Below USD 21bn floor</div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div className="serif-num" style={{ fontSize: 26, color: 'var(--warn)' }}>2.94</div>
-            <div className="caption">mo cover · IMF min 3.0</div>
           </div>
         </div>
-        <div style={{ marginTop: 16 }}>
-          <AreaChart data={data?.fxResHist?.length ? data.fxResHist : M.fxResHist} w={346} h={80} color="var(--neg)" />
-        </div>
+        {data?.fxResHist?.length ? (
+          <div style={{ marginTop: 16 }}>
+            <AreaChart data={data.fxResHist} w={346} h={80} color="var(--neg)" />
+          </div>
+        ) : null}
       </div>
 
       <div style={{ padding: '0 16px 24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 22px 10px' }}>
+          <div className="caption">Balance of payments</div>
+          <DemoBadge />
+        </div>
         <div className="card-flat">
-          {BOP_ITEMS.map((b, i, arr) => (
+          {bopItems.map((b, i, arr) => (
             <div
               key={b.lbl}
               style={{
@@ -120,7 +135,7 @@ function MacroMobile() {
                   <span className="caption">{b.u}</span>
                 </div>
               </div>
-              <span className="caption">{b.d}</span>
+              {b.d && <span className="caption">{b.d}</span>}
             </div>
           ))}
         </div>
@@ -131,7 +146,7 @@ function MacroMobile() {
 
 function MacroDesktop() {
   const { data } = useMacro()
-  const M = FX.macro
+  const bopItems = buildBopItems(data)
   return (
     <>
       <DesktopHeader section="Macro" breadcrumb="YieldScope · Inflation, reserves, balance of payments" />
@@ -150,12 +165,11 @@ function MacroDesktop() {
             <span className="serif-num" style={{ fontSize: 72 }}>{data?.cpiHeadline?.toFixed(2) ?? '—'}</span>
             <span className="caption">% YoY</span>
           </div>
-          <p style={{ marginTop: 14, fontSize: 20, lineHeight: 1.4, color: 'var(--ink)' }}>
-            Eight consecutive months of cooling. Food easing faster than core. Target 7.50 · gap 170 bps.
-          </p>
-          <div style={{ marginTop: 20 }}>
-            <AreaChart data={data?.cpiHist?.length ? data.cpiHist : M.cpiHist} w={540} h={140} color="var(--accent)" />
-          </div>
+          {data?.cpiHist?.length ? (
+            <div style={{ marginTop: 20 }}>
+              <AreaChart data={data.cpiHist} w={540} h={140} color="var(--accent)" />
+            </div>
+          ) : null}
         </div>
         <div>
           <div className="eyebrow" style={{ marginBottom: 8 }}>FX reserves · BPM6</div>
@@ -163,29 +177,30 @@ function MacroDesktop() {
             <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>{data?.fxReservesUsdBn?.toFixed(2) ?? '—'}</span>
             <span className="caption">USD bn</span>
           </div>
-          <p style={{ marginTop: 14, fontSize: 20, lineHeight: 1.4, color: 'var(--ink)' }}>
-            Below the USD 21bn floor. Import cover <span className="num">2.94</span> months — inside the IMF EFF
-            threshold. Review due W24.
-          </p>
-          <div style={{ marginTop: 20 }}>
-            <AreaChart data={data?.fxResHist?.length ? data.fxResHist : M.fxResHist} w={540} h={140} color="var(--neg)" />
-          </div>
+          {data?.fxResHist?.length ? (
+            <div style={{ marginTop: 20 }}>
+              <AreaChart data={data.fxResHist} w={540} h={140} color="var(--neg)" />
+            </div>
+          ) : null}
         </div>
       </div>
 
       <div style={{ height: 1, background: 'var(--line)', margin: '0 48px' }} />
 
       <div style={{ padding: '36px 48px' }}>
-        <div className="eyebrow" style={{ marginBottom: 18 }}>Balance of payments · 12-month flows</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18 }}>
+          <div className="eyebrow">Balance of payments · monthly flows</div>
+          <DemoBadge />
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 32 }}>
-          {BOP_ITEMS.map(b => (
+          {bopItems.map(b => (
             <div key={b.lbl}>
               <div className="caption">{b.lbl}</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 6 }}>
                 <span className="serif-num" style={{ fontSize: 40 }}>{b.v}</span>
                 <span className="caption">{b.u}</span>
               </div>
-              <div className="caption" style={{ marginTop: 4 }}>{b.d}</div>
+              {b.d && <div className="caption" style={{ marginTop: 4 }}>{b.d}</div>}
               <div style={{ marginTop: 14 }}>
                 <Sparkline data={b.spark} w={260} h={32} color={b.col} strokeWidth={1.4} />
               </div>
@@ -199,7 +214,10 @@ function MacroDesktop() {
       <div style={{ padding: '36px 48px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 18 }}>
           <div>
-            <div className="eyebrow" style={{ marginBottom: 6 }}>CPI components · 8-month trajectory</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <div className="eyebrow">CPI components · 8-month trajectory</div>
+              <DemoBadge />
+            </div>
             <h3 className="display" style={{ fontSize: 22, margin: 0 }}>Where the heat is leaving</h3>
           </div>
           <div className="caption">YoY %, by month</div>
@@ -214,12 +232,6 @@ function MacroDesktop() {
             fmt={v => v.toFixed(2)}
             getColor={cpiColor}
           />
-          <div style={{ display: 'flex', gap: 20, marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--line)' }}>
-            <span className="caption">
-              All four series cooling — food fastest (−180 bps in 8 months), core slowest.
-            </span>
-            <span className="caption" style={{ marginLeft: 'auto' }}>Target band 6–7.5% · gap closing</span>
-          </div>
         </div>
       </div>
 

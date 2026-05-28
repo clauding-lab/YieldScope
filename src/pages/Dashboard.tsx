@@ -1,6 +1,6 @@
 import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
-import { Collapse, Delta, SectionTitle, Sparkline } from '../components/primitives'
+import { Collapse, DemoBadge, SectionTitle } from '../components/primitives'
 import { YieldCurve } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useDashboard } from '../hooks/useDashboard'
@@ -9,10 +9,7 @@ interface MetricRow {
   lbl: string
   v: string
   u: string
-  ch: number
-  inv: boolean
   hint?: string
-  spark?: number[]
 }
 
 interface MovingItem {
@@ -40,10 +37,10 @@ function DashboardMobile() {
   const { data } = useDashboard()
 
   const metrics: MetricRow[] = [
-    { lbl: '91-day T-Bill',    v: data?.tbill91     != null ? data.tbill91.toFixed(2)     : '11.42', u: '%',   ch: -0.08, inv: true, spark: FX.snapshots[0].spark },
-    { lbl: '10-year BGTB',     v: data?.tbond10     != null ? data.tbond10.toFixed(2)     : '12.18', u: '%',   ch: -0.02, inv: true, spark: FX.snapshots[2].spark },
-    { lbl: 'Call money · o/n', v: data?.callMoney   != null ? data.callMoney.toFixed(2)   : '9.34',  u: '%',   ch:  0.12, inv: true, spark: FX.snapshots[3].spark, hint: 'Above repo' },
-    { lbl: 'CPI · headline',   v: data?.cpiHeadline != null ? data.cpiHeadline.toFixed(2) : '9.20',  u: '%·y', ch: -0.18, inv: true, spark: FX.snapshots[5].spark, hint: 'April' },
+    { lbl: '91-day T-Bill',    v: data?.tbill91     != null ? data.tbill91.toFixed(2)     : '—', u: '%' },
+    { lbl: '10-year BGTB',     v: data?.tbond10     != null ? data.tbond10.toFixed(2)     : '—', u: '%' },
+    { lbl: 'Call money · o/n', v: data?.callMoney   != null ? data.callMoney.toFixed(2)   : '—', u: '%',   hint: 'Above repo' },
+    { lbl: 'CPI · headline',   v: data?.cpiHeadline != null ? data.cpiHeadline.toFixed(2) : '—', u: '%·y', hint: 'April' },
   ]
 
   return (
@@ -51,6 +48,9 @@ function DashboardMobile() {
       <SectionTitle kicker="Wednesday, 27 May" title="Today" />
 
       <div style={{ padding: '0 22px 24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <DemoBadge />
+        </div>
         <p
           style={{
             margin: 0,
@@ -85,10 +85,7 @@ function DashboardMobile() {
                   <span className="caption">{m.u}</span>
                 </div>
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <Delta value={m.ch} invert={m.inv} size="md" />
-                {m.hint && <div className="caption" style={{ marginTop: 4 }}>{m.hint}</div>}
-              </div>
+              {m.hint && <div className="caption" style={{ textAlign: 'right' }}>{m.hint}</div>}
             </div>
           ))}
         </div>
@@ -100,7 +97,7 @@ function DashboardMobile() {
           <span className="caption">
             Slope 10y – 91d ·{' '}
             <span className="num" style={{ color: 'var(--accent)' }}>
-              {data?.spread10Y_91D_bps != null ? `+${data.spread10Y_91D_bps} bps` : '+76 bps'}
+              {data?.spread10Y_91D_bps != null ? `+${data.spread10Y_91D_bps} bps` : '—'}
             </span>
           </span>
         </div>
@@ -110,7 +107,10 @@ function DashboardMobile() {
       </div>
 
       <div style={{ padding: '32px 22px 16px' }}>
-        <div className="eyebrow">What's moving</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div className="eyebrow">What's moving</div>
+          <DemoBadge />
+        </div>
       </div>
       <div style={{ padding: '0 22px 16px' }}>
         {MOVING.slice(0, 3).map((a, i, arr) => (
@@ -144,7 +144,12 @@ function DashboardMobile() {
 
       <div style={{ padding: '12px 16px 24px' }}>
         <Collapse
-          eyebrow="Weekly briefing"
+          eyebrow={
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              Weekly briefing
+              <DemoBadge />
+            </span>
+          }
           title="The short end is rotating, not relaxing"
           summary="Three forces are squeezing the front — read full analysis."
         >
@@ -163,10 +168,10 @@ function DashboardDesktop() {
   const { data } = useDashboard()
 
   const metrics: MetricRow[] = [
-    { lbl: '91-day T-Bill',    v: data?.tbill91     != null ? data.tbill91.toFixed(2)     : '11.42', u: '%',   ch: -0.08, inv: true, spark: FX.snapshots[0].spark },
-    { lbl: '10-year BGTB',     v: data?.tbond10     != null ? data.tbond10.toFixed(2)     : '12.18', u: '%',   ch: -0.02, inv: true, spark: FX.snapshots[2].spark },
-    { lbl: 'Call money · o/n', v: data?.callMoney   != null ? data.callMoney.toFixed(2)   : '9.34',  u: '%',   ch:  0.12, inv: true, spark: FX.snapshots[3].spark, hint: 'Above repo' },
-    { lbl: 'CPI · headline',   v: data?.cpiHeadline != null ? data.cpiHeadline.toFixed(2) : '9.20',  u: '%·y', ch: -0.18, inv: true, spark: FX.snapshots[5].spark, hint: 'April' },
+    { lbl: '91-day T-Bill',    v: data?.tbill91     != null ? data.tbill91.toFixed(2)     : '—', u: '%' },
+    { lbl: '10-year BGTB',     v: data?.tbond10     != null ? data.tbond10.toFixed(2)     : '—', u: '%' },
+    { lbl: 'Call money · o/n', v: data?.callMoney   != null ? data.callMoney.toFixed(2)   : '—', u: '%',   hint: 'Above repo' },
+    { lbl: 'CPI · headline',   v: data?.cpiHeadline != null ? data.cpiHeadline.toFixed(2) : '—', u: '%·y', hint: 'April' },
   ]
 
   return (
@@ -174,6 +179,9 @@ function DashboardDesktop() {
       <DesktopHeader section="Today" breadcrumb="YieldScope · ALCO Intelligence · Wednesday" />
 
       <div style={{ padding: '40px 48px 24px' }}>
+        <div style={{ marginBottom: 14 }}>
+          <DemoBadge />
+        </div>
         <p
           style={{
             margin: 0,
@@ -186,10 +194,6 @@ function DashboardDesktop() {
         >
           {HERO_LINE}
         </p>
-        <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
-          <span className="chip chip-warn">2 alerts</span>
-          <span className="chip">Refreshed 06:00 BST</span>
-        </div>
       </div>
 
       <div
@@ -207,14 +211,8 @@ function DashboardDesktop() {
               <span className="serif-num" style={{ fontSize: 48 }}>{m.v}</span>
               <span className="caption">{m.u}</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10 }}>
-              <Delta value={m.ch} invert={m.inv} size="md" />
-              {m.hint && <span className="caption">· {m.hint}</span>}
-            </div>
-            {m.spark && (
-              <div style={{ marginTop: 14 }}>
-                <Sparkline data={m.spark} w={220} h={32} strokeWidth={1.5} />
-              </div>
+            {m.hint && (
+              <div className="caption" style={{ marginTop: 10 }}>{m.hint}</div>
             )}
           </div>
         ))}
@@ -235,16 +233,19 @@ function DashboardDesktop() {
             <div>
               <div className="eyebrow" style={{ marginBottom: 6 }}>Sovereign curve</div>
               <h3 className="display" style={{ fontSize: 26, margin: 0 }}>
-                {data?.spread10Y_91D_bps != null ? `+${data.spread10Y_91D_bps} bps` : '+76 bps'}
+                {data?.spread10Y_91D_bps != null ? `+${data.spread10Y_91D_bps} bps` : '—'}
               </h3>
-              <div className="caption" style={{ marginTop: 4 }}>Slope 10y over 91d · flatter by 12 bps vs last month</div>
+              <div className="caption" style={{ marginTop: 4 }}>Slope 10y over 91d</div>
             </div>
           </div>
           <YieldCurve w={620} h={280} showLegend defaultOverlays={['latest', 'weekAgo', 'monthAgo', 'yearAgo']} />
         </div>
 
         <div>
-          <div className="eyebrow" style={{ marginBottom: 14 }}>What's moving</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+            <div className="eyebrow">What's moving</div>
+            <DemoBadge />
+          </div>
           {MOVING.map((a, i, arr) => (
             <div
               key={i}
@@ -290,7 +291,10 @@ function DashboardDesktop() {
         }}
       >
         <div>
-          <div className="eyebrow" style={{ marginBottom: 8 }}>Weekly briefing · drafted by Claude</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <div className="eyebrow">Weekly briefing · drafted by Claude</div>
+            <DemoBadge />
+          </div>
           <h3 className="display" style={{ fontSize: 28, margin: 0 }}>The short end is rotating, not relaxing.</h3>
           <p className="body" style={{ marginTop: 14, fontSize: 15, lineHeight: 1.65, maxWidth: 640 }}>
             {FX.intel.weekly}
@@ -303,7 +307,10 @@ function DashboardDesktop() {
         </div>
 
         <div className="card-flat" style={{ padding: 22 }}>
-          <div className="eyebrow" style={{ marginBottom: 14 }}>Recent auctions</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+            <div className="eyebrow">Recent auctions</div>
+            <DemoBadge />
+          </div>
           {FX.auctions.slice(0, 4).map((a, i, arr) => (
             <div
               key={i}
@@ -319,10 +326,7 @@ function DashboardDesktop() {
                 <span style={{ fontSize: 14, color: 'var(--ink)' }}>{a.tenor}</span>
                 <span className="caption" style={{ marginLeft: 10 }}>{a.date} · cover {a.cover}x</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-                <span className="serif-num" style={{ fontSize: 18 }}>{a.cutoff}</span>
-                <Delta value={a.delta} invert size="sm" />
-              </div>
+              <span className="serif-num" style={{ fontSize: 18 }}>{a.cutoff}</span>
             </div>
           ))}
         </div>
