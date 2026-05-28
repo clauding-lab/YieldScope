@@ -1,12 +1,12 @@
 import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
 import { useLiquidity } from '../hooks/useLiquidity'
-import { Bar, Delta, DemoBadge, ListRow, SectionTitle } from '../components/primitives'
+import { Bar, DemoBadge, ListRow, SectionTitle } from '../components/primitives'
 import { AreaChart, BarChart, Heatmap } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 
 function CorridorViz({ tall = false, callRate }: { tall?: boolean; callRate?: number | null }) {
-  const sdf = 6.50, slf = 10.50, repo = 9.00, call = callRate ?? 9.34
+  const sdf = 6.50, slf = 10.50, repo = 9.00
   const minV = 6, maxV = 11
   const pct = (v: number) => ((v - minV) / (maxV - minV)) * 100
   return (
@@ -44,32 +44,34 @@ function CorridorViz({ tall = false, callRate }: { tall?: boolean; callRate?: nu
             }}
           />
         ))}
-        <div
-          style={{
-            position: 'absolute',
-            left: `${pct(call)}%`,
-            top: -10,
-            bottom: -10,
-            width: 3,
-            background: 'var(--neg)',
-            transform: 'translateX(-1.5px)',
-            borderRadius: 99,
-          }}
-        >
+        {callRate != null && (
           <div
             style={{
               position: 'absolute',
-              bottom: -32,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              whiteSpace: 'nowrap',
-              textAlign: 'center',
+              left: `${pct(callRate)}%`,
+              top: -10,
+              bottom: -10,
+              width: 3,
+              background: 'var(--neg)',
+              transform: 'translateX(-1.5px)',
+              borderRadius: 99,
             }}
           >
-            <div className="serif-num" style={{ fontSize: 18, color: 'var(--neg)' }}>{call != null ? call.toFixed(2) : '—'}</div>
-            <div className="caption" style={{ marginTop: -2 }}>Call · o/n</div>
+            <div
+              style={{
+                position: 'absolute',
+                bottom: -32,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                whiteSpace: 'nowrap',
+                textAlign: 'center',
+              }}
+            >
+              <div className="serif-num" style={{ fontSize: 18, color: 'var(--neg)' }}>{callRate.toFixed(2)}</div>
+              <div className="caption" style={{ marginTop: -2 }}>Call · o/n</div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )
@@ -94,7 +96,6 @@ function intradayColor(v: number) {
 
 function LiquidityMobile() {
   const { data } = useLiquidity()
-  const L = FX.liquidity
 
   return (
     <>
@@ -108,18 +109,11 @@ function LiquidityMobile() {
           </span>
           <span className="caption">%</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
-          <Delta value={0.12} invert size="md" />
-          <span className="caption">2nd session above repo</span>
-        </div>
-        <div style={{ marginTop: 18 }}>
-          <AreaChart
-            data={data?.callSpark?.length ? data.callSpark : L.callSpark}
-            w={346}
-            h={70}
-            color="var(--neg)"
-          />
-        </div>
+        {data?.callSpark?.length ? (
+          <div style={{ marginTop: 18 }}>
+            <AreaChart data={data.callSpark} w={346} h={70} color="var(--neg)" />
+          </div>
+        ) : null}
       </div>
 
       <div style={{ padding: '0 22px 28px' }}>
@@ -137,18 +131,18 @@ function LiquidityMobile() {
               </span>
               <span className="caption">k Cr</span>
             </div>
-            <Delta value={-35} suffix="% · 8w" size="sm" />
           </div>
-          <AreaChart
-            data={data?.excessHistKCr?.length ? data.excessHistKCr : L.excessHistKCr}
-            w={140}
-            h={48}
-            color="var(--neg)"
-          />
+          {data?.excessHistKCr?.length ? (
+            <AreaChart data={data.excessHistKCr} w={140} h={48} color="var(--neg)" />
+          ) : null}
         </div>
       </div>
 
       <div style={{ padding: '0 16px 24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 22px 10px' }}>
+          <div className="caption">Reserve & money supply</div>
+          <DemoBadge />
+        </div>
         <div className="card-flat">
           <ListRow label="Money supply · M2 YoY" value="8.4%"      sub="vs target 10.5" />
           <ListRow label="CRR utilisation"       value="92%"       sub="Reserve ratio 4.0%" />
@@ -183,23 +177,11 @@ function LiquidityDesktop() {
             </span>
             <span className="caption">%</span>
           </div>
-          <p style={{ marginTop: 14, maxWidth: 520, fontSize: 22, lineHeight: 1.35, color: 'var(--ink)' }}>
-            Second session above the repo. Session high <span className="num">9.34</span>, range opened at{' '}
-            <span className="num">8.42</span>. Pressure now in the one-week segment.
-          </p>
-          <div style={{ display: 'flex', gap: 16, marginTop: 18 }}>
-            <span className="chip chip-neg">Above repo +34 bps</span>
-            <span className="chip">7d avg 8.94</span>
-            <span className="chip">σ 30d 0.34</span>
-          </div>
         </div>
         <div>
-          <AreaChart
-            data={data?.callSpark?.length ? data.callSpark : L.callSpark}
-            w={520}
-            h={170}
-            color="var(--neg)"
-          />
+          {data?.callSpark?.length ? (
+            <AreaChart data={data.callSpark} w={520} h={170} color="var(--neg)" />
+          ) : null}
         </div>
       </div>
 
@@ -221,27 +203,21 @@ function LiquidityDesktop() {
             </span>
             <span className="caption">k Cr</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6 }}>
-            <Delta value={-35} suffix="% in 8w" size="sm" />
-          </div>
-          <div style={{ marginTop: 16 }}>
-            {(() => {
-              const hist = data?.excessHistKCr?.length ? data.excessHistKCr : L.excessHistKCr
-              return (
-                <BarChart
-                  w={400}
-                  h={130}
-                  threshold={150}
-                  data={['W14', 'W15', 'W16', 'W17', 'W18', 'W19', 'W20', 'W21'].map((w, i) => ({
-                    label: w,
-                    value: hist[i],
-                    color: hist[i] < 200 ? 'var(--warn)' : 'var(--accent)',
-                  }))}
-                  fmt={v => String(Math.round(v))}
-                />
-              )
-            })()}
-          </div>
+          {data?.excessHistKCr?.length ? (
+            <div style={{ marginTop: 16 }}>
+              <BarChart
+                w={400}
+                h={130}
+                threshold={150}
+                data={['W14', 'W15', 'W16', 'W17', 'W18', 'W19', 'W20', 'W21'].map((w, i) => ({
+                  label: w,
+                  value: data.excessHistKCr[i],
+                  color: data.excessHistKCr[i] < 200 ? 'var(--warn)' : 'var(--accent)',
+                }))}
+                fmt={v => String(Math.round(v))}
+              />
+            </div>
+          ) : null}
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>

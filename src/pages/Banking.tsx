@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
 import { Bar, DemoBadge, ListRow, SectionTitle } from '../components/primitives'
@@ -75,8 +76,13 @@ function severityColor(sev: 'neg' | 'warn' | 'pos') {
 
 function BankingMobile({ liveData }: { liveData: BankingData | null }) {
   const B = FX.banking
-  const nplRatio = liveData?.nplRatio ?? B.nplRatio
-  const crar     = liveData?.crar     ?? B.car
+  const nplRatio = liveData?.nplRatio ?? null
+  const crar     = liveData?.crar     ?? null
+  const prudential: { lbl: string; v: number | null; max: number; unit: string; live: boolean }[] = [
+    { lbl: 'CAR',  v: crar,   max: 16,  unit: '%', live: true  },
+    { lbl: 'LCR',  v: B.lcr,  max: 180, unit: '%', live: false },
+    { lbl: 'NSFR', v: B.nsfr, max: 140, unit: '%', live: false },
+  ]
   return (
     <>
       <SectionTitle kicker="Sector health" title="Banks" />
@@ -90,7 +96,6 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
           <span className="serif-num" style={{ fontSize: 64 }}>81.4</span>
           <span className="caption">%</span>
         </div>
-        <div className="caption" style={{ marginTop: 6 }}>↑ 320 bps in 8m · ceiling 87%</div>
         <div style={{ marginTop: 18 }}>
           <AreaChart data={B.cdHist} w={346} h={70} color="var(--accent)" />
         </div>
@@ -98,9 +103,17 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
 
       <div style={{ padding: '0 16px 24px' }}>
         <div className="card-flat">
-          <ListRow label="NPL · industry"          value={`${nplRatio.toFixed(1)}%`} sub="↑ 240 bps in 18m" />
-          <ListRow label="Pvt sector credit · YoY" value="9.2%"       sub="vs deposits 7.4%" />
-          <ListRow label="Repo borrow · from BB"   value="124.6 k Cr" sub="↑ 42% in 8w" last />
+          <ListRow label="NPL · industry"          value={nplRatio != null ? `${nplRatio.toFixed(1)}%` : '—'} />
+          <ListRow
+            label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>Pvt sector credit · YoY <DemoBadge /></span> as ReactNode}
+            value="9.2%"
+            sub="vs deposits 7.4%"
+          />
+          <ListRow
+            label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>Repo borrow · from BB <DemoBadge /></span> as ReactNode}
+            value="124.6 k Cr"
+            last
+          />
         </div>
       </div>
 
@@ -129,19 +142,17 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
       <div style={{ padding: '0 22px 28px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
           <div className="eyebrow">Basel-III ratios</div>
-          <DemoBadge />
         </div>
-        {[
-          { lbl: 'CAR',  v: crar,   max: 16,  unit: '%' },
-          { lbl: 'LCR',  v: B.lcr,  max: 180, unit: '%' },
-          { lbl: 'NSFR', v: B.nsfr, max: 140, unit: '%' },
-        ].map(p => (
+        {prudential.map(p => (
           <div key={p.lbl} style={{ marginBottom: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-              <span className="label">{p.lbl}</span>
-              <span className="serif-num" style={{ fontSize: 18 }}>{p.v}{p.unit}</span>
+              <span className="label" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                {p.lbl}
+                {!p.live && <DemoBadge />}
+              </span>
+              <span className="serif-num" style={{ fontSize: 18 }}>{p.v != null ? `${p.v}${p.unit}` : '—'}</span>
             </div>
-            <Bar value={p.v} max={p.max} h={4} thresholds={[0.2, 0.5]} />
+            {p.v != null && <Bar value={p.v} max={p.max} h={4} thresholds={[0.2, 0.5]} />}
           </div>
         ))}
       </div>
@@ -152,8 +163,8 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
 
 function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
   const B = FX.banking
-  const nplRatio = liveData?.nplRatio ?? B.nplRatio
-  const nplHist  = liveData?.nplHist?.length ? liveData.nplHist : B.nplHist
+  const nplRatio = liveData?.nplRatio ?? null
+  const nplHist  = liveData?.nplHist?.length ? liveData.nplHist : null
   return (
     <>
       <DesktopHeader section="Banking" breadcrumb="YieldScope · Sector health & prudential" />
@@ -175,7 +186,6 @@ function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
             <span className="serif-num" style={{ fontSize: 72 }}>81.4</span>
             <span className="caption">%</span>
           </div>
-          <div className="caption" style={{ marginTop: 6 }}>↑ 320 bps in 8m · near ADR ceiling 87%</div>
           <div style={{ marginTop: 18 }}>
             <AreaChart data={B.cdHist} w={400} h={100} color="var(--accent)" />
           </div>
@@ -183,13 +193,14 @@ function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
         <div>
           <div className="eyebrow" style={{ marginBottom: 8 }}>NPL · industry</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-            <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>{nplRatio.toFixed(1)}</span>
+            <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>{nplRatio != null ? nplRatio.toFixed(1) : '—'}</span>
             <span className="caption">%</span>
           </div>
-          <div className="caption" style={{ marginTop: 6 }}>↑ 240 bps in 18 months</div>
-          <div style={{ marginTop: 18 }}>
-            <AreaChart data={nplHist} w={400} h={100} color="var(--neg)" />
-          </div>
+          {nplHist && (
+            <div style={{ marginTop: 18 }}>
+              <AreaChart data={nplHist} w={400} h={100} color="var(--neg)" />
+            </div>
+          )}
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
@@ -200,7 +211,6 @@ function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
             <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>124.6</span>
             <span className="caption">k Cr</span>
           </div>
-          <div className="caption" style={{ marginTop: 6 }}>↑ 42% in 8 weeks</div>
           <div style={{ marginTop: 18 }}>
             <AreaChart data={B.repoSpark} w={400} h={100} color="var(--neg)" />
           </div>

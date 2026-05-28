@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
 import { useFiscal } from '../hooks/useFiscal'
@@ -18,8 +19,15 @@ const ISSUANCE_T_BOND = [ 0, 15,  0,  0, 12,  0,  0, 18,  0,  0, 14,  0]
 function FiscalMobile() {
   const F = FX.fiscal
   const { data } = useFiscal()
-  const revenuePct = data?.revenuePct ?? F.revenuePct
-  const adpPct = data?.adpPct ?? F.adpPct
+  const revenuePct = data?.revenuePct ?? null
+  const adpPct = data?.adpPct ?? null
+  const fmtPct = (n: number | null) => n != null ? `${n}%` : '—'
+  const demoLabel = (label: string): ReactNode => (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+      {label}
+      <DemoBadge />
+    </span>
+  )
   return (
     <>
       <SectionTitle kicker="Sovereign balance sheet" title="Fiscal" />
@@ -33,7 +41,6 @@ function FiscalMobile() {
           <span className="serif-num" style={{ fontSize: 64, color: 'var(--warn)' }}>68</span>
           <span className="caption">/ 100</span>
         </div>
-        <div className="caption" style={{ marginTop: 6 }}>Elevated · was 54 in Q4 '25</div>
 
         <div style={{ marginTop: 18 }}>
           <Bar value={68} thresholds={[0.33, 0.66]} h={8} />
@@ -47,19 +54,18 @@ function FiscalMobile() {
 
       <div style={{ padding: '0 16px 24px' }}>
         <div className="card-flat">
-          <ListRow label="Revenue / target" value={`${revenuePct}%`}      sub={`${F.revenueYTD} of ${F.revenueTarget} k Cr`} />
-          <ListRow label="Debt / GDP"        value={`${F.debtToGdp}%`}      sub="↑ 260 bps in 24 months" />
-          <ListRow label="Net dom. borrow"   value={`${F.netDomesticBorrowingYTD} k Cr`} sub="64% of FY26 target" />
-          <ListRow label="Ways & Means"      value={`${F.waysMeans} k Cr`}  sub={`46% of limit ${F.waysMeansLimit} k Cr`} />
-          <ListRow label="ADP implementation" value={`${adpPct}%`}        sub="Undershoot −11.6 pp" last />
+          <ListRow label="Revenue / target" value={fmtPct(revenuePct)} />
+          <ListRow label={demoLabel('Debt / GDP')}        value={`${F.debtToGdp}%`} />
+          <ListRow label={demoLabel('Net dom. borrow')}   value={`${F.netDomesticBorrowingYTD} k Cr`} />
+          <ListRow label={demoLabel('Ways & Means')}      value={`${F.waysMeans} k Cr`} />
+          <ListRow label="ADP implementation" value={fmtPct(adpPct)} last />
         </div>
       </div>
 
       <div style={{ padding: '12px 22px 28px' }}>
-        <div className="eyebrow" style={{ marginBottom: 14 }}>Revenue · YTD</div>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 12 }}>
-          <span className="serif-num" style={{ fontSize: 30 }}>312.4</span>
-          <span className="caption">target 420 k Cr</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+          <div className="eyebrow">Revenue progress</div>
+          {revenuePct == null && <DemoBadge />}
         </div>
         <div style={{ position: 'relative', height: 8, background: 'var(--sunken)', borderRadius: 99 }}>
           <div
@@ -68,7 +74,7 @@ function FiscalMobile() {
               left: 0,
               top: 0,
               bottom: 0,
-              width: `${revenuePct}%`,
+              width: `${revenuePct ?? 0}%`,
               background: 'var(--accent)',
               borderRadius: 99,
             }}
@@ -105,8 +111,15 @@ function FiscalMobile() {
 function FiscalDesktop() {
   const F = FX.fiscal
   const { data } = useFiscal()
-  const revenuePct = data?.revenuePct ?? F.revenuePct
-  const adpPct = data?.adpPct ?? F.adpPct
+  const revenuePct = data?.revenuePct ?? null
+  const adpPct = data?.adpPct ?? null
+  const fmtPct = (n: number | null) => n != null ? `${n}%` : '—'
+  const demoLabel = (label: string): ReactNode => (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+      {label}
+      <DemoBadge />
+    </span>
+  )
   return (
     <>
       <DesktopHeader section="Fiscal" breadcrumb="YieldScope · Sovereign balance sheet" />
@@ -129,15 +142,11 @@ function FiscalDesktop() {
             <DemoBadge />
           </div>
           <h2 className="display" style={{ fontSize: 36, margin: 0, color: 'var(--warn)' }}>Elevated.</h2>
-          <p className="body" style={{ marginTop: 14, fontSize: 16, lineHeight: 1.55, color: 'var(--ink)', maxWidth: 540 }}>
-            The index climbed from 54 at the end of FY25 — revenue undershoot, rising debt service, and active
-            monetary financing are the three drivers.
-          </p>
           <div className="card-flat" style={{ padding: 18, marginTop: 22, maxWidth: 540 }}>
-            <ListRow label="Revenue / target" value={`${revenuePct}%`} sub={`${F.revenueYTD} of ${F.revenueTarget} k Cr`} />
-            <ListRow label="Debt / GDP"        value={`${F.debtToGdp}%`}  sub="↑ 260 bps in 24m" />
-            <ListRow label="W&M usage"         value="46%"                sub="Monetary financing active" />
-            <ListRow label="ADP implementation" value={`${adpPct}%`}    sub="Undershoot −11.6 pp" last />
+            <ListRow label="Revenue / target" value={fmtPct(revenuePct)} />
+            <ListRow label={demoLabel('Debt / GDP')}        value={`${F.debtToGdp}%`} />
+            <ListRow label={demoLabel('W&M usage')}         value="46%" />
+            <ListRow label="ADP implementation" value={fmtPct(adpPct)} last />
           </div>
         </div>
       </div>
@@ -169,7 +178,7 @@ function FiscalDesktop() {
             </div>
           </div>
           <div className="caption" style={{ marginTop: 14 }}>
-            <span className="num" style={{ color: 'var(--ink)' }}>{revenuePct}%</span> of target · expected pace 83%
+            <span className="num" style={{ color: 'var(--ink)' }}>{fmtPct(revenuePct)}</span> of target · expected pace 83%
           </div>
         </div>
         <div>
