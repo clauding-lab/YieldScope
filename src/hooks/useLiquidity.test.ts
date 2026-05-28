@@ -16,11 +16,14 @@ beforeEach(() => {
 })
 
 describe('useLiquidity', () => {
-  it('maps call money + excess liquidity + M2 from EconDelta', async () => {
+  it('maps call money + excess liquidity + M2 + policy corridor from EconDelta', async () => {
     vi.mocked(fetchLatest).mockImplementation(async (id) => {
       if (id === 'call_money_rate')                       return { asOf: '2026-05-27', value: 9.34 }
       if (id === 'excess_liquid_asset_total_minimum')     return { asOf: '2026-05-26', value: 18420000 }
       if (id === 'broad_money')                            return { asOf: '2026-04-30', value: 12500000 }
+      if (id === 'policy_rate_repo')                       return { asOf: '2026-04-30', value: 10.00 }
+      if (id === 'policy_rate_sdf')                        return { asOf: '2026-04-30', value: 7.50 }
+      if (id === 'policy_rate_slf')                        return { asOf: '2026-04-30', value: 11.50 }
       return null
     })
     vi.mocked(fetchSeries).mockImplementation(async (id) => {
@@ -37,6 +40,20 @@ describe('useLiquidity', () => {
     // Excess liquidity stored in BDT crore; hook converts to lakh crore (k Cr) by dividing by 100000
     expect(result.current.data!.excessLiquidityKCr).toBeCloseTo(184.2, 1)
     expect(result.current.data!.excessHistKCr.length).toBe(2)
+    // Policy corridor — values land from BB MEI bulletin page 10.
+    expect(result.current.data!.policyRepo).toBe(10.00)
+    expect(result.current.data!.policySdf).toBe(7.50)
+    expect(result.current.data!.policySlf).toBe(11.50)
+  })
+
+  it('returns nulls for policy corridor when EconDelta has no rows', async () => {
+    vi.mocked(fetchLatest).mockResolvedValue(null)
+    vi.mocked(fetchSeries).mockResolvedValue([])
+    const { result } = renderHook(() => useLiquidity())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.data!.policyRepo).toBeNull()
+    expect(result.current.data!.policySdf).toBeNull()
+    expect(result.current.data!.policySlf).toBeNull()
   })
 
   it('starts in loading state', () => {
