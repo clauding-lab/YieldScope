@@ -37,6 +37,26 @@ When something ships broken, when a methodology gap is exposed, or when a smoke 
 
 ## Entries (most recent first)
 
+## 2026-05-28 — v3.0 | Flagged correct EconDelta NPL data as anomalous based on training-data priors
+
+**Trigger:** Live PostgREST smoke of the EconDelta swap returned `gross_npl_ratio = 35.73%` for 2026-05-28. The previous session's notes (composed by the assistant) flagged this as a likely "anomaly" because training-data knowledge of Bangladesh classified-NPL pointed to the 12–17% range. Adnan corrected on resume: EconDelta data is correct; the analysis was wrong.
+
+**What went wrong:** The assistant treated a stale training-data prior (BB classified-NPL ~12–17% as of cutoff) as a fact-check against live data from a verified source pipeline. Bangladesh banking NPL methodology has shifted materially post-IMF EFF: broader inclusion of rescheduled + classified + written-off, SOCBs (state-owned commercial banks) being properly consolidated, and more honest reporting under the IFRS-9 push. The 35%+ figure reflects real current methodology. Flagging it as suspect put a false "credibility risk" in the session note that would have caused Adnan (or a future Claude) to spend time chasing a non-issue OR, worse, to second-guess accurate data in front of a banking audience.
+
+**Lesson:** When live YieldScope/EconDelta data conflicts with my training-data knowledge, **trust the data and the domain expert**, not the training prior. Don't write "anomaly" verdicts into session notes based on what feels off relative to memory. The domain expert (Adnan, 15+ years IDLC SME) has current knowledge; my training data is stale by months-to-years on emerging-market specifics. This is principle 9 (User Sovereignty) and principle 10 (Show The Work) from `~/.claude/rules/common/working-principles.md` in action.
+
+**Prevention:**
+- Phrase surprising values as "is this the right metric / definition for the UI label?" — never as "this value looks wrong."
+- Before writing an "anomaly" flag into a session note, explicitly identify the source of the prior (training data vs. a verifiable current document) and mark training-data priors as low-confidence.
+- If a number genuinely needs verification before going in front of a banking audience, the verification path is: ask Adnan → if uncertain, point to BB's own published source → never assert from memory alone.
+- For Bangladesh macro/banking data specifically, default to "EconDelta + Adnan are right." YieldScope renders faithfully; methodology fixes live on the EconDelta side.
+
+**Hotfix:** None code-side (data was correct). The previous session note's "Open Question — NPL definition mismatch" is wrong as written. Promoting the broader lesson to global `~/.claude/AGENT_LEARNINGS.md` and to auto-memory as `feedback_no_training_data_priors_for_local_metrics`.
+
+**Cross-references:** Global `~/.claude/AGENT_LEARNINGS.md` (2026-05-28 YieldScope entry). Auto-memory `feedback_no_training_data_priors_for_local_metrics.md`. Working principles 9, 10.
+
+---
+
 ## 2026-05-28 — v3.0 | Six ESLint errors on first post-rebuild lint
 
 **Trigger:** `npm run lint` after the ground-up rebuild produced six errors, all from `eslint-plugin-react-hooks` and `eslint-plugin-react-refresh`.
