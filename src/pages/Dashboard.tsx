@@ -3,6 +3,7 @@ import { FX } from '../data/fixtures'
 import { Collapse, Delta, SectionTitle, Sparkline } from '../components/primitives'
 import { YieldCurve } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
+import { useDashboard } from '../hooks/useDashboard'
 
 interface MetricRow {
   lbl: string
@@ -24,13 +25,6 @@ interface MovingItem {
 const HERO_LINE =
   'The short end is easing — but call money has now pierced the repo for a second session, and reserves slipped through the IMF floor.'
 
-const METRICS: MetricRow[] = [
-  { lbl: '91-day T-Bill',    v: '11.42', u: '%',   ch: -0.08, inv: true, spark: FX.snapshots[0].spark },
-  { lbl: '10-year BGTB',     v: '12.18', u: '%',   ch: -0.02, inv: true, spark: FX.snapshots[2].spark },
-  { lbl: 'Call money · o/n', v: '9.34',  u: '%',   ch:  0.12, inv: true, spark: FX.snapshots[3].spark, hint: 'Above repo' },
-  { lbl: 'CPI · headline',   v: '9.20',  u: '%·y', ch: -0.18, inv: true, spark: FX.snapshots[5].spark, hint: 'April' },
-]
-
 const MOVING: MovingItem[] = [
   { tag: 'Liquidity', text: 'Call rate breached the repo for a 2nd session — VAT outflow not fully sterilised.',  sev: 'warn', when: '09:42' },
   { tag: 'Auctions',  text: '364-day undersubscribed in 3 of last 4 prints. Cover at 1.17x. Devolvement risk.',   sev: 'warn', when: '08:15' },
@@ -43,6 +37,15 @@ function sevColor(sev: 'warn' | 'neg' | 'pos') {
 }
 
 function DashboardMobile() {
+  const { data } = useDashboard()
+
+  const metrics: MetricRow[] = [
+    { lbl: '91-day T-Bill',    v: data?.tbill91     != null ? data.tbill91.toFixed(2)     : '11.42', u: '%',   ch: -0.08, inv: true, spark: FX.snapshots[0].spark },
+    { lbl: '10-year BGTB',     v: data?.tbond10     != null ? data.tbond10.toFixed(2)     : '12.18', u: '%',   ch: -0.02, inv: true, spark: FX.snapshots[2].spark },
+    { lbl: 'Call money · o/n', v: data?.callMoney   != null ? data.callMoney.toFixed(2)   : '9.34',  u: '%',   ch:  0.12, inv: true, spark: FX.snapshots[3].spark, hint: 'Above repo' },
+    { lbl: 'CPI · headline',   v: data?.cpiHeadline != null ? data.cpiHeadline.toFixed(2) : '9.20',  u: '%·y', ch: -0.18, inv: true, spark: FX.snapshots[5].spark, hint: 'April' },
+  ]
+
   return (
     <>
       <SectionTitle kicker="Wednesday, 27 May" title="Today" />
@@ -63,7 +66,7 @@ function DashboardMobile() {
 
       <div style={{ padding: '0 16px' }}>
         <div className="card-flat">
-          {METRICS.map((m, i, arr) => (
+          {metrics.map((m, i, arr) => (
             <div
               key={m.lbl}
               style={{
@@ -96,7 +99,9 @@ function DashboardMobile() {
           <div className="eyebrow">Yield curve</div>
           <span className="caption">
             Slope 10y – 91d ·{' '}
-            <span className="num" style={{ color: 'var(--accent)' }}>+76 bps</span>
+            <span className="num" style={{ color: 'var(--accent)' }}>
+              {data?.spread10Y_91D_bps != null ? `+${data.spread10Y_91D_bps} bps` : '+76 bps'}
+            </span>
           </span>
         </div>
       </div>
@@ -155,6 +160,15 @@ function DashboardMobile() {
 }
 
 function DashboardDesktop() {
+  const { data } = useDashboard()
+
+  const metrics: MetricRow[] = [
+    { lbl: '91-day T-Bill',    v: data?.tbill91     != null ? data.tbill91.toFixed(2)     : '11.42', u: '%',   ch: -0.08, inv: true, spark: FX.snapshots[0].spark },
+    { lbl: '10-year BGTB',     v: data?.tbond10     != null ? data.tbond10.toFixed(2)     : '12.18', u: '%',   ch: -0.02, inv: true, spark: FX.snapshots[2].spark },
+    { lbl: 'Call money · o/n', v: data?.callMoney   != null ? data.callMoney.toFixed(2)   : '9.34',  u: '%',   ch:  0.12, inv: true, spark: FX.snapshots[3].spark, hint: 'Above repo' },
+    { lbl: 'CPI · headline',   v: data?.cpiHeadline != null ? data.cpiHeadline.toFixed(2) : '9.20',  u: '%·y', ch: -0.18, inv: true, spark: FX.snapshots[5].spark, hint: 'April' },
+  ]
+
   return (
     <>
       <DesktopHeader section="Today" breadcrumb="YieldScope · ALCO Intelligence · Wednesday" />
@@ -186,7 +200,7 @@ function DashboardDesktop() {
           gap: 24,
         }}
       >
-        {METRICS.map(m => (
+        {metrics.map(m => (
           <div key={m.lbl}>
             <div className="label">{m.lbl}</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 8 }}>
@@ -220,7 +234,9 @@ function DashboardDesktop() {
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 18 }}>
             <div>
               <div className="eyebrow" style={{ marginBottom: 6 }}>Sovereign curve</div>
-              <h3 className="display" style={{ fontSize: 26, margin: 0 }}>+76 bps</h3>
+              <h3 className="display" style={{ fontSize: 26, margin: 0 }}>
+                {data?.spread10Y_91D_bps != null ? `+${data.spread10Y_91D_bps} bps` : '+76 bps'}
+              </h3>
               <div className="caption" style={{ marginTop: 4 }}>Slope 10y over 91d · flatter by 12 bps vs last month</div>
             </div>
           </div>

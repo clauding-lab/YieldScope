@@ -1,0 +1,100 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+
+// Tests assume the module exposes fetchLatest + fetchSeries.
+// We mock @supabase/supabase-js entirely so no network is hit.
+const mockFrom = vi.fn()
+const mockSelect = vi.fn()
+const mockEq = vi.fn()
+const mockOrder = vi.fn()
+const mockLimit = vi.fn()
+
+vi.mock('./supabase', () => ({
+  getSupabase: () => ({ from: mockFrom }),
+  isLiveDataAvailable: () => true,
+}))
+
+beforeEach(() => {
+  mockFrom.mockReset()
+  mockSelect.mockReset()
+  mockEq.mockReset()
+  mockOrder.mockReset()
+  mockLimit.mockReset()
+
+  // Default: chain returns itself, .limit resolves with empty data
+  const chain = { select: mockSelect, eq: mockEq, order: mockOrder, limit: mockLimit }
+  mockFrom.mockReturnValue(chain)
+  mockSelect.mockReturnValue(chain)
+  mockEq.mockReturnValue(chain)
+  mockOrder.mockReturnValue(chain)
+  mockLimit.mockResolvedValue({ data: [], error: null })
+})
+
+describe('fetchLatest', () => {
+  it('queries metric_history with the right metric_id and returns the most recent value', async () => {
+    mockLimit.mockResolvedValueOnce({
+      data: [{ metric_id: 'brent_crude_usd_barrel', as_of: '2026-05-27', value: 83.42 }],
+      error: null,
+    })
+
+    const { fetchLatest } = await import('./econdelta')
+    const result = await fetchLatest('brent_crude_usd_barrel')
+
+    expect(mockFrom).toHaveBeenCalledWith('metric_history')
+    expect(mockEq).toHaveBeenCalledWith('metric_id', 'brent_crude_usd_barrel')
+    expect(mockOrder).toHaveBeenCalledWith('as_of', { ascending: false })
+    expect(mockLimit).toHaveBeenCalledWith(1)
+    expect(result).toEqual({ asOf: '2026-05-27', value: 83.42 })
+  })
+
+  it('returns null when no rows exist', async () => {
+    const { fetchLatest } = await import('./econdelta')
+    const result = await fetchLatest('brent_crude_usd_barrel')
+    expect(result).toBeNull()
+  })
+
+  it('routes monthly metrics to metric_history_monthly table', async () => {
+    mockLimit.mockResolvedValueOnce({
+      data: [{ metric_id: 'cpi_12m_avg_monthly', as_of: '2026-04-01', value: 8.6 }],
+      error: null,
+    })
+    const { fetchLatest } = await import('./econdelta')
+    await fetchLatest('cpi_12m_avg_monthly')
+    expect(mockFrom).toHaveBeenCalledWith('metric_history_monthly')
+  })
+})
+
+describe('fetchSeries', () => {
+  it('returns rows in chronological ascending order', async () => {
+    mockLimit.mockResolvedValueOnce({
+      data: [
+        { metric_id: 'call_money_rate', as_of: '2026-05-27', value: 9.34 },
+        { metric_id: 'call_money_rate', as_of: '2026-05-26', value: 9.22 },
+      ],
+      error: null,
+    })
+    const { fetchSeries } = await import('./econdelta')
+    const series = await fetchSeries('call_money_rate', { limit: 8 })
+
+    // Verify ordering on output (PostgREST returns desc; client flips to asc for chart use)
+    expect(series.map(p => p.asOf)).toEqual(['2026-05-26', '2026-05-27'])
+    expect(series.map(p => p.value)).toEqual([9.22, 9.34])
+  })
+
+  it('returns empty array on PostgREST error', async () => {
+    mockLimit.mockResolvedValueOnce({ data: null, error: { message: 'oops' } })
+    const { fetchSeries } = await import('./econdelta')
+    const result = await fetchSeries('brent_crude_usd_barrel', { limit: 8 })
+    expect(result).toEqual([])
+  })
+
+  it('returns empty array when supabase client is missing', async () => {
+    vi.doMock('./supabase', () => ({
+      getSupabase: () => null,
+      isLiveDataAvailable: () => false,
+    }))
+    vi.resetModules()
+    const { fetchSeries } = await import('./econdelta')
+    const result = await fetchSeries('brent_crude_usd_barrel', { limit: 8 })
+    expect(result).toEqual([])
+  })
+})

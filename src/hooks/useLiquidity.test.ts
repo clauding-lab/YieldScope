@@ -1,0 +1,56 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { renderHook, waitFor } from '@testing-library/react'
+
+vi.mock('../lib/econdelta', () => ({
+  fetchLatest: vi.fn(),
+  fetchSeries: vi.fn(),
+  isLiveDataAvailable: () => true,
+}))
+
+import { fetchLatest, fetchSeries } from '../lib/econdelta'
+import { useLiquidity } from './useLiquidity'
+
+beforeEach(() => {
+  vi.mocked(fetchLatest).mockReset()
+  vi.mocked(fetchSeries).mockReset()
+})
+
+describe('useLiquidity', () => {
+  it('maps call money + excess liquidity + M2 from EconDelta', async () => {
+    vi.mocked(fetchLatest).mockImplementation(async (id) => {
+      if (id === 'call_money_rate')                       return { asOf: '2026-05-27', value: 9.34 }
+      if (id === 'excess_liquid_asset_total_minimum')     return { asOf: '2026-05-26', value: 18420000 }
+      if (id === 'broad_money')                            return { asOf: '2026-04-30', value: 12500000 }
+      return null
+    })
+    vi.mocked(fetchSeries).mockImplementation(async (id) => {
+      if (id === 'call_money_rate')                   return [{ asOf: '2026-05-20', value: 8.42 }, { asOf: '2026-05-27', value: 9.34 }]
+      if (id === 'excess_liquid_asset_total_minimum') return [{ asOf: '2026-03-01', value: 28400000 }, { asOf: '2026-05-26', value: 18420000 }]
+      return []
+    })
+
+    const { result } = renderHook(() => useLiquidity())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.data!.callMoneyRate).toBe(9.34)
+    expect(result.current.data!.callSpark.length).toBe(2)
+    // Excess liquidity stored in BDT crore; hook converts to lakh crore (k Cr) by dividing by 100000
+    expect(result.current.data!.excessLiquidityKCr).toBeCloseTo(184.2, 1)
+    expect(result.current.data!.excessHistKCr.length).toBe(2)
+  })
+
+  it('starts in loading state', () => {
+    vi.mocked(fetchLatest).mockResolvedValue(null)
+    vi.mocked(fetchSeries).mockResolvedValue([])
+    const { result } = renderHook(() => useLiquidity())
+    expect(result.current.loading).toBe(true)
+  })
+
+  it('captures error', async () => {
+    vi.mocked(fetchLatest).mockRejectedValue(new Error('network'))
+    vi.mocked(fetchSeries).mockResolvedValue([])
+    const { result } = renderHook(() => useLiquidity())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.error).not.toBeNull()
+  })
+})

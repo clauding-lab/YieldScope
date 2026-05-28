@@ -1,11 +1,12 @@
 import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
-import { Bar, Delta, ListRow, SectionTitle } from '../components/primitives'
+import { useLiquidity } from '../hooks/useLiquidity'
+import { Bar, Delta, DemoBadge, ListRow, SectionTitle } from '../components/primitives'
 import { AreaChart, BarChart, Heatmap } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 
-function CorridorViz({ tall = false }: { tall?: boolean }) {
-  const sdf = 6.50, slf = 10.50, repo = 9.00, call = 9.34
+function CorridorViz({ tall = false, callRate }: { tall?: boolean; callRate?: number | null }) {
+  const sdf = 6.50, slf = 10.50, repo = 9.00, call = callRate ?? 9.34
   const minV = 6, maxV = 11
   const pct = (v: number) => ((v - minV) / (maxV - minV)) * 100
   return (
@@ -65,7 +66,7 @@ function CorridorViz({ tall = false }: { tall?: boolean }) {
               textAlign: 'center',
             }}
           >
-            <div className="serif-num" style={{ fontSize: 18, color: 'var(--neg)' }}>{call.toFixed(2)}</div>
+            <div className="serif-num" style={{ fontSize: 18, color: 'var(--neg)' }}>{call != null ? call.toFixed(2) : '—'}</div>
             <div className="caption" style={{ marginTop: -2 }}>Call · o/n</div>
           </div>
         </div>
@@ -92,6 +93,9 @@ function intradayColor(v: number) {
 }
 
 function LiquidityMobile() {
+  const { data } = useLiquidity()
+  const L = FX.liquidity
+
   return (
     <>
       <SectionTitle kicker="System pulse" title="Liquidity" />
@@ -99,7 +103,9 @@ function LiquidityMobile() {
       <div style={{ padding: '0 22px 28px' }}>
         <div className="caption">Call money · overnight</div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginTop: 4 }}>
-          <span className="serif-num" style={{ fontSize: 64, color: 'var(--neg)' }}>9.34</span>
+          <span className="serif-num" style={{ fontSize: 64, color: 'var(--neg)' }}>
+            {data?.callMoneyRate?.toFixed(2) ?? '—'}
+          </span>
           <span className="caption">%</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
@@ -107,13 +113,18 @@ function LiquidityMobile() {
           <span className="caption">2nd session above repo</span>
         </div>
         <div style={{ marginTop: 18 }}>
-          <AreaChart data={FX.liquidity.callSpark} w={346} h={70} color="var(--neg)" />
+          <AreaChart
+            data={data?.callSpark?.length ? data.callSpark : L.callSpark}
+            w={346}
+            h={70}
+            color="var(--neg)"
+          />
         </div>
       </div>
 
       <div style={{ padding: '0 22px 28px' }}>
         <div className="eyebrow" style={{ marginBottom: 14 }}>Policy corridor</div>
-        <CorridorViz />
+        <CorridorViz callRate={data?.callMoneyRate} />
       </div>
 
       <div style={{ padding: '0 22px 28px' }}>
@@ -121,12 +132,19 @@ function LiquidityMobile() {
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <span className="serif-num" style={{ fontSize: 36 }}>184.2</span>
+              <span className="serif-num" style={{ fontSize: 36 }}>
+                {data?.excessLiquidityKCr?.toFixed(1) ?? '—'}
+              </span>
               <span className="caption">k Cr</span>
             </div>
             <Delta value={-35} suffix="% · 8w" size="sm" />
           </div>
-          <AreaChart data={FX.liquidity.excessHistKCr} w={140} h={48} color="var(--neg)" />
+          <AreaChart
+            data={data?.excessHistKCr?.length ? data.excessHistKCr : L.excessHistKCr}
+            w={140}
+            h={48}
+            color="var(--neg)"
+          />
         </div>
       </div>
 
@@ -143,6 +161,7 @@ function LiquidityMobile() {
 }
 
 function LiquidityDesktop() {
+  const { data } = useLiquidity()
   const L = FX.liquidity
   return (
     <>
@@ -159,7 +178,9 @@ function LiquidityDesktop() {
         <div>
           <div className="eyebrow" style={{ marginBottom: 8 }}>Call money · overnight</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-            <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>9.34</span>
+            <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>
+              {data?.callMoneyRate?.toFixed(2) ?? '—'}
+            </span>
             <span className="caption">%</span>
           </div>
           <p style={{ marginTop: 14, maxWidth: 520, fontSize: 22, lineHeight: 1.35, color: 'var(--ink)' }}>
@@ -173,7 +194,12 @@ function LiquidityDesktop() {
           </div>
         </div>
         <div>
-          <AreaChart data={L.callSpark} w={520} h={170} color="var(--neg)" />
+          <AreaChart
+            data={data?.callSpark?.length ? data.callSpark : L.callSpark}
+            w={520}
+            h={170}
+            color="var(--neg)"
+          />
         </div>
       </div>
 
@@ -181,7 +207,7 @@ function LiquidityDesktop() {
 
       <div style={{ padding: '36px 48px' }}>
         <div className="eyebrow" style={{ marginBottom: 22 }}>Policy rate corridor</div>
-        <CorridorViz tall />
+        <CorridorViz tall callRate={data?.callMoneyRate} />
       </div>
 
       <div style={{ height: 1, background: 'var(--line)', margin: '0 48px' }} />
@@ -190,28 +216,38 @@ function LiquidityDesktop() {
         <div>
           <div className="eyebrow" style={{ marginBottom: 10 }}>Excess liquidity</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span className="serif-num" style={{ fontSize: 48 }}>184.2</span>
+            <span className="serif-num" style={{ fontSize: 48 }}>
+              {data?.excessLiquidityKCr?.toFixed(1) ?? '—'}
+            </span>
             <span className="caption">k Cr</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6 }}>
             <Delta value={-35} suffix="% in 8w" size="sm" />
           </div>
           <div style={{ marginTop: 16 }}>
-            <BarChart
-              w={400}
-              h={130}
-              threshold={150}
-              data={['W14', 'W15', 'W16', 'W17', 'W18', 'W19', 'W20', 'W21'].map((w, i) => ({
-                label: w,
-                value: L.excessHistKCr[i],
-                color: L.excessHistKCr[i] < 200 ? 'var(--warn)' : 'var(--accent)',
-              }))}
-              fmt={v => String(Math.round(v))}
-            />
+            {(() => {
+              const hist = data?.excessHistKCr?.length ? data.excessHistKCr : L.excessHistKCr
+              return (
+                <BarChart
+                  w={400}
+                  h={130}
+                  threshold={150}
+                  data={['W14', 'W15', 'W16', 'W17', 'W18', 'W19', 'W20', 'W21'].map((w, i) => ({
+                    label: w,
+                    value: hist[i],
+                    color: hist[i] < 200 ? 'var(--warn)' : 'var(--accent)',
+                  }))}
+                  fmt={v => String(Math.round(v))}
+                />
+              )
+            })()}
           </div>
         </div>
         <div>
-          <div className="eyebrow" style={{ marginBottom: 10 }}>Money supply · M2 YoY</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <div className="eyebrow">Money supply · M2 YoY</div>
+            <DemoBadge />
+          </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span className="serif-num" style={{ fontSize: 48 }}>8.4</span>
             <span className="caption">%</span>
@@ -222,7 +258,10 @@ function LiquidityDesktop() {
           </div>
         </div>
         <div>
-          <div className="eyebrow" style={{ marginBottom: 10 }}>Reserve utilisation</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <div className="eyebrow">Reserve utilisation</div>
+            <DemoBadge />
+          </div>
           {[
             { lbl: 'CRR',         v: 92, t: [0.7, 0.9] as [number, number] },
             { lbl: 'SLR',         v: 86, t: [0.7, 0.9] as [number, number] },
@@ -245,7 +284,10 @@ function LiquidityDesktop() {
       <div style={{ padding: '36px 48px 48px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 18 }}>
           <div>
-            <div className="eyebrow" style={{ marginBottom: 6 }}>Call money · intraday this week</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <div className="eyebrow">Call money · intraday this week</div>
+              <DemoBadge />
+            </div>
             <h3 className="display" style={{ fontSize: 22, margin: 0 }}>Pressure builds at the open</h3>
           </div>
           <div className="caption">Rates %, by hour</div>

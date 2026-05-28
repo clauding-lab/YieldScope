@@ -1,0 +1,58 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { renderHook, waitFor } from '@testing-library/react'
+
+vi.mock('../lib/econdelta', () => ({
+  fetchLatest: vi.fn(),
+  fetchSeries: vi.fn(),
+  isLiveDataAvailable: () => true,
+}))
+
+import { fetchLatest } from '../lib/econdelta'
+import { useYields } from './useYields'
+
+beforeEach(() => {
+  vi.mocked(fetchLatest).mockReset()
+})
+
+describe('useYields', () => {
+  it('maps 5 live tenors from EconDelta', async () => {
+    vi.mocked(fetchLatest).mockImplementation(async (id) => {
+      switch (id) {
+        case 'bill_bond_rates':  return { asOf: '2026-05-26', value: 11.42 } // 91D
+        case 'tbill_182d_yield': return { asOf: '2026-05-26', value: 11.60 }
+        case 'tbill_364d_yield': return { asOf: '2026-05-26', value: 11.71 }
+        case 'tbond_5y_yield':   return { asOf: '2026-05-21', value: 12.04 }
+        case 'tbond_10y_yield':  return { asOf: '2026-05-21', value: 12.18 }
+        default: return null
+      }
+    })
+
+    const { result } = renderHook(() => useYields())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    const d = result.current.data!
+    expect(d.yields['91D']).toBe(11.42)
+    expect(d.yields['182D']).toBe(11.60)
+    expect(d.yields['364D']).toBe(11.71)
+    expect(d.yields['5Y']).toBe(12.04)
+    expect(d.yields['10Y']).toBe(12.18)
+    expect(d.spread10Y_91D_bps).toBe(76) // (12.18 - 11.42) * 100 = 76 bps
+  })
+
+  it('returns null spread when either end is missing', async () => {
+    vi.mocked(fetchLatest).mockImplementation(async (id) => {
+      if (id === 'bill_bond_rates') return { asOf: '2026-05-26', value: 11.42 }
+      return null
+    })
+    const { result } = renderHook(() => useYields())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.data!.spread10Y_91D_bps).toBeNull()
+  })
+
+  it('captures error', async () => {
+    vi.mocked(fetchLatest).mockRejectedValue(new Error('network'))
+    const { result } = renderHook(() => useYields())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.error).not.toBeNull()
+  })
+})

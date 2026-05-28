@@ -1,9 +1,11 @@
 import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
-import { Bar, ListRow, SectionTitle } from '../components/primitives'
+import { Bar, DemoBadge, ListRow, SectionTitle } from '../components/primitives'
 import { AreaChart, Donut, DonutLegend, Heatmap, SlopeChart } from '../components/charts'
 import type { SlopeItem } from '../components/charts/SlopeChart'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
+import { useBanking } from '../hooks/useBanking'
+import type { BankingData } from '../hooks/useBanking'
 
 const NPL_BY_SEG = [
   { lbl: 'State-owned commercial', v: 22.4, sev: 'neg'  as const },
@@ -71,14 +73,19 @@ function severityColor(sev: 'neg' | 'warn' | 'pos') {
   return sev === 'neg' ? 'var(--neg)' : sev === 'warn' ? 'var(--warn)' : 'var(--pos)'
 }
 
-function BankingMobile() {
+function BankingMobile({ liveData }: { liveData: BankingData | null }) {
   const B = FX.banking
+  const nplRatio = liveData?.nplRatio ?? B.nplRatio
+  const crar     = liveData?.crar     ?? B.car
   return (
     <>
       <SectionTitle kicker="Sector health" title="Banks" />
 
       <div style={{ padding: '0 22px 28px' }}>
-        <div className="caption">Credit / Deposit · industry</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+          <div className="caption">Credit / Deposit · industry</div>
+          <DemoBadge />
+        </div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginTop: 4 }}>
           <span className="serif-num" style={{ fontSize: 64 }}>81.4</span>
           <span className="caption">%</span>
@@ -91,14 +98,17 @@ function BankingMobile() {
 
       <div style={{ padding: '0 16px 24px' }}>
         <div className="card-flat">
-          <ListRow label="NPL · industry"          value="11.8%"      sub="↑ 240 bps in 18m" />
+          <ListRow label="NPL · industry"          value={`${nplRatio.toFixed(1)}%`} sub="↑ 240 bps in 18m" />
           <ListRow label="Pvt sector credit · YoY" value="9.2%"       sub="vs deposits 7.4%" />
           <ListRow label="Repo borrow · from BB"   value="124.6 k Cr" sub="↑ 42% in 8w" last />
         </div>
       </div>
 
       <div style={{ padding: '12px 22px 28px' }}>
-        <div className="eyebrow" style={{ marginBottom: 14 }}>NPL by segment</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+          <div className="eyebrow">NPL by segment</div>
+          <DemoBadge />
+        </div>
         {NPL_BY_SEG.map((s, i, arr) => (
           <div
             key={s.lbl}
@@ -117,9 +127,12 @@ function BankingMobile() {
       </div>
 
       <div style={{ padding: '0 22px 28px' }}>
-        <div className="eyebrow" style={{ marginBottom: 14 }}>Basel-III ratios</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+          <div className="eyebrow">Basel-III ratios</div>
+          <DemoBadge />
+        </div>
         {[
-          { lbl: 'CAR',  v: B.car,  max: 16,  unit: '%' },
+          { lbl: 'CAR',  v: crar,   max: 16,  unit: '%' },
           { lbl: 'LCR',  v: B.lcr,  max: 180, unit: '%' },
           { lbl: 'NSFR', v: B.nsfr, max: 140, unit: '%' },
         ].map(p => (
@@ -132,12 +145,15 @@ function BankingMobile() {
           </div>
         ))}
       </div>
+
     </>
   )
 }
 
-function BankingDesktop() {
+function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
   const B = FX.banking
+  const nplRatio = liveData?.nplRatio ?? B.nplRatio
+  const nplHist  = liveData?.nplHist?.length ? liveData.nplHist : B.nplHist
   return (
     <>
       <DesktopHeader section="Banking" breadcrumb="YieldScope · Sector health & prudential" />
@@ -151,7 +167,10 @@ function BankingDesktop() {
         }}
       >
         <div>
-          <div className="eyebrow" style={{ marginBottom: 8 }}>Credit / Deposit · industry</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <div className="eyebrow">Credit / Deposit · industry</div>
+            <DemoBadge />
+          </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
             <span className="serif-num" style={{ fontSize: 72 }}>81.4</span>
             <span className="caption">%</span>
@@ -164,16 +183,19 @@ function BankingDesktop() {
         <div>
           <div className="eyebrow" style={{ marginBottom: 8 }}>NPL · industry</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-            <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>11.8</span>
+            <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>{nplRatio.toFixed(1)}</span>
             <span className="caption">%</span>
           </div>
           <div className="caption" style={{ marginTop: 6 }}>↑ 240 bps in 18 months</div>
           <div style={{ marginTop: 18 }}>
-            <AreaChart data={B.nplHist} w={400} h={100} color="var(--neg)" />
+            <AreaChart data={nplHist} w={400} h={100} color="var(--neg)" />
           </div>
         </div>
         <div>
-          <div className="eyebrow" style={{ marginBottom: 8 }}>Repo borrow · from BB</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <div className="eyebrow">Repo borrow · from BB</div>
+            <DemoBadge />
+          </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
             <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>124.6</span>
             <span className="caption">k Cr</span>
@@ -190,7 +212,10 @@ function BankingDesktop() {
       <div style={{ padding: '36px 48px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 18 }}>
           <div>
-            <div className="eyebrow" style={{ marginBottom: 6 }}>Top 10 banks · Basel-III & asset quality</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <div className="eyebrow">Top 10 banks · Basel-III & asset quality</div>
+              <DemoBadge />
+            </div>
             <h3 className="display" style={{ fontSize: 24, margin: 0 }}>Where the stress sits</h3>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -237,7 +262,10 @@ function BankingDesktop() {
         }}
       >
         <div>
-          <div className="eyebrow" style={{ marginBottom: 6 }}>NPL trajectory · by segment</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+            <div className="eyebrow">NPL trajectory · by segment</div>
+            <DemoBadge />
+          </div>
           <h3 className="display" style={{ fontSize: 22, margin: 0, marginBottom: 14 }}>
             State-owned widening, foreign tightening
           </h3>
@@ -251,7 +279,10 @@ function BankingDesktop() {
           />
         </div>
         <div>
-          <div className="eyebrow" style={{ marginBottom: 14 }}>System deposits · by ownership</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+            <div className="eyebrow">System deposits · by ownership</div>
+            <DemoBadge />
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
             <Donut size={150} thickness={22} segments={DEPOSIT_SEGMENTS} centerValue="৳18.4T" centerLabel="Total · BDT" />
             <div style={{ flex: 1 }}>
@@ -269,5 +300,6 @@ function BankingDesktop() {
 
 export default function Banking() {
   const isDesktop = useIsDesktop()
-  return isDesktop ? <BankingDesktop /> : <BankingMobile />
+  const { data } = useBanking()
+  return isDesktop ? <BankingDesktop liveData={data} /> : <BankingMobile liveData={data} />
 }
