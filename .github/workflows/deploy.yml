@@ -29,7 +29,16 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm run build
+
+      # Vite bakes VITE_* env vars into the static bundle at build time.
+      # VITE_SUPABASE_URL is public (same project The Brief uses).
+      # VITE_SUPABASE_ANON_KEY is RLS-scoped read-only — sourced from a GitHub Secret.
+      # Without these, the production bundle falls back to fixture data.
+      - name: Build
+        env:
+          VITE_SUPABASE_URL: https://ssbliukchgibjcjohibi.supabase.co
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: npm run build
 
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
