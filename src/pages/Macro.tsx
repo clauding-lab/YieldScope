@@ -7,13 +7,26 @@ import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useMacro } from '../hooks/useMacro'
 
 const CPI_ROWS = ['Food', 'Non-food', 'Core', 'Headline']
-const CPI_COLS = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr']
-const CPI_DATA = [
-  [11.20, 11.00, 10.80, 10.50, 10.20, 9.90, 9.70, 9.40],
-  [9.00,  8.95,  8.90,  8.80,  8.75,  8.70, 8.65, 8.60],
-  [8.40,  8.32,  8.18,  8.04,  7.94,  7.82, 7.74, 7.62],
-  [9.94,  9.86,  9.74,  9.62,  9.58,  9.42, 9.38, 9.20],
-]
+const CORE_CPI_FIXTURE = [8.40, 8.32, 8.18, 8.04, 7.94, 7.82, 7.74, 7.62]
+const CPI_COLS_FALLBACK = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr']
+
+function padOrTrim<T>(arr: T[], len: number, fill: T): T[] {
+  if (arr.length === len) return arr
+  if (arr.length > len) return arr.slice(-len)
+  return [...Array(len - arr.length).fill(fill), ...arr]
+}
+
+function buildCpiHeatmapData(data: ReturnType<typeof useMacro>['data']): number[][] {
+  const food = data?.foodHist?.length ? padOrTrim(data.foodHist, 8, NaN) : CORE_CPI_FIXTURE
+  const nonFood = data?.nonFoodHist?.length ? padOrTrim(data.nonFoodHist, 8, NaN) : CORE_CPI_FIXTURE
+  const headline = data?.cpiHist?.length ? padOrTrim(data.cpiHist, 8, NaN) : CORE_CPI_FIXTURE
+  return [food, nonFood, CORE_CPI_FIXTURE, headline]
+}
+
+function buildCpiHeatmapCols(data: ReturnType<typeof useMacro>['data']): string[] {
+  const months = data?.cpiMonths?.filter(Boolean) ?? []
+  return months.length === 8 ? months : CPI_COLS_FALLBACK
+}
 
 function cpiColor(v: number) {
   const pct = Math.max(0, Math.min(1, (v - 7.5) / (11.5 - 7.5)))
@@ -45,12 +58,28 @@ function buildBopItems(data: ReturnType<typeof useMacro>['data']): BopItem[] {
   ]
 }
 
-const COMMODITIES: { c: string; v: string; u: string; d: number; spark: number[] }[] = [
-  { c: 'Brent',    v: '84.20', u: 'USD/bbl',   d:  1.4, spark: [78, 80, 82, 81, 83, 84, 83.5, 84.20] },
-  { c: 'LNG',      v: '11.40', u: 'USD/MMBtu', d: -2.1, spark: [13, 12.8, 12.4, 12.0, 11.8, 11.7, 11.5, 11.40] },
-  { c: 'Wheat',    v: '612',   u: 'USD/MT',    d:  0.6, spark: [598, 602, 605, 608, 610, 611, 610, 612] },
-  { c: 'Palm oil', v: '3,840', u: 'MYR/MT',    d: -0.4, spark: [3900, 3880, 3860, 3850, 3845, 3850, 3845, 3840] },
-]
+interface CommodityRow {
+  c: string
+  v: string
+  u: string
+  d: number
+  spark: number[]
+  live: boolean
+}
+
+function buildCommodities(data: ReturnType<typeof useMacro>['data']): CommodityRow[] {
+  const brentSpark = data?.brentHist?.length ? data.brentHist : [78, 80, 82, 81, 83, 84, 83.5, 84.20]
+  const brentVal = data?.brentUsdBarrel
+  const brentDelta = data?.brentHist?.length && data.brentHist.length >= 2
+    ? data.brentHist[data.brentHist.length - 1] - data.brentHist[data.brentHist.length - 2]
+    : 0
+  return [
+    { c: 'Brent',    v: brentVal != null ? brentVal.toFixed(2) : '—', u: 'USD/bbl',   d:  brentDelta, spark: brentSpark, live: brentVal != null },
+    { c: 'LNG',      v: '11.40', u: 'USD/MMBtu', d: -2.1, spark: [13, 12.8, 12.4, 12.0, 11.8, 11.7, 11.5, 11.40], live: false },
+    { c: 'Wheat',    v: '612',   u: 'USD/MT',    d:  0.6, spark: [598, 602, 605, 608, 610, 611, 610, 612], live: false },
+    { c: 'Palm oil', v: '3,840', u: 'MYR/MT',    d: -0.4, spark: [3900, 3880, 3860, 3850, 3845, 3850, 3845, 3840], live: false },
+  ]
+}
 
 function MacroMobile() {
   const { data } = useMacro()
@@ -147,6 +176,10 @@ function MacroMobile() {
 function MacroDesktop() {
   const { data } = useMacro()
   const bopItems = buildBopItems(data)
+  const commodities = buildCommodities(data)
+  const cpiHeatmapData = buildCpiHeatmapData(data)
+  const cpiHeatmapCols = buildCpiHeatmapCols(data)
+  const usdBdtChartData = data?.usdBdtHist?.length ? data.usdBdtHist : null
   return (
     <>
       <DesktopHeader section="Macro" breadcrumb="YieldScope · Inflation, reserves, balance of payments" />
@@ -225,11 +258,11 @@ function MacroDesktop() {
         <div className="card-flat" style={{ padding: '22px 24px' }}>
           <Heatmap
             rows={CPI_ROWS}
-            cols={CPI_COLS}
-            data={CPI_DATA}
+            cols={cpiHeatmapCols}
+            data={cpiHeatmapData}
             leftW={100}
             cellH={36}
-            fmt={v => v.toFixed(2)}
+            fmt={v => Number.isFinite(v) ? v.toFixed(2) : '—'}
             getColor={cpiColor}
           />
         </div>
@@ -251,7 +284,7 @@ function MacroDesktop() {
             <DemoBadge />
           </div>
           <div className="card-flat">
-            {COMMODITIES.map((c, i, arr) => (
+            {commodities.map((c, i, arr) => (
               <div
                 key={c.c}
                 style={{
@@ -287,14 +320,11 @@ function MacroDesktop() {
             <span className="caption">+1.2% YTD</span>
             <span className="caption">REER 108.4 · overvalued ~6%</span>
           </div>
-          <div style={{ marginTop: 20 }}>
-            <AreaChart
-              data={[118.4, 118.8, 119.1, 119.3, 119.4, 119.5, 119.58, 119.62]}
-              w={540}
-              h={130}
-              color="var(--info)"
-            />
-          </div>
+          {usdBdtChartData ? (
+            <div style={{ marginTop: 20 }}>
+              <AreaChart data={usdBdtChartData} w={540} h={130} color="var(--info)" />
+            </div>
+          ) : null}
         </div>
       </div>
     </>

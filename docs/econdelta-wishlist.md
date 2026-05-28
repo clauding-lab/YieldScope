@@ -12,13 +12,13 @@ Sorted by effort tier. Within each tier, prioritised by visibility on the YieldS
 
 These metrics exist in EconDelta today. They're not wired into a YieldScope hook yet. Pure YieldScope-side work — no EconDelta change needed.
 
-| YieldScope panel | EconDelta metric_id | YieldScope hook to extend | Notes |
-|---|---|---|---|
-| Macro · USD/BDT historical chart | `usd_bdt_exchange_rate` | `useMacro` → add `fetchSeries` call | Just need `fetchSeries(METRIC.USD_BDT, { limit: 8 })` and wire into `usdBdtHist` field. Strips the hardcoded `[118.4, ..., 119.62]` array in `Macro.tsx`. |
-| Macro · Brent oil in commodities mini-list | `brent_crude_usd_barrel` | `useMacro` → add Brent latest + series | Live Brent is already returned in the cornerstone smoke (USD 93.30 on 2026-05-28). Replaces the fixture "Brent 84.20" tile. |
-| Macro · CPI heatmap (8-month, 4-series) | `point_to_point_inflation` + `food_inflation` + `non_food_inflation` (+ TODO core) | `useMacro` → extend `fetchSeries` limit from 8 to 12+ | Existing CPI series fetches use `limit: 8`. Heatmap needs `limit: 12` or longer for the 12-month read. Plus a Core CPI scraper (see Tier 2). |
-| Yields · History tab (6 tenors × 11-period series) | `bill_bond_rates` (all 5 tenors) + 2Y addition (Tier 2) | `useYields` → add `fetchSeries` per tenor | Currently HISTORY_SERIES in `Yields.tsx` is fixture. Need `fetchSeries` calls for each tenor at limit 11. |
-| Yields · 5y-2y spread tile | `bill_bond_rates` (2Y tenor) | depends on EconDelta adding TBOND_2Y first | EconDelta currently scrapes 91D, 182D, 364D, 5Y, 10Y — no 2Y. Once added, compute 5Y - 2Y. |
+| Status | YieldScope panel | EconDelta metric_id | YieldScope hook to extend | Notes |
+|---|---|---|---|---|
+| ✅ shipped 2026-05-28 | Macro · USD/BDT historical chart | `usd_bdt_exchange_rate` | `useMacro` added `usdBdtHist` field via `fetchSeries(METRIC.USD_BDT, { limit: 8 })`. Hardcoded `[118.4, ..., 119.62]` array removed. |
+| ✅ shipped 2026-05-28 | Macro · Brent oil in commodities mini-list | `brent_crude_usd_barrel` | `useMacro` added `brentUsdBarrel` + `brentHist` fields. Replaces fixture "Brent 84.20" tile + sparkline. |
+| ✅ shipped 2026-05-28 (partial) | Macro · CPI heatmap (8-month, 4-series) | `point_to_point_inflation` + `food_inflation` + `non_food_inflation` (+ TODO core) | 3 of 4 rows wired live (Food, Non-food, Headline). Core row stays fixture pending EconDelta core CPI scraper (Tier 2). Col labels now derived from CPI series as_of dates via new `cpiMonths` field. |
+| ✅ shipped 2026-05-28 | Yields · History tab (5 tenors × 11-period series) | `bill_bond_rates` + `tbill_182d_yield` + `tbill_364d_yield` + `tbond_5y_yield` + `tbond_10y_yield` | `useYields` added `series` field via 5 `fetchSeries` calls at limit 11. HISTORY_SERIES fixture removed. 2Y dropped from picker (not in EconDelta). |
+| ⏳ blocked on Tier 2 | Yields · 5y-2y spread tile | `bill_bond_rates` (2Y tenor) | EconDelta currently scrapes 91D, 182D, 364D, 5Y, 10Y — no 2Y. Once added, compute 5Y - 2Y. Stays Demo-chipped today. |
 
 ---
 
@@ -106,11 +106,9 @@ Each EconDelta scraper additions also needs:
 
 ---
 
-## Status snapshot (2026-05-28)
+## Status snapshot
 
-- Tier 1: 0 / 5 done. Easy wins.
-- Tier 2: ~22 items queued. Biggest pile.
-- Tier 3: 3 items, no plan.
-- Tier 4: 6 items, defer.
+- 2026-05-28 evening: Tier 1: 4 / 5 done (one blocked on Tier 2 — need EconDelta to add 2Y tenor). Tier 2: 0 / 22 queued — biggest pile. Tier 3: 3 items, no plan. Tier 4: 6 items, defer.
+- 2026-05-28 (start of day): Tier 1: 0 / 5 done.
 
-Current real-data coverage on YieldScope: ~15 metrics live across 6 hooks. Placeholder coverage: ~40 panels labeled `Demo` or rendering `—`.
+Current real-data coverage on YieldScope after Tier 1 wires: ~18 metrics live across 6 hooks (added Brent latest + USD/BDT series + Brent series + 5 tenor series + CPI months). Placeholder coverage: ~30 panels labeled `Demo` or rendering `—` (down from ~40).

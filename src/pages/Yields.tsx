@@ -4,10 +4,11 @@ import { FX } from '../data/fixtures'
 import { Delta, DemoBadge, SectionTitle, Sparkline, Tabs } from '../components/primitives'
 import { AreaChart, YieldCurve } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
-import { useYields } from '../hooks/useYields'
+import { useYields, type TenorKey } from '../hooks/useYields'
 
 type YieldsTab = 'curve' | 'series' | 'auctions'
-type TenorKey = '91D' | '182D' | '364D' | '2Y' | '5Y' | '10Y'
+
+const HISTORY_TENORS: TenorKey[] = ['91D', '182D', '364D', '5Y', '10Y']
 
 const TENOR_LADDER: { tenor: string; yld: number; delta: number }[] = [
   { tenor: '91D',  yld: 11.42, delta: -0.08 },
@@ -19,15 +20,6 @@ const TENOR_LADDER: { tenor: string; yld: number; delta: number }[] = [
   { tenor: '15Y',  yld: 12.31, delta:  0.00 },
   { tenor: '20Y',  yld: 12.40, delta:  0.00 },
 ]
-
-const HISTORY_SERIES: Record<TenorKey, number[]> = {
-  '91D':  [10.80, 11.20, 11.55, 11.78, 11.85, 11.78, 11.65, 11.58, 11.52, 11.50, 11.42],
-  '182D': [11.10, 11.40, 11.70, 11.85, 11.92, 11.85, 11.78, 11.72, 11.66, 11.62, 11.60],
-  '364D': [11.30, 11.55, 11.82, 11.95, 12.01, 11.96, 11.88, 11.78, 11.74, 11.70, 11.71],
-  '2Y':   [11.42, 11.65, 11.85, 11.92, 11.96, 11.93, 11.90, 11.87, 11.85, 11.84, 11.85],
-  '5Y':   [11.62, 11.78, 11.95, 12.05, 12.10, 12.08, 12.06, 12.04, 12.03, 12.03, 12.04],
-  '10Y':  [11.78, 11.92, 12.08, 12.18, 12.24, 12.22, 12.20, 12.18, 12.16, 12.18, 12.18],
-}
 
 const UPCOMING = [
   { date: '02 Jun', day: 'Tue', tenor: '91D · 182D · 364D', size: '50k Cr' },
@@ -122,17 +114,16 @@ function YieldsCurveTab() {
 }
 
 function YieldsHistoryTab() {
+  const { data: yieldsData } = useYields()
   const [tenor, setTenor] = useState<TenorKey>('91D')
-  const data = HISTORY_SERIES[tenor]
+  const series = yieldsData?.series[tenor] ?? []
+  const hasData = series.length > 0
+  const latest = hasData ? series[series.length - 1] : null
 
   return (
     <>
-      <div style={{ padding: '0 22px 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div className="eyebrow">History</div>
-        <DemoBadge />
-      </div>
       <div style={{ padding: '0 22px 18px', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        {(Object.keys(HISTORY_SERIES) as TenorKey[]).map(t => (
+        {HISTORY_TENORS.map(t => (
           <button
             key={t}
             type="button"
@@ -147,18 +138,22 @@ function YieldsHistoryTab() {
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 16 }}>
           <div>
             <div className="caption">{tenor} · today</div>
-            <div className="serif-num" style={{ fontSize: 44, marginTop: 4 }}>{data[data.length - 1].toFixed(2)}</div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div className="caption">12-month range</div>
-            <div style={{ fontSize: 14, color: 'var(--ink)', marginTop: 6 }}>
-              <span className="num">{Math.min(...data).toFixed(2)}</span>
-              <span className="dim" style={{ margin: '0 6px' }}>—</span>
-              <span className="num">{Math.max(...data).toFixed(2)}</span>
+            <div className="serif-num" style={{ fontSize: 44, marginTop: 4 }}>
+              {latest != null ? latest.toFixed(2) : '—'}
             </div>
           </div>
+          {hasData && (
+            <div style={{ textAlign: 'right' }}>
+              <div className="caption">Recent range</div>
+              <div style={{ fontSize: 14, color: 'var(--ink)', marginTop: 6 }}>
+                <span className="num">{Math.min(...series).toFixed(2)}</span>
+                <span className="dim" style={{ margin: '0 6px' }}>—</span>
+                <span className="num">{Math.max(...series).toFixed(2)}</span>
+              </div>
+            </div>
+          )}
         </div>
-        <AreaChart data={data} w={346} h={150} color="var(--accent)" />
+        {hasData && <AreaChart data={series} w={346} h={150} color="var(--accent)" />}
       </div>
     </>
   )

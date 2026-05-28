@@ -1,16 +1,13 @@
 import { useEffect, useState } from 'react'
-import { fetchLatest } from '../lib/econdelta'
+import { fetchLatest, fetchSeries } from '../lib/econdelta'
 import { METRIC } from '../lib/econdelta-metrics'
 import { spreadBps } from '../lib/yieldMath'
 
+export type TenorKey = '91D' | '182D' | '364D' | '5Y' | '10Y'
+
 export interface YieldsData {
-  yields: {
-    '91D':  number | null
-    '182D': number | null
-    '364D': number | null
-    '5Y':   number | null
-    '10Y':  number | null
-  }
+  yields: Record<TenorKey, number | null>
+  series: Record<TenorKey, number[]>
   spread10Y_91D_bps: number | null
   asOf: string | null
 }
@@ -30,12 +27,20 @@ export function useYields(): UseYieldsResult {
     let cancelled = false
     ;(async () => {
       try {
-        const [y91, y182, y364, y5y, y10y] = await Promise.all([
+        const [
+          y91, y182, y364, y5y, y10y,
+          s91, s182, s364, s5y, s10y,
+        ] = await Promise.all([
           fetchLatest(METRIC.TBILL_91),
           fetchLatest(METRIC.TBILL_182),
           fetchLatest(METRIC.TBILL_364),
           fetchLatest(METRIC.TBOND_5Y),
           fetchLatest(METRIC.TBOND_10Y),
+          fetchSeries(METRIC.TBILL_91,  { limit: 11 }),
+          fetchSeries(METRIC.TBILL_182, { limit: 11 }),
+          fetchSeries(METRIC.TBILL_364, { limit: 11 }),
+          fetchSeries(METRIC.TBOND_5Y,  { limit: 11 }),
+          fetchSeries(METRIC.TBOND_10Y, { limit: 11 }),
         ])
         if (cancelled) return
 
@@ -50,6 +55,13 @@ export function useYields(): UseYieldsResult {
           error: null,
           data: {
             yields: { '91D': v91, '182D': v182, '364D': v364, '5Y': v5y, '10Y': v10y },
+            series: {
+              '91D':  s91.map(p => p.value),
+              '182D': s182.map(p => p.value),
+              '364D': s364.map(p => p.value),
+              '5Y':   s5y.map(p => p.value),
+              '10Y':  s10y.map(p => p.value),
+            },
             spread10Y_91D_bps: spreadBps(v10y, v91),
             asOf: y91?.asOf ?? y10y?.asOf ?? null,
           },
