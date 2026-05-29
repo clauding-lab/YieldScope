@@ -14,8 +14,10 @@ export const METRIC = {
   FX_RESERVES:     'fx_reserve_gross_and_bpm6',
 
   // Money market & yields
-  CALL_MONEY:      'call_money_rate',
-  POLICY_RATE:     'policy_rate_slf_sdf',
+  CALL_MONEY:       'call_money_rate',
+  POLICY_RATE_REPO: 'policy_rate_repo',
+  POLICY_RATE_SDF:  'policy_rate_sdf',
+  POLICY_RATE_SLF:  'policy_rate_slf',
   TBILL_91:        'bill_bond_rates',
   TBILL_182:       'tbill_182d_yield',
   TBILL_364:       'tbill_364d_yield',

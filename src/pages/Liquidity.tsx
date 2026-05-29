@@ -5,31 +5,50 @@ import { Bar, DemoBadge, ListRow, SectionTitle } from '../components/primitives'
 import { AreaChart, BarChart, Heatmap } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 
-function CorridorViz({ tall = false, callRate }: { tall?: boolean; callRate?: number | null }) {
-  const sdf = 6.50, slf = 10.50, repo = 9.00
-  const minV = 6, maxV = 11
+interface CorridorVizProps {
+  tall?: boolean
+  callRate?: number | null
+  repo: number | null
+  sdf: number | null
+  slf: number | null
+}
+
+function CorridorViz({ tall = false, callRate, repo, sdf, slf }: CorridorVizProps) {
+  // Dynamic axis from whatever BB-published values are present. Pad ±1pp so
+  // the markers don't sit flush at the rail edges. Fall back to the long-running
+  // 6–12% band when no values are loaded yet — keeps the empty rail proportioned
+  // the same as a populated one (avoids a layout jump on first fire).
+  const fmt = (v: number | null) => (v == null ? '—' : v.toFixed(2))
+  const presentValues = [sdf, repo, slf].filter((v): v is number => v != null)
+  const callRateInRange = callRate != null
+  const allValues = callRateInRange ? [...presentValues, callRate] : presentValues
+  const minV = allValues.length ? Math.min(...allValues) - 1 : 6
+  const maxV = allValues.length ? Math.max(...allValues) + 1 : 12
   const pct = (v: number) => ((v - minV) / (maxV - minV)) * 100
+
   return (
     <div style={{ paddingBottom: tall ? 48 : 32 }}>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 18 }}>
-        <span className="caption">Standing deposit · 6.50</span>
-        <span className="caption">Repo · 9.00</span>
-        <span className="caption">Standing lending · 10.50</span>
+        <span className="caption">Standing deposit · {fmt(sdf)}</span>
+        <span className="caption">Repo · {fmt(repo)}</span>
+        <span className="caption">Standing lending · {fmt(slf)}</span>
       </div>
       <div style={{ position: 'relative', height: 8, background: 'var(--sunken)', borderRadius: 99 }}>
-        <div
-          style={{
-            position: 'absolute',
-            left: `${pct(sdf)}%`,
-            right: `${100 - pct(slf)}%`,
-            top: 0,
-            bottom: 0,
-            background: 'linear-gradient(90deg, var(--pos), var(--warn) 70%, var(--neg))',
-            opacity: 0.25,
-            borderRadius: 99,
-          }}
-        />
-        {[sdf, repo, slf].map(v => (
+        {sdf != null && slf != null && (
+          <div
+            style={{
+              position: 'absolute',
+              left: `${pct(sdf)}%`,
+              right: `${100 - pct(slf)}%`,
+              top: 0,
+              bottom: 0,
+              background: 'linear-gradient(90deg, var(--pos), var(--warn) 70%, var(--neg))',
+              opacity: 0.25,
+              borderRadius: 99,
+            }}
+          />
+        )}
+        {presentValues.map(v => (
           <div
             key={v}
             style={{
@@ -117,8 +136,16 @@ function LiquidityMobile() {
       </div>
 
       <div style={{ padding: '0 22px 28px' }}>
-        <div className="eyebrow" style={{ marginBottom: 14 }}>Policy corridor</div>
-        <CorridorViz callRate={data?.callMoneyRate} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+          <div className="eyebrow">Policy corridor</div>
+          {(data?.policyRepo == null || data?.policySdf == null || data?.policySlf == null) && <DemoBadge />}
+        </div>
+        <CorridorViz
+          callRate={data?.callMoneyRate}
+          repo={data?.policyRepo ?? null}
+          sdf={data?.policySdf ?? null}
+          slf={data?.policySlf ?? null}
+        />
       </div>
 
       <div style={{ padding: '0 22px 28px' }}>
@@ -188,8 +215,17 @@ function LiquidityDesktop() {
       <div style={{ height: 1, background: 'var(--line)', margin: '0 48px' }} />
 
       <div style={{ padding: '36px 48px' }}>
-        <div className="eyebrow" style={{ marginBottom: 22 }}>Policy rate corridor</div>
-        <CorridorViz tall callRate={data?.callMoneyRate} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 22 }}>
+          <div className="eyebrow">Policy rate corridor</div>
+          {(data?.policyRepo == null || data?.policySdf == null || data?.policySlf == null) && <DemoBadge />}
+        </div>
+        <CorridorViz
+          tall
+          callRate={data?.callMoneyRate}
+          repo={data?.policyRepo ?? null}
+          sdf={data?.policySdf ?? null}
+          slf={data?.policySlf ?? null}
+        />
       </div>
 
       <div style={{ height: 1, background: 'var(--line)', margin: '0 48px' }} />

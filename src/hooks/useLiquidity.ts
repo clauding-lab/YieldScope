@@ -8,6 +8,12 @@ export interface LiquidityData {
   excessLiquidityKCr: number | null  // in lakh crore (KCr = 100k crore)
   excessHistKCr: number[]
   m2YoY: number | null
+  // BB policy rate corridor — three explicit monthly metrics sourced from
+  // MEI bulletin page 10. Each may be null if EconDelta hasn't ingested the
+  // first row yet (first aggregate fire scheduled 2026-05-29 13:00 BDT).
+  policyRepo: number | null
+  policySdf: number | null
+  policySlf: number | null
   asOf: string | null
 }
 
@@ -29,11 +35,14 @@ export function useLiquidity(): UseLiquidityResult {
     let cancelled = false
     ;(async () => {
       try {
-        const [call, excess, callSer, excessSer] = await Promise.all([
+        const [call, excess, callSer, excessSer, repo, sdf, slf] = await Promise.all([
           fetchLatest(METRIC.CALL_MONEY),
           fetchLatest(METRIC.EXCESS_LIQ),
           fetchSeries(METRIC.CALL_MONEY, { limit: 8 }),
           fetchSeries(METRIC.EXCESS_LIQ, { limit: 8 }),
+          fetchLatest(METRIC.POLICY_RATE_REPO),
+          fetchLatest(METRIC.POLICY_RATE_SDF),
+          fetchLatest(METRIC.POLICY_RATE_SLF),
         ])
         // M2 YoY deferred — EconDelta has broad_money level, not YoY %.
         // When derivation lands, add fetchSeries(METRIC.M2) here.
@@ -46,6 +55,9 @@ export function useLiquidity(): UseLiquidityResult {
             excessLiquidityKCr: excess ? excess.value / CR_PER_KCR : null,
             excessHistKCr: excessSer.map(p => p.value / CR_PER_KCR),
             m2YoY: null,
+            policyRepo: repo?.value ?? null,
+            policySdf: sdf?.value ?? null,
+            policySlf: slf?.value ?? null,
             asOf: call?.asOf ?? null,
           },
         })
