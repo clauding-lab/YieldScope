@@ -21,6 +21,7 @@ function FiscalMobile() {
   const { data } = useFiscal()
   const revenuePct = data?.revenuePct ?? null
   const adpPct = data?.adpPct ?? null
+  const domesticBorrowingCr = data?.domesticBorrowingCr ?? null
   const fmtPct = (n: number | null) => n != null ? `${n}%` : '—'
   const demoLabel = (label: string): ReactNode => (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
@@ -56,7 +57,7 @@ function FiscalMobile() {
         <div className="card-flat">
           <ListRow label="Revenue / target" value={fmtPct(revenuePct)} />
           <ListRow label={demoLabel('Debt / GDP')}        value={`${F.debtToGdp}%`} />
-          <ListRow label={demoLabel('Net dom. borrow')}   value={`${F.netDomesticBorrowingYTD} k Cr`} />
+          <ListRow label={domesticBorrowingCr == null ? demoLabel('Net dom. borrow') : 'Net dom. borrow'} value={domesticBorrowingCr != null ? `${(domesticBorrowingCr / 1000).toFixed(1)} k Cr` : `${F.netDomesticBorrowingYTD} k Cr`} />
           <ListRow label={demoLabel('Ways & Means')}      value={`${F.waysMeans} k Cr`} />
           <ListRow label="ADP implementation" value={fmtPct(adpPct)} last />
         </div>
@@ -79,20 +80,9 @@ function FiscalMobile() {
               borderRadius: 99,
             }}
           />
-          <div
-            style={{
-              position: 'absolute',
-              left: '83%',
-              top: -4,
-              bottom: -4,
-              width: 2,
-              background: 'var(--ink-2)',
-            }}
-          />
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
           <span className="caption">0</span>
-          <span className="caption">Expected 83%</span>
           <span className="caption">100%</span>
         </div>
       </div>
@@ -178,7 +168,7 @@ function FiscalDesktop() {
             </div>
           </div>
           <div className="caption" style={{ marginTop: 14 }}>
-            <span className="num" style={{ color: 'var(--ink)' }}>{fmtPct(revenuePct)}</span> of target · expected pace 83%
+            <span className="num" style={{ color: 'var(--ink)' }}>{fmtPct(revenuePct)}</span> of target
           </div>
         </div>
         <div>
