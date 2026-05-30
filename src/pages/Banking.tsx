@@ -91,7 +91,7 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
 
       <div style={{ padding: '0 22px 28px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-          <div className="caption">Credit / Deposit · industry</div>
+          <div className="caption">Pvt credit / deposits</div>
           {cdRatio == null && <DemoBadge />}
         </div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginTop: 4 }}>
@@ -181,7 +181,7 @@ function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <div className="eyebrow">Credit / Deposit · industry</div>
+            <div className="eyebrow">Pvt credit / deposits</div>
             {cdRatio == null && <DemoBadge />}
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
