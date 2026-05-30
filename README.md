@@ -1,73 +1,95 @@
-# React + TypeScript + Vite
+# YieldScope
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**A banker-grade Bangladesh ALCO Intelligence Platform** — a mobile-first PWA that helps treasury and Asset-Liability Committee (ALCO) teams at Bangladeshi banks read the government-securities curve, money-market liquidity, macro indicators, and fiscal pressure at a glance.
 
-Currently, two official plugins are available:
+🌐 **Live:** https://clauding-lab.github.io/YieldScope/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## What it surfaces
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Seven pages, each with separate mobile and desktop layouts:
 
-## Expanding the ESLint configuration
+| Page | Covers |
+|------|--------|
+| **Dashboard** | At-a-glance summary across all domains |
+| **Yields** | Government-securities curve + T-bill / T-bond auction results |
+| **Liquidity** | Money-market liquidity, repo/SDF/SLF corridor, call-money rates |
+| **Macro** | CPI, FX reserves, balance of payments, USD/BDT, Brent |
+| **Fiscal** | Revenue, ADP execution, debt/GDP |
+| **Banking** | Sector health — NPL, CAR, repo borrowing |
+| **Intelligence** | Editorial weekly note tying the signals together |
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+A deliberate convention runs through the rate/inflation panels: **up = red, down = green** (fixed-income markets read rising yields as tightening). That is intentional and not a bug.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Data architecture
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Live data comes from **[EconDelta](https://github.com/clauding-lab/econdelta)** — Bangladesh economic data pulled into a **Supabase** project (the same project that powers [The Brief](https://github.com/clauding-lab/the-brief)) and read client-side via an RLS-scoped, read-only anon key.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- `src/lib/econdelta.ts` / `src/lib/supabase.ts` — the live data seam.
+- `src/data/fixtures.ts` — bundled fallback used when the Supabase env vars are absent (e.g. a local build with no key). Non-live panels are explicitly tagged so placeholder data is never presented as authoritative.
+
+> This honesty discipline is load-bearing: a v2.0-era predecessor silently rendered AI-invented macro figures as real data. See `AGENT_LEARNINGS.md` for the full post-mortem.
+
+## Tech stack
+
+- **React 19** + **TypeScript 5.7** + **Vite 6**
+- **Tailwind CSS 4** for styling; design system in `src/styles/globals.css`
+- **React Router 7** (hash-free, `/YieldScope/` base path)
+- **@supabase/supabase-js 2** for live data
+- **vite-plugin-pwa** — installable, offline-capable PWA
+- **Vitest 2** + Testing Library for the data-hook test suite
+- **No chart library** — all charts are hand-rolled SVG primitives in `src/components/charts/`
+- Typography: **Geist** + **Geist Mono**; four switchable palettes (Slate / Ivory / Linen / Moss) applied via `theme-*` classes on `<html>`
+- Performance target: **≤ 100 kB gzip** total
+
+## Project structure
+
+```
+src/
+├── App.tsx                 Lazy routes + AppShell
+├── main.tsx                ThemeProvider → ErrorBoundary → Router → App
+├── pages/                  7 pages, each Mobile + Desktop layout
+├── components/             charts/ (hand-rolled SVG) + primitives/ (design-system atoms)
+├── hooks/                  Per-domain data hooks (useDashboard, useMacro, useYields, …)
+├── lib/                    econdelta, supabase, econdelta-metrics, yieldMath, routes
+├── data/fixtures.ts        Fallback data layer
+├── theme/                  Palette types + ThemeProvider
+└── styles/globals.css      Design system, palettes, typography
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Local development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Requires **Node 22+**.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev          # start the dev server
+npm run build        # type-check + production build
+npm run preview      # serve the production build locally
+npm run lint         # ESLint
+npm run test         # Vitest (watch)
+npm run test:run     # Vitest (single run)
 ```
+
+Without `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` in the environment, the app runs on bundled fixture data and tags those panels accordingly.
+
+## Deployment
+
+Pushes to `main` are built and deployed to **GitHub Pages** automatically via `.github/workflows/deploy.yml`. Vite bakes the public `VITE_SUPABASE_URL` and the RLS-scoped `VITE_SUPABASE_ANON_KEY` (from a repo secret) into the static bundle at build time.
+
+The base path `/YieldScope/` is set in three places that must always move together: `vite.config` `base`, the `BrowserRouter` basename, and the PWA manifest `start_url` / `scope`.
+
+## Governance
+
+This repo uses a three-document governance triad — read these before making changes:
+
+- **`AGENTS.md`** — operational rules for AI coding agents, plus a running list of landmines.
+- **`VISION.md`** — what ships merge-by-default vs. what needs sign-off.
+- **`AGENT_LEARNINGS.md`** — dated incident reports (trigger / what went wrong / lesson / prevention).
+
+There is **no authentication** in v3.0 by design, and no client-side password gates.
+
+---
+
+*Private project. v3.0 (2026-05) is a ground-up rebuild. Solo-developed; directed by Adnan via AI coding agents.*
