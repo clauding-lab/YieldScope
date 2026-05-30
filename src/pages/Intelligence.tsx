@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useIsDesktop } from '../lib/hooks'
 import { useBriefing } from '../hooks/useBriefing'
 import type { Briefing } from '../lib/econdelta'
+import { BriefingBody } from '../lib/briefingMarkdown'
 import { FX } from '../data/fixtures'
 import { DemoBadge, ListRow, SectionTitle } from '../components/primitives'
 import { Timeline } from '../components/charts'
@@ -159,9 +160,9 @@ function IntelMobile() {
           <span className="chip">{shown ? shown.weekOf : 'Fresh · 6h ago'}</span>
           {banner && <span className="chip chip-warn">{banner}</span>}
         </div>
-        <p className="body" style={{ marginTop: 18, fontSize: 15, lineHeight: 1.7 }}>
-          {shown ? shown.body : FX.intel.weekly}
-        </p>
+        <div style={{ marginTop: 18 }}>
+          <BriefingBody markdown={shown ? shown.body : FX.intel.weekly} baseSize={15} />
+        </div>
         <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
           <button type="button" className="btn btn-sm" onClick={() => setShowHistory(v => !v)}>
             {showHistory ? 'Hide history' : 'Read history'}
@@ -247,9 +248,9 @@ function IntelDesktop() {
               <span className="chip chip-warn">{banner}</span>
             </div>
           )}
-          <p className="body" style={{ marginTop: 22, fontSize: 17, lineHeight: 1.7, color: 'var(--ink)', maxWidth: 720 }}>
-            {shown ? shown.body : FX.intel.weekly}
-          </p>
+          <div style={{ marginTop: 22, color: 'var(--ink)', maxWidth: 720 }}>
+            <BriefingBody markdown={shown ? shown.body : FX.intel.weekly} baseSize={17} />
+          </div>
           <div style={{ display: 'flex', gap: 8, marginTop: 22 }}>
             <button type="button" className="btn" onClick={() => setShowHistory(v => !v)}>
               {showHistory ? 'Hide history' : 'Read history'}
