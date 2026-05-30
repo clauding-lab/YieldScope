@@ -47,7 +47,7 @@ Owner: solo dev (Adnan, Bangladesh, UTC+6). Vibe-coded — Adnan directs AI agen
 | Production build | `npm run build` (runs `tsc -b && vite build`) |
 | Lint | `npm run lint` (ESLint, must be green to merge) |
 | Local preview of prod build | `npm run preview` |
-| Unit tests | (Vitest — added in Phase 2 of the EconDelta swap; not yet installed) |
+| Unit tests | `npm run test:run` (Vitest — hook + lib unit tests; 41 as of 2026-05-31) |
 | E2E tests | (none yet) |
 
 Build gotchas:
@@ -108,6 +108,16 @@ Numbered, named, and specific enough to keep a fresh AI session from stepping on
 15. **No silent fixture fallback. Live or `—`, never `?? 'literal'`.** When a hook returns null because EconDelta has no row yet, render `—` (or hide the chart/sub-element) — NEVER fall back to a hardcoded value. The v3.0 honesty pass (2026-05-28, PR #2) stripped 7+ silent fallbacks across Dashboard/Yields/Banking/Fiscal that were rendering hardcoded `'9.34'` / `'11.42'` / `'12.18'` / `'9.20'` / `'+76'` / `B.nplRatio` / `F.revenuePct` when EconDelta returned null. Same dishonesty class as v2.0's hallucinated macro pipeline, different mechanism. For non-live content that's intentionally placeholder, attach `<DemoBadge />` (the grey "Demo data" chip) so the reader knows it's not real. See `docs/econdelta-wishlist.md` for the tiered backlog of panels that should eventually become live.
 
 16. **A fresh `as_of` in Supabase does NOT prove the value is fresh.** EconDelta's `aggregate` re-stamps the latest available snapshot with today's `as_of` on every run — so when its parse stage is down, daily metrics keep showing today's date while the value is days stale (a carry-forward). This actually happened 2026-05-25→05-29 (EconDelta's parse died on a sandbox `EROFS`; fixed). When auditing "is this panel actually live?", a today `as_of` is necessary but NOT sufficient — confirm EconDelta's parse cron is healthy (`run_logs` `source=parse status=ok`, or `econdelta.clauding-lab.com/runs`). This is the upstream cousin of landmine 15: a stale carry-forward can look just as live as a hardcoded fixture.
+
+17. **Never pass raw float subtraction into `<Delta />` (or any verbatim-rendering display).** `Delta` renders `{value}` literally — no `toFixed`, no rounding — so `11.42 - 11.50` shows `↓ -0.08000000000000007`. Round computed numbers at the source with `roundTo(value, dp)` from `src/lib/yieldMath.ts` (2 dp for yields/rates/FX). This bit the Tier A hero deltas (Yields 91d/10y, Macro USD/BDT) — a 17-significant-digit delta is a "wrong-looking number" and fails the honesty bar. Same rule for any new component that prints a number verbatim.
+
+18. **Don't render a live headline above an unbadged fixture/synthetic chart.** When a panel's headline goes live but its sparkline/trend stays a fixture (or is synthetic), the two contradict each other and silently imply a false trend — Banking C/D showed a live ~89.5% over a fixture chart that ended at the old hardcoded 81.4. Either gate the chart to render only with live history (the NPL `{nplHist && (…)}` pattern), or drop the chart. This is landmine 15 extended from single values to charts/deltas/sparklines. NOTE: `private_sector_credit` and `deposits_of_the_system` are flat daily carry-forwards (see #16), so a derived C/D history is a meaningless flat line — the C/D chart was dropped, not wired.
+
+19. **An EconDelta metric's id is NOT its panel label — verify the semantic before wiring.** Two confirmed mismatches left as `<DemoBadge />` rather than mislabelled: (a) `bop_summary` is an LLM row-parse of BB's *entire* Balance-of-Payments table (`config/sources-v3.json` task "Entire Table") — its "BOP Summary" name most likely means the **Overall Balance** line, NOT specifically the Current Account; do not wire it to a "Current acct" panel. (b) `interbank_repo_data` is bank-to-bank **interbank** repo, NOT central-bank repo from BB; do not wire it to "Repo borrow from BB". When a metric's id/source is ambiguous, leave the panel demo and flag it — never relabel a real number into a slot it doesn't mean.
+
+20. **Label a derived ratio by what it actually divides.** The Banking C/D headline is `private_sector_credit ÷ deposits_of_the_system × 100` (~89.5%) — that is NOT the regulated total-advances ADR/CDR. It is labelled "Pvt credit / deposits", NOT "Credit / Deposit · industry". Don't relabel an approximation as the regulated metric.
+
+21. **Lagged monthly metrics must show their vintage.** M2 YoY (Feb), REER / import-cover (Mar), 2Y/20Y yields (Apr) lag "today" by 1–3 months. Render each with a compact vintage via `monthLabel(asOf)` from `src/lib/dates.ts` (e.g. "Feb '26") so a stale monthly print is never read as the current figure. Thread the metric's OWN `as_of` through the hook — the hook's top-level `asOf` is the daily anchor-metric's date and is wrong for a lagged monthly. `monthLabel` rejects partial dates so a malformed value can't fabricate a vintage.
 
 ## Communication & timezone
 
