@@ -71,6 +71,13 @@ export const METRIC = {
   CPI_12M_AVG_M:   'cpi_12m_avg_monthly',
   CPI_FOOD_M:      'cpi_p2p_food_monthly',
   CPI_NONFOOD_M:   'cpi_p2p_nonfood_monthly',
+
+  // Tier A monthly metrics (metric_history_monthly)
+  M2_YOY_M:        'm2_growth_yoy_monthly',
+  REER_M:          'reer_monthly',
+  IMPORT_COVER_M:  'import_cover_months_monthly',
+  YIELD_2Y_M:      'yield_2y_monthly',
+  YIELD_20Y_M:     'yield_20y_monthly',
 } as const
 
 export type MetricId = typeof METRIC[keyof typeof METRIC]
@@ -80,4 +87,9 @@ export const MONTHLY_METRICS: ReadonlySet<MetricId> = new Set([
   METRIC.CPI_12M_AVG_M,
   METRIC.CPI_FOOD_M,
   METRIC.CPI_NONFOOD_M,
+  METRIC.M2_YOY_M,
+  METRIC.REER_M,
+  METRIC.IMPORT_COVER_M,
+  METRIC.YIELD_2Y_M,
+  METRIC.YIELD_20Y_M,
 ])
