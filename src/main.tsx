@@ -13,7 +13,7 @@ createRoot(rootEl).render(
   <StrictMode>
     <ThemeProvider>
       <ErrorBoundary>
-        <BrowserRouter basename="/YieldScope">
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
           <App />
         </BrowserRouter>
       </ErrorBoundary>
