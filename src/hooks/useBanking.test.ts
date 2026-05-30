@@ -20,6 +20,9 @@ describe('useBanking', () => {
     vi.mocked(fetchLatest).mockImplementation(async (id) => {
       if (id === 'gross_npl_ratio')      return { asOf: '2026-03-31', value: 11.8 }
       if (id === 'banking_sector_crar')  return { asOf: '2026-03-31', value: 11.6 }
+      if (id === 'private_sector_credit_yoy_pct') return { asOf: '2026-05-30', value: 6.03 }
+      if (id === 'private_sector_credit')         return { asOf: '2026-05-30', value: 1785976 }
+      if (id === 'deposits_of_the_system')        return { asOf: '2026-05-30', value: 1995461.3 }
       return null
     })
     vi.mocked(fetchSeries).mockImplementation(async (id) => {
@@ -40,6 +43,8 @@ describe('useBanking', () => {
     expect(result.current.data!.nplHist.length).toBe(2)
     expect(result.current.data!.nplHist[0]).toBe(9.4)
     expect(result.current.data!.nplHist[1]).toBe(11.8)
+    expect(result.current.data!.pvtCreditYoY).toBe(6.03)
+    expect(result.current.data!.cdRatio).toBeCloseTo(89.5, 1)
   })
 
   it('captures error', async () => {
