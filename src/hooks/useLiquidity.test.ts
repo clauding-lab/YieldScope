@@ -30,6 +30,7 @@ describe('useLiquidity', () => {
     vi.mocked(fetchSeries).mockImplementation(async (id) => {
       if (id === 'call_money_rate')                   return [{ asOf: '2026-05-20', value: 8.42 }, { asOf: '2026-05-27', value: 9.34 }]
       if (id === 'excess_liquid_asset_total_minimum') return [{ asOf: '2026-03-01', value: 28400000 }, { asOf: '2026-05-26', value: 18420000 }]
+      if (id === 'm2_growth_yoy_monthly')             return [{ asOf: '2026-01-01', value: 9.46 }, { asOf: '2026-02-01', value: 10.52 }]
       return []
     })
 
@@ -46,6 +47,8 @@ describe('useLiquidity', () => {
     expect(result.current.data!.policySdf).toBe(7.50)
     expect(result.current.data!.policySlf).toBe(11.50)
     expect(result.current.data!.m2YoY).toBe(10.52)
+    expect(result.current.data!.m2YoYAsOf).toBe('2026-02-01')
+    expect(result.current.data!.m2Hist).toEqual([9.46, 10.52])
   })
 
   it('returns nulls for policy corridor when EconDelta has no rows', async () => {

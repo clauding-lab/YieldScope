@@ -24,7 +24,9 @@ export interface MacroData {
   brentHist: number[]
 
   reer: number | null
+  reerAsOf: string | null              // REER is a lagged monthly index — surface its vintage
   importCoverMonths: number | null
+  importCoverAsOf: string | null       // import cover is a lagged monthly print
 
   asOf: string | null
 }
@@ -104,7 +106,9 @@ export function useMacro(): UseMacroResult {
             brentUsdBarrel: brent?.value ?? null,
             brentHist:      brentSer.map(p => p.value),
             reer:               reer?.value ?? null,
+            reerAsOf:           reer?.asOf ?? null,
             importCoverMonths:  impCov?.value ?? null,
+            importCoverAsOf:    impCov?.asOf ?? null,
             asOf,
           },
         })

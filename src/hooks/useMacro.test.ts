@@ -56,7 +56,9 @@ describe('useMacro', () => {
     expect(result.current.data!.cpiHist[0]).toBe(9.94)
     expect(result.current.data!.cpiHist[1]).toBe(9.20)
     expect(result.current.data!.reer).toBe(102.78)
+    expect(result.current.data!.reerAsOf).toBe('2026-03-01')
     expect(result.current.data!.importCoverMonths).toBe(5.86)
+    expect(result.current.data!.importCoverAsOf).toBe('2026-03-01')
   })
 
   it('captures error from the client', async () => {

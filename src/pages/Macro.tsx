@@ -5,6 +5,7 @@ import { Delta, DemoBadge, ListRow, SectionTitle, Sparkline } from '../component
 import { AreaChart, Heatmap } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useMacro } from '../hooks/useMacro'
+import { monthLabel } from '../lib/dates'
 
 const CPI_ROWS = ['Food', 'Non-food', 'Core', 'Headline']
 const CORE_CPI_FIXTURE = [8.40, 8.32, 8.18, 8.04, 7.94, 7.82, 7.74, 7.62]
@@ -84,6 +85,7 @@ function buildCommodities(data: ReturnType<typeof useMacro>['data']): CommodityR
 function MacroMobile() {
   const { data } = useMacro()
   const bopItems = buildBopItems(data)
+  const importVintage = monthLabel(data?.importCoverAsOf)
   const fmtPct = (n: number | null | undefined) => n != null ? `${n.toFixed(2)}%` : '—'
   return (
     <>
@@ -133,7 +135,7 @@ function MacroMobile() {
           </div>
         </div>
         {data?.importCoverMonths != null && (
-          <div className="caption" style={{ marginTop: 8 }}>{data.importCoverMonths.toFixed(1)} mo import cover</div>
+          <div className="caption" style={{ marginTop: 8 }}>{data.importCoverMonths.toFixed(1)} mo import cover{importVintage ? ` · ${importVintage}` : ''}</div>
         )}
         {data?.fxResHist?.length ? (
           <div style={{ marginTop: 16 }}>
@@ -186,6 +188,8 @@ function MacroDesktop() {
   const usdDelta = (data?.usdBdtHist && data.usdBdtHist.length >= 2)
     ? data.usdBdtHist[data.usdBdtHist.length - 1] - data.usdBdtHist[data.usdBdtHist.length - 2]
     : null
+  const reerVintage = monthLabel(data?.reerAsOf)
+  const importVintage = monthLabel(data?.importCoverAsOf)
   return (
     <>
       <DesktopHeader section="Macro" breadcrumb="YieldScope · Inflation, reserves, balance of payments" />
@@ -217,7 +221,7 @@ function MacroDesktop() {
             <span className="caption">USD bn</span>
           </div>
           {data?.importCoverMonths != null && (
-            <div className="caption" style={{ marginTop: 6 }}>{data.importCoverMonths.toFixed(1)} mo import cover</div>
+            <div className="caption" style={{ marginTop: 6 }}>{data.importCoverMonths.toFixed(1)} mo import cover{importVintage ? ` · ${importVintage}` : ''}</div>
           )}
           {data?.fxResHist?.length ? (
             <div style={{ marginTop: 20 }}>
@@ -327,7 +331,7 @@ function MacroDesktop() {
           </div>
           {data?.reer != null && (
             <div style={{ display: 'flex', gap: 24, marginTop: 8 }}>
-              <span className="caption">REER {data.reer.toFixed(1)}</span>
+              <span className="caption">REER {data.reer.toFixed(1)}{reerVintage ? ` · ${reerVintage}` : ''}</span>
             </div>
           )}
           {usdBdtChartData ? (

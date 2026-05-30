@@ -1,6 +1,7 @@
 import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
 import { useLiquidity } from '../hooks/useLiquidity'
+import { monthLabel } from '../lib/dates'
 import { Bar, DemoBadge, ListRow, SectionTitle } from '../components/primitives'
 import { AreaChart, BarChart, Heatmap } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
@@ -115,6 +116,7 @@ function intradayColor(v: number) {
 
 function LiquidityMobile() {
   const { data } = useLiquidity()
+  const m2Vintage = monthLabel(data?.m2YoYAsOf)
 
   return (
     <>
@@ -171,7 +173,7 @@ function LiquidityMobile() {
           <DemoBadge />
         </div>
         <div className="card-flat">
-          <ListRow label="Money supply · M2 YoY" value={data?.m2YoY != null ? `${data.m2YoY.toFixed(1)}%` : '—'} />
+          <ListRow label="Money supply · M2 YoY" value={data?.m2YoY != null ? `${data.m2YoY.toFixed(1)}%` : '—'} sub={m2Vintage ?? undefined} />
           <ListRow label="CRR utilisation"       value="92%"       sub="Reserve ratio 4.0%" />
           <ListRow label="SLR utilisation"       value="86%"       sub="Statutory ratio 13.0%" />
           <ListRow label="Repo from BB"          value="124.6 k Cr" sub="↑ 42% in 8 weeks" last />
@@ -184,6 +186,7 @@ function LiquidityMobile() {
 function LiquidityDesktop() {
   const { data } = useLiquidity()
   const L = FX.liquidity
+  const m2Vintage = monthLabel(data?.m2YoYAsOf)
   return (
     <>
       <DesktopHeader section="Liquidity" breadcrumb="YieldScope · Money market & corridor" />
@@ -264,8 +267,9 @@ function LiquidityDesktop() {
             <span className="serif-num" style={{ fontSize: 48 }}>{data?.m2YoY != null ? data.m2YoY.toFixed(1) : '—'}</span>
             <span className="caption">%</span>
           </div>
+          {m2Vintage && <div className="caption" style={{ marginTop: 4 }}>{m2Vintage}</div>}
           <div style={{ marginTop: 16 }}>
-            <AreaChart data={L.m2Hist} w={360} h={100} color="var(--info)" />
+            <AreaChart data={data?.m2Hist?.length ? data.m2Hist : L.m2Hist} w={360} h={100} color="var(--info)" />
           </div>
         </div>
         <div>
