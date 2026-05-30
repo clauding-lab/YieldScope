@@ -63,6 +63,34 @@ describe('fetchLatest', () => {
   })
 })
 
+describe('fetchRecentBriefings', () => {
+  it('maps briefing rows newest-first and defaults null jsonb to []', async () => {
+    mockLimit.mockResolvedValueOnce({
+      data: [{
+        week_of: '2026-06-01', generated_at: '2026-06-01T01:00:00Z',
+        title: 'T', body: 'B',
+        featured_anomalies: [{ candidate_id: 'x:change', label: 'L', stat: 's', value: 1, detail: 'd', severity: 'up', metric_id: 'x', why: 'w' }],
+        open_threads: null, data_as_of: '2026-05-31', stale_series: null,
+      }],
+      error: null,
+    })
+    const { fetchRecentBriefings } = await import('./econdelta')
+    const out = await fetchRecentBriefings(12)
+    expect(mockFrom).toHaveBeenCalledWith('briefings')
+    expect(mockOrder).toHaveBeenCalledWith('week_of', { ascending: false })
+    expect(out[0].weekOf).toBe('2026-06-01')
+    expect(out[0].featuredAnomalies[0].value).toBe(1)
+    expect(out[0].openThreads).toEqual([])
+    expect(out[0].staleSeries).toEqual([])
+  })
+
+  it('returns empty array on error', async () => {
+    mockLimit.mockResolvedValueOnce({ data: null, error: { message: 'oops' } })
+    const { fetchRecentBriefings } = await import('./econdelta')
+    expect(await fetchRecentBriefings()).toEqual([])
+  })
+})
+
 describe('fetchSeries', () => {
   it('returns rows in chronological ascending order', async () => {
     mockLimit.mockResolvedValueOnce({
