@@ -35,7 +35,7 @@ export function useLiquidity(): UseLiquidityResult {
     let cancelled = false
     ;(async () => {
       try {
-        const [call, excess, callSer, excessSer, repo, sdf, slf] = await Promise.all([
+        const [call, excess, callSer, excessSer, repo, sdf, slf, m2] = await Promise.all([
           fetchLatest(METRIC.CALL_MONEY),
           fetchLatest(METRIC.EXCESS_LIQ),
           fetchSeries(METRIC.CALL_MONEY, { limit: 8 }),
@@ -43,9 +43,9 @@ export function useLiquidity(): UseLiquidityResult {
           fetchLatest(METRIC.POLICY_RATE_REPO),
           fetchLatest(METRIC.POLICY_RATE_SDF),
           fetchLatest(METRIC.POLICY_RATE_SLF),
+          fetchLatest(METRIC.M2_YOY_M),
         ])
-        // M2 YoY deferred — EconDelta has broad_money level, not YoY %.
-        // When derivation lands, add fetchSeries(METRIC.M2) here.
+        // M2 YoY now sourced from m2_growth_yoy_monthly (monthly, lagged).
         if (cancelled) return
         setState({
           loading: false, error: null,
@@ -54,7 +54,7 @@ export function useLiquidity(): UseLiquidityResult {
             callSpark: callSer.map(p => p.value),
             excessLiquidityKCr: excess ? excess.value / CR_PER_KCR : null,
             excessHistKCr: excessSer.map(p => p.value / CR_PER_KCR),
-            m2YoY: null,
+            m2YoY: m2?.value ?? null,
             policyRepo: repo?.value ?? null,
             policySdf: sdf?.value ?? null,
             policySlf: slf?.value ?? null,

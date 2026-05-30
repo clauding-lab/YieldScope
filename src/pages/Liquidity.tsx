@@ -171,7 +171,7 @@ function LiquidityMobile() {
           <DemoBadge />
         </div>
         <div className="card-flat">
-          <ListRow label="Money supply · M2 YoY" value="8.4%"      sub="vs target 10.5" />
+          <ListRow label="Money supply · M2 YoY" value={data?.m2YoY != null ? `${data.m2YoY.toFixed(1)}%` : '—'} />
           <ListRow label="CRR utilisation"       value="92%"       sub="Reserve ratio 4.0%" />
           <ListRow label="SLR utilisation"       value="86%"       sub="Statutory ratio 13.0%" />
           <ListRow label="Repo from BB"          value="124.6 k Cr" sub="↑ 42% in 8 weeks" last />
@@ -258,13 +258,12 @@ function LiquidityDesktop() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
             <div className="eyebrow">Money supply · M2 YoY</div>
-            <DemoBadge />
+            {data?.m2YoY == null && <DemoBadge />}
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span className="serif-num" style={{ fontSize: 48 }}>8.4</span>
+            <span className="serif-num" style={{ fontSize: 48 }}>{data?.m2YoY != null ? data.m2YoY.toFixed(1) : '—'}</span>
             <span className="caption">%</span>
           </div>
-          <div className="caption" style={{ marginTop: 6 }}>vs target 10.5</div>
           <div style={{ marginTop: 16 }}>
             <AreaChart data={L.m2Hist} w={360} h={100} color="var(--info)" />
           </div>

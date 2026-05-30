@@ -24,6 +24,7 @@ describe('useLiquidity', () => {
       if (id === 'policy_rate_repo')                       return { asOf: '2026-04-30', value: 10.00 }
       if (id === 'policy_rate_sdf')                        return { asOf: '2026-04-30', value: 7.50 }
       if (id === 'policy_rate_slf')                        return { asOf: '2026-04-30', value: 11.50 }
+      if (id === 'm2_growth_yoy_monthly')                  return { asOf: '2026-02-01', value: 10.52 }
       return null
     })
     vi.mocked(fetchSeries).mockImplementation(async (id) => {
@@ -44,6 +45,7 @@ describe('useLiquidity', () => {
     expect(result.current.data!.policyRepo).toBe(10.00)
     expect(result.current.data!.policySdf).toBe(7.50)
     expect(result.current.data!.policySlf).toBe(11.50)
+    expect(result.current.data!.m2YoY).toBe(10.52)
   })
 
   it('returns nulls for policy corridor when EconDelta has no rows', async () => {
