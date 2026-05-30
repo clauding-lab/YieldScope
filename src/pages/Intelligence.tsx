@@ -179,6 +179,11 @@ function IntelMobile() {
       <div style={{ padding: '0 22px 24px' }}>
         <div className="section-rule">Anomalies · 24h</div>
       </div>
+      {shown == null && (
+        <div style={{ padding: '0 22px 8px' }}>
+          <DemoBadge />
+        </div>
+      )}
       <div style={{ padding: '0 22px 24px' }}>
         <AnomalyList items={anomalies} compact />
       </div>
@@ -263,7 +268,9 @@ function IntelDesktop() {
 
         <aside>
           <div className="card-flat" style={{ padding: 22 }}>
-            <div className="eyebrow" style={{ marginBottom: 12 }}>Anomalies · 24h</div>
+            <div className="eyebrow" style={{ marginBottom: 12, display: 'flex', gap: 8, alignItems: 'center' }}>
+              Anomalies · 24h{shown == null && <DemoBadge />}
+            </div>
             <AnomalyList items={anomalies} />
           </div>
         </aside>

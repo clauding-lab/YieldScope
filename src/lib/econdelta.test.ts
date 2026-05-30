@@ -126,3 +126,15 @@ describe('fetchSeries', () => {
     expect(result).toEqual([])
   })
 })
+
+describe('fetchRecentBriefings (no credentials)', () => {
+  it('returns empty array when supabase client is missing', async () => {
+    vi.doMock('./supabase', () => ({
+      getSupabase: () => null,
+      isLiveDataAvailable: () => false,
+    }))
+    vi.resetModules()
+    const { fetchRecentBriefings } = await import('./econdelta')
+    expect(await fetchRecentBriefings()).toEqual([])
+  })
+})
