@@ -17,14 +17,16 @@ beforeEach(() => {
 })
 
 describe('useYields', () => {
-  it('maps 5 live tenors from EconDelta', async () => {
+  it('maps 7 live tenors from EconDelta', async () => {
     vi.mocked(fetchLatest).mockImplementation(async (id) => {
       switch (id) {
         case 'bill_bond_rates':  return { asOf: '2026-05-26', value: 11.42 } // 91D
         case 'tbill_182d_yield': return { asOf: '2026-05-26', value: 11.60 }
         case 'tbill_364d_yield': return { asOf: '2026-05-26', value: 11.71 }
+        case 'yield_2y_monthly': return { asOf: '2026-03-01', value: 10.23 }
         case 'tbond_5y_yield':   return { asOf: '2026-05-21', value: 12.04 }
         case 'tbond_10y_yield':  return { asOf: '2026-05-21', value: 12.18 }
+        case 'yield_20y_monthly': return { asOf: '2026-03-01', value: 11.23 }
         default: return null
       }
     })
@@ -36,8 +38,10 @@ describe('useYields', () => {
     expect(d.yields['91D']).toBe(11.42)
     expect(d.yields['182D']).toBe(11.60)
     expect(d.yields['364D']).toBe(11.71)
+    expect(d.yields['2Y']).toBe(10.23)
     expect(d.yields['5Y']).toBe(12.04)
     expect(d.yields['10Y']).toBe(12.18)
+    expect(d.yields['20Y']).toBe(11.23)
     expect(d.spread10Y_91D_bps).toBe(76) // (12.18 - 11.42) * 100 = 76 bps
   })
 
