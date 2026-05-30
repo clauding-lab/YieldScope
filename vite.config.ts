@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  base: '/YieldScope/',
+  base: '/',
   plugins: [
     react(),
     tailwindcss(),
@@ -19,8 +19,8 @@ export default defineConfig({
         background_color: '#14171C',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: '/YieldScope/',
-        scope: '/YieldScope/',
+        start_url: '/',
+        scope: '/',
         categories: ['finance', 'business'],
         icons: [
           { src: 'icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
@@ -30,7 +30,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
-        navigateFallback: '/YieldScope/index.html',
+        navigateFallback: '/index.html',
       },
     }),
   ],
