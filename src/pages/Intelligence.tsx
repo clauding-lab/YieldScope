@@ -1,4 +1,7 @@
+import { useState } from 'react'
 import { useIsDesktop } from '../lib/hooks'
+import { useBriefing } from '../hooks/useBriefing'
+import type { Briefing } from '../lib/econdelta'
 import { FX } from '../data/fixtures'
 import { DemoBadge, ListRow, SectionTitle } from '../components/primitives'
 import { Timeline } from '../components/charts'
@@ -11,6 +14,8 @@ const SEV_DOT_COLOR: Record<AnomalySev, string> = {
   up:   'var(--neg)',
   down: 'var(--pos)',
 }
+
+const DEMO_TITLE = 'The short end is rotating, not relaxing.'
 
 const TIMELINE_EVENTS = [
   { pct: 0.04, label: 'Repo held at 9.00%',       sub: 'MPC · 8 Apr',     sev: 'info' as const },
@@ -42,66 +47,147 @@ function chipForStatus(status: string): string {
   return 'chip'
 }
 
+interface DisplayAnomaly { key: string; label: string; sub: string; severity: AnomalySev }
+
+// Live anomalies carry Python-computed numbers (the integrity guarantee); show
+// the label + the concrete `detail` figure.
+function liveAnomalies(b: Briefing): DisplayAnomaly[] {
+  return b.featuredAnomalies.map(a => ({
+    key: a.candidate_id, label: a.label, sub: a.detail, severity: a.severity,
+  }))
+}
+
+function demoAnomalies(extra: { code: string; label: string; sev: AnomalySev }[]): DisplayAnomaly[] {
+  return [...FX.intel.anomalies, ...extra].map((a, i) => ({
+    key: a.code, label: a.label, sub: RECENT_RELATIVE[i] ?? '3d', severity: a.sev as AnomalySev,
+  }))
+}
+
+// "data as of X — N series stale" honesty banner; null when the briefing is fully fresh.
+function staleNote(b: Briefing | null): string | null {
+  if (!b || b.staleSeries.length === 0) return null
+  return `Data as of ${b.dataAsOf} · ${b.staleSeries.length} series stale`
+}
+
+interface HistoryPanelProps {
+  briefings: Briefing[]
+  activeWeek: string | null
+  onSelect: (weekOf: string | null) => void
+}
+
+function HistoryPanel({ briefings, activeWeek, onSelect }: HistoryPanelProps) {
+  if (briefings.length === 0) {
+    return <div className="caption" style={{ padding: '8px 0' }}>No prior briefings yet.</div>
+  }
+  return (
+    <div className="card-flat" style={{ padding: 8, marginTop: 12 }}>
+      {briefings.map((b, i) => {
+        const active = (activeWeek ?? briefings[0]?.weekOf) === b.weekOf
+        return (
+          <button
+            key={b.weekOf}
+            type="button"
+            onClick={() => onSelect(i === 0 ? null : b.weekOf)}
+            style={{
+              display: 'block', width: '100%', textAlign: 'left', background: 'none', border: 'none',
+              cursor: 'pointer', padding: '10px 12px',
+              borderBottom: i < briefings.length - 1 ? '1px solid var(--line)' : 'none',
+              color: active ? 'var(--ink)' : 'var(--ink-2)',
+            }}
+          >
+            <span className="caption">{b.weekOf}{i === 0 ? ' · latest' : ''}</span>
+            <div style={{ fontSize: 13, marginTop: 2 }}>{b.title}</div>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+interface AnomalyListProps { items: DisplayAnomaly[]; compact?: boolean }
+
+function AnomalyList({ items, compact = false }: AnomalyListProps) {
+  return (
+    <>
+      {items.map((a, i, arr) => (
+        <div
+          key={a.key}
+          style={{
+            padding: compact ? '14px 0' : '12px 0',
+            borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none',
+            display: 'flex', gap: 12, alignItems: 'flex-start',
+          }}
+        >
+          <span style={{
+            width: 6, height: 6, borderRadius: 99, marginTop: compact ? 8 : 6,
+            background: SEV_DOT_COLOR[a.severity], flexShrink: 0,
+          }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: compact ? 14 : 13, color: 'var(--ink)', lineHeight: 1.5 }}>{a.label}</div>
+            <div className="caption" style={{ marginTop: compact ? 3 : 2 }}>{a.sub}</div>
+          </div>
+        </div>
+      ))}
+    </>
+  )
+}
+
 function IntelMobile() {
-  const anomalies = [...FX.intel.anomalies, ...EXTRA_ANOMALIES]
+  const { briefings } = useBriefing()
+  const [selectedWeek, setSelectedWeek] = useState<string | null>(null)
+  const [showHistory, setShowHistory] = useState(false)
+  const latest = briefings[0] ?? null
+  const shown = (selectedWeek && briefings.find(b => b.weekOf === selectedWeek)) || latest
+
+  const anomalies = shown ? liveAnomalies(shown) : demoAnomalies(EXTRA_ANOMALIES)
+  const banner = staleNote(shown)
 
   return (
     <>
       <SectionTitle kicker="Weekly read · drafted by Claude" title="Briefings" />
-      <div style={{ padding: '0 22px 12px' }}>
-        <DemoBadge />
-      </div>
+      {latest == null && (
+        <div style={{ padding: '0 22px 12px' }}>
+          <DemoBadge />
+        </div>
+      )}
 
       <div style={{ padding: '0 22px 24px' }}>
         <h2 className="display" style={{ fontSize: 28, margin: 0, lineHeight: 1.2 }}>
-          The short end is rotating, not relaxing.
+          {shown ? shown.title : DEMO_TITLE}
         </h2>
-        <div style={{ display: 'flex', gap: 12, marginTop: 14 }}>
-          <span className="chip">Fresh · 6h ago</span>
-          <span className="chip">Week 22</span>
+        <div style={{ display: 'flex', gap: 12, marginTop: 14, flexWrap: 'wrap' }}>
+          <span className="chip">{shown ? shown.weekOf : 'Fresh · 6h ago'}</span>
+          {banner && <span className="chip chip-warn">{banner}</span>}
         </div>
-        <p className="body" style={{ marginTop: 18, fontSize: 15, lineHeight: 1.7 }}>{FX.intel.weekly}</p>
+        <p className="body" style={{ marginTop: 18, fontSize: 15, lineHeight: 1.7 }}>
+          {shown ? shown.body : FX.intel.weekly}
+        </p>
         <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
-          <button type="button" className="btn btn-sm">Regenerate</button>
-          <button type="button" className="btn btn-sm btn-ghost">Edit tone</button>
+          <button type="button" className="btn btn-sm" onClick={() => setShowHistory(v => !v)}>
+            {showHistory ? 'Hide history' : 'Read history'}
+          </button>
         </div>
+        {showHistory && (
+          <HistoryPanel
+            briefings={briefings}
+            activeWeek={selectedWeek}
+            onSelect={(w) => { setSelectedWeek(w); setShowHistory(false) }}
+          />
+        )}
       </div>
 
       <div style={{ padding: '0 22px 24px' }}>
         <div className="section-rule">Anomalies · 24h</div>
       </div>
       <div style={{ padding: '0 22px 24px' }}>
-        {anomalies.map((a, i, arr) => (
-          <div
-            key={a.code}
-            style={{
-              padding: '14px 0',
-              borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none',
-              display: 'flex',
-              gap: 12,
-              alignItems: 'flex-start',
-            }}
-          >
-            <span
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: 99,
-                marginTop: 8,
-                background: SEV_DOT_COLOR[a.sev as AnomalySev],
-                flexShrink: 0,
-              }}
-            />
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.5 }}>{a.label}</div>
-              <div className="caption" style={{ marginTop: 3 }}>{RECENT_RELATIVE[i] ?? '3d'}</div>
-            </div>
-          </div>
-        ))}
+        <AnomalyList items={anomalies} compact />
       </div>
 
       <div style={{ padding: '0 22px 16px' }}>
         <div className="section-rule">ALCO decisions</div>
+      </div>
+      <div style={{ padding: '0 16px 8px' }}>
+        <DemoBadge />
       </div>
       <div style={{ padding: '0 16px 24px' }}>
         <div className="card-flat">
@@ -116,104 +202,69 @@ function IntelMobile() {
           ))}
         </div>
       </div>
-
-      <div style={{ padding: '0 16px 28px' }}>
-        <div className="card" style={{ padding: 20 }}>
-          <div className="eyebrow" style={{ marginBottom: 8 }}>Export</div>
-          <h3 className="display" style={{ fontSize: 22, margin: 0 }}>Weekly ALCO brief</h3>
-          <div className="caption" style={{ marginTop: 4 }}>3 pages · charts & commentary</div>
-          <button
-            type="button"
-            className="btn btn-primary"
-            style={{ marginTop: 14, width: '100%', justifyContent: 'center' }}
-          >
-            Generate PDF
-          </button>
-        </div>
-      </div>
     </>
   )
 }
 
 function IntelDesktop() {
-  const sidebarAnomalies = [
-    ...FX.intel.anomalies,
+  const { briefings } = useBriefing()
+  const [selectedWeek, setSelectedWeek] = useState<string | null>(null)
+  const [showHistory, setShowHistory] = useState(false)
+  const latest = briefings[0] ?? null
+  const shown = (selectedWeek && briefings.find(b => b.weekOf === selectedWeek)) || latest
+
+  const sidebarDemo = demoAnomalies([
     { code: 'X-RES', label: 'Repo borrowing +42% in 8w', sev: 'up'   as AnomalySev },
     { code: 'X-AUC', label: '364D under-sub 3 of 4',     sev: 'warn' as AnomalySev },
-  ]
+  ])
+  const anomalies = shown ? liveAnomalies(shown) : sidebarDemo
+  const banner = staleNote(shown)
 
   return (
     <>
       <DesktopHeader section="Briefings" breadcrumb="YieldScope · Weekly read & ALCO log" />
-      <div style={{ padding: '0 48px' }}>
-        <DemoBadge />
-      </div>
+      {latest == null && (
+        <div style={{ padding: '0 48px' }}>
+          <DemoBadge />
+        </div>
+      )}
 
       <div style={{ padding: '40px 48px 0', display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 56 }}>
         <div>
-          <div className="eyebrow" style={{ marginBottom: 8 }}>Weekly read · Wednesday · drafted by Claude</div>
+          <div className="eyebrow" style={{ marginBottom: 8 }}>
+            Weekly read · {shown ? shown.weekOf : 'Wednesday'} · drafted by Claude
+          </div>
           <h2 className="display" style={{ fontSize: 44, margin: 0, lineHeight: 1.15 }}>
-            The short end is rotating, not relaxing.
+            {shown ? shown.title : DEMO_TITLE}
           </h2>
+          {banner && (
+            <div style={{ marginTop: 14 }}>
+              <span className="chip chip-warn">{banner}</span>
+            </div>
+          )}
           <p className="body" style={{ marginTop: 22, fontSize: 17, lineHeight: 1.7, color: 'var(--ink)', maxWidth: 720 }}>
-            {FX.intel.weekly}
+            {shown ? shown.body : FX.intel.weekly}
           </p>
           <div style={{ display: 'flex', gap: 8, marginTop: 22 }}>
-            <button type="button" className="btn">Regenerate</button>
-            <button type="button" className="btn btn-ghost">Edit tone</button>
-            <button type="button" className="btn btn-ghost">Read history</button>
-            <button type="button" className="btn btn-ghost">Share</button>
+            <button type="button" className="btn" onClick={() => setShowHistory(v => !v)}>
+              {showHistory ? 'Hide history' : 'Read history'}
+            </button>
           </div>
+          {showHistory && (
+            <div style={{ maxWidth: 720 }}>
+              <HistoryPanel
+                briefings={briefings}
+                activeWeek={selectedWeek}
+                onSelect={(w) => { setSelectedWeek(w); setShowHistory(false) }}
+              />
+            </div>
+          )}
         </div>
 
         <aside>
           <div className="card-flat" style={{ padding: 22 }}>
             <div className="eyebrow" style={{ marginBottom: 12 }}>Anomalies · 24h</div>
-            {sidebarAnomalies.map((a, i, arr) => (
-              <div
-                key={a.code}
-                style={{
-                  padding: '12px 0',
-                  borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none',
-                  display: 'flex',
-                  gap: 12,
-                  alignItems: 'flex-start',
-                }}
-              >
-                <span
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: 99,
-                    marginTop: 6,
-                    background: SEV_DOT_COLOR[a.sev],
-                    flexShrink: 0,
-                  }}
-                />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, color: 'var(--ink)', lineHeight: 1.45 }}>{a.label}</div>
-                  <div className="caption" style={{ marginTop: 2 }}>{['Now', '2h', '8h', '1d', '2d'][i] ?? '3d'}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="card" style={{ padding: 22, marginTop: 18 }}>
-            <div className="eyebrow" style={{ marginBottom: 8 }}>Export</div>
-            <h3 className="display" style={{ fontSize: 26, margin: 0 }}>Weekly ALCO brief</h3>
-            <div className="caption" style={{ marginTop: 6 }}>3 pages · PDF · ready in ~10s</div>
-            <div style={{ marginTop: 18, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {['Dashboard', 'Curve', 'Auctions', 'Liquidity', 'Macro', 'Commentary'].map(s => (
-                <span key={s} className="chip">{s} ✓</span>
-              ))}
-            </div>
-            <button
-              type="button"
-              className="btn btn-primary"
-              style={{ marginTop: 18, width: '100%', justifyContent: 'center' }}
-            >
-              Generate PDF
-            </button>
+            <AnomalyList items={anomalies} />
           </div>
         </aside>
       </div>
@@ -223,12 +274,10 @@ function IntelDesktop() {
       <div style={{ padding: '32px 48px 0' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 22 }}>
           <div>
-            <div className="eyebrow" style={{ marginBottom: 6 }}>What happened · 7 weeks</div>
+            <div className="eyebrow" style={{ marginBottom: 6, display: 'flex', gap: 10, alignItems: 'center' }}>
+              What happened · 7 weeks <DemoBadge />
+            </div>
             <h3 className="display" style={{ fontSize: 24, margin: 0 }}>The market through April–May</h3>
-          </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button type="button" className="btn btn-sm">Filter</button>
-            <button type="button" className="btn btn-sm">Add event</button>
           </div>
         </div>
         <div className="card-flat" style={{ padding: '24px 24px 16px' }}>
@@ -244,10 +293,11 @@ function IntelDesktop() {
       <div style={{ padding: '32px 48px 48px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 18 }}>
           <div>
-            <div className="eyebrow" style={{ marginBottom: 6 }}>ALCO decision log · Week 22</div>
+            <div className="eyebrow" style={{ marginBottom: 6, display: 'flex', gap: 10, alignItems: 'center' }}>
+              ALCO decision log · Week 22 <DemoBadge />
+            </div>
             <h3 className="display" style={{ fontSize: 24, margin: 0 }}>Six entries</h3>
           </div>
-          <button type="button" className="btn btn-sm">New decision</button>
         </div>
         <div className="card-flat">
           {[...FX.intel.decisions, ...EXTRA_DECISIONS].map((d, i, arr) => (
