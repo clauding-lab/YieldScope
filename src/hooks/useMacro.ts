@@ -23,6 +23,9 @@ export interface MacroData {
   brentUsdBarrel: number | null
   brentHist: number[]
 
+  reer: number | null
+  importCoverMonths: number | null
+
   asOf: string | null
 }
 
@@ -56,6 +59,7 @@ export function useMacro(): UseMacroResult {
           cpiH, cpiF, cpiNF, usd, fxr, brent,
           cpiSer, foodSer, nfSer, fxSer, usdSer, brentSer,
           rem, exp, imp,
+          reer, impCov,
         ] = await Promise.all([
           fetchLatest(METRIC.CPI_HEADLINE),
           fetchLatest(METRIC.CPI_FOOD),
@@ -72,6 +76,8 @@ export function useMacro(): UseMacroResult {
           fetchLatest(METRIC.REMIT_MONTHLY),
           fetchLatest(METRIC.EXPORT_MONTHLY),
           fetchLatest(METRIC.IMPORT_MONTHLY),
+          fetchLatest(METRIC.REER_M),
+          fetchLatest(METRIC.IMPORT_COVER_M),
         ])
 
         if (cancelled) return
@@ -97,6 +103,8 @@ export function useMacro(): UseMacroResult {
             importMonthlyUsdBn: imp?.value ?? null,
             brentUsdBarrel: brent?.value ?? null,
             brentHist:      brentSer.map(p => p.value),
+            reer:               reer?.value ?? null,
+            importCoverMonths:  impCov?.value ?? null,
             asOf,
           },
         })

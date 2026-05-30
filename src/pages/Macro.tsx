@@ -132,6 +132,9 @@ function MacroMobile() {
             </div>
           </div>
         </div>
+        {data?.importCoverMonths != null && (
+          <div className="caption" style={{ marginTop: 8 }}>{data.importCoverMonths.toFixed(1)} mo import cover</div>
+        )}
         {data?.fxResHist?.length ? (
           <div style={{ marginTop: 16 }}>
             <AreaChart data={data.fxResHist} w={346} h={80} color="var(--neg)" />
@@ -180,6 +183,9 @@ function MacroDesktop() {
   const cpiHeatmapData = buildCpiHeatmapData(data)
   const cpiHeatmapCols = buildCpiHeatmapCols(data)
   const usdBdtChartData = data?.usdBdtHist?.length ? data.usdBdtHist : null
+  const usdDelta = (data?.usdBdtHist && data.usdBdtHist.length >= 2)
+    ? data.usdBdtHist[data.usdBdtHist.length - 1] - data.usdBdtHist[data.usdBdtHist.length - 2]
+    : null
   return (
     <>
       <DesktopHeader section="Macro" breadcrumb="YieldScope · Inflation, reserves, balance of payments" />
@@ -210,6 +216,9 @@ function MacroDesktop() {
             <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>{data?.fxReservesUsdBn?.toFixed(2) ?? '—'}</span>
             <span className="caption">USD bn</span>
           </div>
+          {data?.importCoverMonths != null && (
+            <div className="caption" style={{ marginTop: 6 }}>{data.importCoverMonths.toFixed(1)} mo import cover</div>
+          )}
           {data?.fxResHist?.length ? (
             <div style={{ marginTop: 20 }}>
               <AreaChart data={data.fxResHist} w={540} h={140} color="var(--neg)" />
@@ -310,16 +319,17 @@ function MacroDesktop() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
             <div className="eyebrow">USD / BDT · mid-rate</div>
-            <DemoBadge />
+            {data?.usdBdt == null && <DemoBadge />}
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
             <span className="serif-num" style={{ fontSize: 56 }}>{data?.usdBdt?.toFixed(2) ?? '—'}</span>
-            <Delta value={0.04} size="md" />
+            {usdDelta != null && <Delta value={usdDelta} size="md" />}
           </div>
-          <div style={{ display: 'flex', gap: 24, marginTop: 8 }}>
-            <span className="caption">+1.2% YTD</span>
-            <span className="caption">REER 108.4 · overvalued ~6%</span>
-          </div>
+          {data?.reer != null && (
+            <div style={{ display: 'flex', gap: 24, marginTop: 8 }}>
+              <span className="caption">REER {data.reer.toFixed(1)}</span>
+            </div>
+          )}
           {usdBdtChartData ? (
             <div style={{ marginTop: 20 }}>
               <AreaChart data={usdBdtChartData} w={540} h={130} color="var(--info)" />
