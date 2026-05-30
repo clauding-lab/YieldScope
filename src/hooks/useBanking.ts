@@ -7,6 +7,7 @@ export interface BankingData {
   crar: number | null        // banking_sector_crar (CAR / Basel-III %)
   nplHist: number[]          // NPL trajectory
   pvtCreditYoY: number | null // private_sector_credit_yoy_pct
+  pvtCreditYoYAsOf: string | null // vintage of the pvt-credit YoY print
   cdRatio: number | null      // derived: private_sector_credit / deposits_of_the_system * 100
   asOf: string | null
 }
@@ -43,6 +44,7 @@ export function useBanking(): UseBankingResult {
             crar:     crar?.value ?? null,
             nplHist:  nplSer.map(p => p.value),
             pvtCreditYoY: pcy?.value ?? null,
+            pvtCreditYoYAsOf: pcy?.asOf ?? null,
             cdRatio: (pc?.value != null && dep?.value) ? (pc.value / dep.value) * 100 : null,
             asOf:     npl?.asOf ?? null,
           },

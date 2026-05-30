@@ -176,7 +176,7 @@ function LiquidityMobile() {
           <ListRow label="Money supply · M2 YoY" value={data?.m2YoY != null ? `${data.m2YoY.toFixed(1)}%` : '—'} sub={m2Vintage ?? undefined} />
           <ListRow label="CRR utilisation"       value="92%"       sub="Reserve ratio 4.0%" />
           <ListRow label="SLR utilisation"       value="86%"       sub="Statutory ratio 13.0%" />
-          <ListRow label="Repo from BB"          value="124.6 k Cr" sub="↑ 42% in 8 weeks" last />
+          <ListRow label="Repo from BB"          value="124.6 k Cr" last />
         </div>
       </div>
     </>

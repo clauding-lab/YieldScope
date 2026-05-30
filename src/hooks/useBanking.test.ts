@@ -44,7 +44,20 @@ describe('useBanking', () => {
     expect(result.current.data!.nplHist[0]).toBe(9.4)
     expect(result.current.data!.nplHist[1]).toBe(11.8)
     expect(result.current.data!.pvtCreditYoY).toBe(6.03)
+    expect(result.current.data!.pvtCreditYoYAsOf).toBe('2026-05-30')
     expect(result.current.data!.cdRatio).toBeCloseTo(89.5, 1)
+  })
+
+  it('returns null cdRatio when deposits are missing (no divide-by-null)', async () => {
+    vi.mocked(fetchLatest).mockImplementation(async (id) => {
+      if (id === 'private_sector_credit') return { asOf: '2026-05-30', value: 1785976 }
+      // deposits_of_the_system intentionally absent
+      return null
+    })
+    vi.mocked(fetchSeries).mockResolvedValue([])
+    const { result } = renderHook(() => useBanking())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.data!.cdRatio).toBeNull()
   })
 
   it('captures error', async () => {

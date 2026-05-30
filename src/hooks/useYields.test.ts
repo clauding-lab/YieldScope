@@ -67,6 +67,8 @@ describe('useYields', () => {
     vi.mocked(fetchSeries).mockImplementation(async (id) => {
       if (id === 'bill_bond_rates')   return [{ asOf: '2026-05-25', value: 11.40 }, { asOf: '2026-05-26', value: 11.42 }]
       if (id === 'tbond_10y_yield')   return [{ asOf: '2026-05-20', value: 12.16 }, { asOf: '2026-05-21', value: 12.18 }]
+      if (id === 'yield_2y_monthly')  return [{ asOf: '2026-02-01', value: 10.05 }, { asOf: '2026-03-01', value: 10.18 }]
+      if (id === 'yield_20y_monthly') return [{ asOf: '2026-02-01', value: 11.10 }, { asOf: '2026-03-01', value: 11.19 }]
       return []
     })
 
@@ -76,6 +78,8 @@ describe('useYields', () => {
     const d = result.current.data!
     expect(d.series['91D']).toEqual([11.40, 11.42])
     expect(d.series['10Y']).toEqual([12.16, 12.18])
+    expect(d.series['2Y']).toEqual([10.05, 10.18])
+    expect(d.series['20Y']).toEqual([11.10, 11.19])
     expect(d.series['182D']).toEqual([])
   })
 })

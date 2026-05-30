@@ -6,6 +6,7 @@ import { AreaChart, Heatmap } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useMacro } from '../hooks/useMacro'
 import { monthLabel } from '../lib/dates'
+import { roundTo } from '../lib/yieldMath'
 
 const CPI_ROWS = ['Food', 'Non-food', 'Core', 'Headline']
 const CORE_CPI_FIXTURE = [8.40, 8.32, 8.18, 8.04, 7.94, 7.82, 7.74, 7.62]
@@ -186,7 +187,7 @@ function MacroDesktop() {
   const cpiHeatmapCols = buildCpiHeatmapCols(data)
   const usdBdtChartData = data?.usdBdtHist?.length ? data.usdBdtHist : null
   const usdDelta = (data?.usdBdtHist && data.usdBdtHist.length >= 2)
-    ? data.usdBdtHist[data.usdBdtHist.length - 1] - data.usdBdtHist[data.usdBdtHist.length - 2]
+    ? roundTo(data.usdBdtHist[data.usdBdtHist.length - 1] - data.usdBdtHist[data.usdBdtHist.length - 2], 2)
     : null
   const reerVintage = monthLabel(data?.reerAsOf)
   const importVintage = monthLabel(data?.importCoverAsOf)

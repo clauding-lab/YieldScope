@@ -5,10 +5,11 @@ import { Delta, DemoBadge, SectionTitle, Sparkline, Tabs } from '../components/p
 import { AreaChart, YieldCurve } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useYields, type TenorKey } from '../hooks/useYields'
+import { spreadBps, roundTo } from '../lib/yieldMath'
 
 type YieldsTab = 'curve' | 'series' | 'auctions'
 
-const HISTORY_TENORS: TenorKey[] = ['91D', '182D', '364D', '5Y', '10Y']
+const HISTORY_TENORS: TenorKey[] = ['91D', '182D', '364D', '2Y', '5Y', '10Y', '20Y']
 
 const TENOR_LADDER: { tenor: string; yld: number; delta: number }[] = [
   { tenor: '91D',  yld: 11.42, delta: -0.08 },
@@ -40,9 +41,13 @@ function YieldsCurveTab() {
     ? `+${data.spread10Y_91D_bps}`
     : '—'
 
+  // 5y–2y now derived from the live rungs (both wired this branch); fall back to demo only if absent.
+  const spread5y2y = spreadBps(data?.yields['5Y'] ?? null, data?.yields['2Y'] ?? null)
+  const fmtBps = (n: number) => `${n >= 0 ? '+' : ''}${n}`
+
   const liveSpreads = [
     { lbl: '10y – 91d', v: slopeLabel, u: 'bps', demo: false },
-    { lbl: '5y – 2y',   v: '+19',      u: 'bps', demo: true  },
+    { lbl: '5y – 2y',   v: spread5y2y != null ? fmtBps(spread5y2y) : '+19', u: 'bps', demo: spread5y2y == null },
     { lbl: '91d – SDF', v: '+492',     u: 'bps', demo: true  },
   ]
 
@@ -262,8 +267,8 @@ function YieldsDesktop() {
 
   const s91 = data?.series['91D'] ?? []
   const s10 = data?.series['10Y'] ?? []
-  const delta91 = s91.length >= 2 ? s91[s91.length - 1] - s91[s91.length - 2] : null
-  const delta10 = s10.length >= 2 ? s10[s10.length - 1] - s10[s10.length - 2] : null
+  const delta91 = s91.length >= 2 ? roundTo(s91[s91.length - 1] - s91[s91.length - 2], 2) : null
+  const delta10 = s10.length >= 2 ? roundTo(s10[s10.length - 1] - s10[s10.length - 2], 2) : null
 
   return (
     <>

@@ -6,6 +6,7 @@ import { AreaChart, Donut, DonutLegend, Heatmap, SlopeChart } from '../component
 import type { SlopeItem } from '../components/charts/SlopeChart'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useBanking } from '../hooks/useBanking'
+import { monthLabel } from '../lib/dates'
 import type { BankingData } from '../hooks/useBanking'
 
 const NPL_BY_SEG = [
@@ -79,6 +80,7 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
   const nplRatio = liveData?.nplRatio ?? null
   const crar     = liveData?.crar     ?? null
   const pvtCreditYoY = liveData?.pvtCreditYoY ?? null
+  const pvtCreditVintage = monthLabel(liveData?.pvtCreditYoYAsOf)
   const cdRatio  = liveData?.cdRatio ?? null
   const prudential: { lbl: string; v: number | null; max: number; unit: string; live: boolean }[] = [
     { lbl: 'CAR',  v: crar,   max: 16,  unit: '%', live: true  },
@@ -98,9 +100,6 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
           <span className="serif-num" style={{ fontSize: 64 }}>{cdRatio != null ? cdRatio.toFixed(1) : '—'}</span>
           <span className="caption">%</span>
         </div>
-        <div style={{ marginTop: 18 }}>
-          <AreaChart data={B.cdHist} w={346} h={70} color="var(--accent)" />
-        </div>
       </div>
 
       <div style={{ padding: '0 16px 24px' }}>
@@ -109,6 +108,7 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
           <ListRow
             label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>Pvt sector credit · YoY {pvtCreditYoY == null && <DemoBadge />}</span> as ReactNode}
             value={pvtCreditYoY != null ? `${pvtCreditYoY.toFixed(1)}%` : '—'}
+            sub={pvtCreditVintage ?? undefined}
           />
           <ListRow
             label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>Repo borrow · from BB <DemoBadge /></span> as ReactNode}
@@ -187,9 +187,6 @@ function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
             <span className="serif-num" style={{ fontSize: 72 }}>{cdRatio != null ? cdRatio.toFixed(1) : '—'}</span>
             <span className="caption">%</span>
-          </div>
-          <div style={{ marginTop: 18 }}>
-            <AreaChart data={B.cdHist} w={400} h={100} color="var(--accent)" />
           </div>
         </div>
         <div>

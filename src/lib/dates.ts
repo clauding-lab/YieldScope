@@ -7,6 +7,9 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
  */
 export function monthLabel(iso: string | null | undefined): string | null {
   if (!iso) return null
+  // Require a full YYYY-MM-DD prefix so a partial value (e.g. "2026" or "2026-03")
+  // can't silently produce a fabricated vintage via Date()'s lenient parsing.
+  if (!/^\d{4}-\d{2}-\d{2}/.test(iso)) return null
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return null
   return `${MONTHS[d.getUTCMonth()]} '${String(d.getUTCFullYear()).slice(2)}`

@@ -12,4 +12,9 @@ describe('monthLabel', () => {
     expect(monthLabel(undefined)).toBeNull()
     expect(monthLabel('not-a-date')).toBeNull()
   })
+
+  it('returns null for partial dates rather than fabricating a vintage', () => {
+    expect(monthLabel('2026')).toBeNull()
+    expect(monthLabel('2026-03')).toBeNull()
+  })
 })
