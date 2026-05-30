@@ -32,6 +32,8 @@ describe('useMacro', () => {
       if (id === 'point_to_point_inflation') return { asOf: '2026-04-01', value: 9.20 }
       if (id === 'usd_bdt_exchange_rate')    return { asOf: '2026-05-27', value: 119.62 }
       if (id === 'fx_reserve_gross_and_bpm6') return { asOf: '2026-05-25', value: 20.84 }
+      if (id === 'reer_monthly')             return { asOf: '2026-03-01', value: 102.78 }
+      if (id === 'import_cover_months_monthly') return { asOf: '2026-03-01', value: 5.86 }
       return null
     })
     mockFetchSeries.mockImplementation(async (id) => {
@@ -53,6 +55,10 @@ describe('useMacro', () => {
     expect(result.current.data!.fxReservesUsdBn).toBe(20.84)
     expect(result.current.data!.cpiHist[0]).toBe(9.94)
     expect(result.current.data!.cpiHist[1]).toBe(9.20)
+    expect(result.current.data!.reer).toBe(102.78)
+    expect(result.current.data!.reerAsOf).toBe('2026-03-01')
+    expect(result.current.data!.importCoverMonths).toBe(5.86)
+    expect(result.current.data!.importCoverAsOf).toBe('2026-03-01')
   })
 
   it('captures error from the client', async () => {

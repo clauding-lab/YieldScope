@@ -5,6 +5,8 @@ import { Delta, DemoBadge, ListRow, SectionTitle, Sparkline } from '../component
 import { AreaChart, Heatmap } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useMacro } from '../hooks/useMacro'
+import { monthLabel } from '../lib/dates'
+import { roundTo } from '../lib/yieldMath'
 
 const CPI_ROWS = ['Food', 'Non-food', 'Core', 'Headline']
 const CORE_CPI_FIXTURE = [8.40, 8.32, 8.18, 8.04, 7.94, 7.82, 7.74, 7.62]
@@ -84,6 +86,7 @@ function buildCommodities(data: ReturnType<typeof useMacro>['data']): CommodityR
 function MacroMobile() {
   const { data } = useMacro()
   const bopItems = buildBopItems(data)
+  const importVintage = monthLabel(data?.importCoverAsOf)
   const fmtPct = (n: number | null | undefined) => n != null ? `${n.toFixed(2)}%` : '—'
   return (
     <>
@@ -132,6 +135,9 @@ function MacroMobile() {
             </div>
           </div>
         </div>
+        {data?.importCoverMonths != null && (
+          <div className="caption" style={{ marginTop: 8 }}>{data.importCoverMonths.toFixed(1)} mo import cover{importVintage ? ` · ${importVintage}` : ''}</div>
+        )}
         {data?.fxResHist?.length ? (
           <div style={{ marginTop: 16 }}>
             <AreaChart data={data.fxResHist} w={346} h={80} color="var(--neg)" />
@@ -180,6 +186,11 @@ function MacroDesktop() {
   const cpiHeatmapData = buildCpiHeatmapData(data)
   const cpiHeatmapCols = buildCpiHeatmapCols(data)
   const usdBdtChartData = data?.usdBdtHist?.length ? data.usdBdtHist : null
+  const usdDelta = (data?.usdBdtHist && data.usdBdtHist.length >= 2)
+    ? roundTo(data.usdBdtHist[data.usdBdtHist.length - 1] - data.usdBdtHist[data.usdBdtHist.length - 2], 2)
+    : null
+  const reerVintage = monthLabel(data?.reerAsOf)
+  const importVintage = monthLabel(data?.importCoverAsOf)
   return (
     <>
       <DesktopHeader section="Macro" breadcrumb="YieldScope · Inflation, reserves, balance of payments" />
@@ -210,6 +221,9 @@ function MacroDesktop() {
             <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>{data?.fxReservesUsdBn?.toFixed(2) ?? '—'}</span>
             <span className="caption">USD bn</span>
           </div>
+          {data?.importCoverMonths != null && (
+            <div className="caption" style={{ marginTop: 6 }}>{data.importCoverMonths.toFixed(1)} mo import cover{importVintage ? ` · ${importVintage}` : ''}</div>
+          )}
           {data?.fxResHist?.length ? (
             <div style={{ marginTop: 20 }}>
               <AreaChart data={data.fxResHist} w={540} h={140} color="var(--neg)" />
@@ -310,16 +324,17 @@ function MacroDesktop() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
             <div className="eyebrow">USD / BDT · mid-rate</div>
-            <DemoBadge />
+            {data?.usdBdt == null && <DemoBadge />}
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
             <span className="serif-num" style={{ fontSize: 56 }}>{data?.usdBdt?.toFixed(2) ?? '—'}</span>
-            <Delta value={0.04} size="md" />
+            {usdDelta != null && <Delta value={usdDelta} size="md" />}
           </div>
-          <div style={{ display: 'flex', gap: 24, marginTop: 8 }}>
-            <span className="caption">+1.2% YTD</span>
-            <span className="caption">REER 108.4 · overvalued ~6%</span>
-          </div>
+          {data?.reer != null && (
+            <div style={{ display: 'flex', gap: 24, marginTop: 8 }}>
+              <span className="caption">REER {data.reer.toFixed(1)}{reerVintage ? ` · ${reerVintage}` : ''}</span>
+            </div>
+          )}
           {usdBdtChartData ? (
             <div style={{ marginTop: 20 }}>
               <AreaChart data={usdBdtChartData} w={540} h={130} color="var(--info)" />

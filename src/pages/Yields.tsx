@@ -5,10 +5,11 @@ import { Delta, DemoBadge, SectionTitle, Sparkline, Tabs } from '../components/p
 import { AreaChart, YieldCurve } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useYields, type TenorKey } from '../hooks/useYields'
+import { spreadBps, roundTo } from '../lib/yieldMath'
 
 type YieldsTab = 'curve' | 'series' | 'auctions'
 
-const HISTORY_TENORS: TenorKey[] = ['91D', '182D', '364D', '5Y', '10Y']
+const HISTORY_TENORS: TenorKey[] = ['91D', '182D', '364D', '2Y', '5Y', '10Y', '20Y']
 
 const TENOR_LADDER: { tenor: string; yld: number; delta: number }[] = [
   { tenor: '91D',  yld: 11.42, delta: -0.08 },
@@ -40,9 +41,13 @@ function YieldsCurveTab() {
     ? `+${data.spread10Y_91D_bps}`
     : '—'
 
+  // 5y–2y now derived from the live rungs (both wired this branch); fall back to demo only if absent.
+  const spread5y2y = spreadBps(data?.yields['5Y'] ?? null, data?.yields['2Y'] ?? null)
+  const fmtBps = (n: number) => `${n >= 0 ? '+' : ''}${n}`
+
   const liveSpreads = [
     { lbl: '10y – 91d', v: slopeLabel, u: 'bps', demo: false },
-    { lbl: '5y – 2y',   v: '+19',      u: 'bps', demo: true  },
+    { lbl: '5y – 2y',   v: spread5y2y != null ? fmtBps(spread5y2y) : '+19', u: 'bps', demo: spread5y2y == null },
     { lbl: '91d – SDF', v: '+492',     u: 'bps', demo: true  },
   ]
 
@@ -56,7 +61,6 @@ function YieldsCurveTab() {
               {slopeLabel} <span className="caption" style={{ marginLeft: 4 }}>bps</span>
             </div>
           </div>
-          <span className="caption">Flatter by 12 bps · last month</span>
         </div>
         <YieldCurve w={346} h={190} />
       </div>
@@ -261,6 +265,11 @@ function YieldsDesktop() {
   const yield91d = data?.yields['91D']?.toFixed(2) ?? '—'
   const yield10y = data?.yields['10Y']?.toFixed(2) ?? '—'
 
+  const s91 = data?.series['91D'] ?? []
+  const s10 = data?.series['10Y'] ?? []
+  const delta91 = s91.length >= 2 ? roundTo(s91[s91.length - 1] - s91[s91.length - 2], 2) : null
+  const delta10 = s10.length >= 2 ? roundTo(s10[s10.length - 1] - s10[s10.length - 2], 2) : null
+
   return (
     <>
       <DesktopHeader section="Yields" breadcrumb="YieldScope · Sovereign curve & auctions" />
@@ -279,7 +288,6 @@ function YieldsDesktop() {
             <span className="serif-num" style={{ fontSize: 60, color: 'var(--accent)' }}>{slopeLabel}</span>
             <span className="caption">bps</span>
           </div>
-          <div className="caption" style={{ marginTop: 6 }}>Flatter by 12 bps vs last month</div>
         </div>
         <div>
           <div className="eyebrow" style={{ marginBottom: 6 }}>Front-end · 91d</div>
@@ -287,10 +295,11 @@ function YieldsDesktop() {
             <span className="serif-num" style={{ fontSize: 60 }}>{yield91d}</span>
             <span className="caption">%</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6 }}>
-            <Delta value={-0.08} invert size="md" />
-            <span className="caption">cleared 26 May</span>
-          </div>
+          {delta91 != null && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6 }}>
+              <Delta value={delta91} invert size="md" />
+            </div>
+          )}
         </div>
         <div>
           <div className="eyebrow" style={{ marginBottom: 6 }}>Long-end · 10y</div>
@@ -298,10 +307,11 @@ function YieldsDesktop() {
             <span className="serif-num" style={{ fontSize: 60 }}>{yield10y}</span>
             <span className="caption">%</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6 }}>
-            <Delta value={-0.02} invert size="md" />
-            <span className="caption">fairly priced vs CPI path</span>
-          </div>
+          {delta10 != null && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6 }}>
+              <Delta value={delta10} invert size="md" />
+            </div>
+          )}
         </div>
       </div>
 

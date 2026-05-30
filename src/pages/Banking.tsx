@@ -6,6 +6,7 @@ import { AreaChart, Donut, DonutLegend, Heatmap, SlopeChart } from '../component
 import type { SlopeItem } from '../components/charts/SlopeChart'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useBanking } from '../hooks/useBanking'
+import { monthLabel } from '../lib/dates'
 import type { BankingData } from '../hooks/useBanking'
 
 const NPL_BY_SEG = [
@@ -78,6 +79,9 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
   const B = FX.banking
   const nplRatio = liveData?.nplRatio ?? null
   const crar     = liveData?.crar     ?? null
+  const pvtCreditYoY = liveData?.pvtCreditYoY ?? null
+  const pvtCreditVintage = monthLabel(liveData?.pvtCreditYoYAsOf)
+  const cdRatio  = liveData?.cdRatio ?? null
   const prudential: { lbl: string; v: number | null; max: number; unit: string; live: boolean }[] = [
     { lbl: 'CAR',  v: crar,   max: 16,  unit: '%', live: true  },
     { lbl: 'LCR',  v: B.lcr,  max: 180, unit: '%', live: false },
@@ -89,15 +93,12 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
 
       <div style={{ padding: '0 22px 28px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-          <div className="caption">Credit / Deposit · industry</div>
-          <DemoBadge />
+          <div className="caption">Pvt credit / deposits</div>
+          {cdRatio == null && <DemoBadge />}
         </div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginTop: 4 }}>
-          <span className="serif-num" style={{ fontSize: 64 }}>81.4</span>
+          <span className="serif-num" style={{ fontSize: 64 }}>{cdRatio != null ? cdRatio.toFixed(1) : '—'}</span>
           <span className="caption">%</span>
-        </div>
-        <div style={{ marginTop: 18 }}>
-          <AreaChart data={B.cdHist} w={346} h={70} color="var(--accent)" />
         </div>
       </div>
 
@@ -105,9 +106,9 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
         <div className="card-flat">
           <ListRow label="NPL · industry"          value={nplRatio != null ? `${nplRatio.toFixed(1)}%` : '—'} />
           <ListRow
-            label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>Pvt sector credit · YoY <DemoBadge /></span> as ReactNode}
-            value="9.2%"
-            sub="vs deposits 7.4%"
+            label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>Pvt sector credit · YoY {pvtCreditYoY == null && <DemoBadge />}</span> as ReactNode}
+            value={pvtCreditYoY != null ? `${pvtCreditYoY.toFixed(1)}%` : '—'}
+            sub={pvtCreditVintage ?? undefined}
           />
           <ListRow
             label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>Repo borrow · from BB <DemoBadge /></span> as ReactNode}
@@ -165,6 +166,7 @@ function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
   const B = FX.banking
   const nplRatio = liveData?.nplRatio ?? null
   const nplHist  = liveData?.nplHist?.length ? liveData.nplHist : null
+  const cdRatio  = liveData?.cdRatio ?? null
   return (
     <>
       <DesktopHeader section="Banking" breadcrumb="YieldScope · Sector health & prudential" />
@@ -179,15 +181,12 @@ function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <div className="eyebrow">Credit / Deposit · industry</div>
-            <DemoBadge />
+            <div className="eyebrow">Pvt credit / deposits</div>
+            {cdRatio == null && <DemoBadge />}
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-            <span className="serif-num" style={{ fontSize: 72 }}>81.4</span>
+            <span className="serif-num" style={{ fontSize: 72 }}>{cdRatio != null ? cdRatio.toFixed(1) : '—'}</span>
             <span className="caption">%</span>
-          </div>
-          <div style={{ marginTop: 18 }}>
-            <AreaChart data={B.cdHist} w={400} h={100} color="var(--accent)" />
           </div>
         </div>
         <div>
