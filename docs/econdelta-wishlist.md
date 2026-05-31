@@ -4,6 +4,8 @@ Created 2026-05-28 after the YieldScope honesty pass surfaced every panel that s
 
 **Last refreshed: 2026-05-31** — after the corridor wire (PR #4), the "Tier A" flowing-scalar wire (PR #10/#11), and the weekly-briefing pipeline (econdelta PR #39). The YieldScope-side wiring is now essentially **complete for every metric EconDelta currently provides**. Almost everything still showing a `Demo data` pill is a **structured panel** (table / donut / heatmap / per-bank or per-segment breakdown / multi-week calendar) whose data EconDelta does not scrape yet — so the remaining work is mostly **EconDelta-side** (new scrapers), not YieldScope-side. A handful (per-bank matrix, intraday call money, ALCO log) have **no public BD source** and likely stay Demo permanently.
 
+**▶ Execution blueprint:** [`docs/superpowers/plans/2026-05-31-tier2-closeout.md`](superpowers/plans/2026-05-31-tier2-closeout.md) — a 17-step, two-repo construction plan to close Tier 2 (drafted + adversarially reviewed 2026-05-31; 14 items built, 3 reclassified to Tier 3 / accept-Demo). Start there for the actual build.
+
 Audience: future-Claude (or anyone) working in `~/Projects/clauding-lab/econdelta` or back in YieldScope. The Brief consumes the same data pipeline so most of these are also wins for The Brief.
 
 Sorted by effort tier. Within each tier, prioritised by visibility on the YieldScope screen.
