@@ -1,4 +1,4 @@
-# YieldScope
+<img src="assets/hero.svg" alt="YieldScope — Bangladesh ALCO / treasury intelligence" width="100%">
 
 **A banker-grade Bangladesh ALCO Intelligence Platform** — a mobile-first PWA that helps treasury and Asset-Liability Committee (ALCO) teams at Bangladeshi banks read the government-securities curve, money-market liquidity, macro indicators, and fiscal pressure at a glance.
 
