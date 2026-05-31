@@ -20,7 +20,7 @@ export function HeaderActions({ compact = false }: HeaderActionsProps) {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <IconButton title="Toggle theme" onClick={toggleTheme} size={btnSize}>
+      <IconButton title="Cycle theme" onClick={toggleTheme} size={btnSize}>
         <ThemeIcon size={compact ? 13 : 14} />
       </IconButton>
     </div>

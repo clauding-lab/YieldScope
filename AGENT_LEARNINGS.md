@@ -37,6 +37,49 @@ When something ships broken, when a methodology gap is exposed, or when a smoke 
 
 ## Entries (most recent first)
 
+## 2026-05-31 — v3.0 | Playwright `fullPage` screenshot photographed a live page as all-"Demo data"
+
+**Trigger:** Post-HTTPS visual smoke of the live site. A `fullPage` screenshot of the Dashboard showed the demo hero copy, "Demo data" badges on every panel, and empty metric tiles — even though a `browser_evaluate` taken seconds earlier on the same load reported fully live values (91d 10.15%, the live briefing, FX 35.1bn). The two contradicted each other.
+
+**What went wrong:** Playwright expands the viewport to capture a full-page screenshot. That viewport change remounts the React data hooks into their initial loading state, which renders the demo fallbacks (with `<DemoBadge />`) and skeleton dashes — and the screenshot froze that transient. The settled, user-visible state was live the whole time; the console showed zero fetch errors. Nearly logged a false P0 "live site fell back to demo" alarm.
+
+**Lesson:** For visual QA of this app, a `fullPage` screenshot is unreliable — it captures a loading/demo transient, not what users see. Use viewport screenshots after the fetch settles, and assert live values with `browser_evaluate` / text-waits, not from a `fullPage` image.
+
+**Prevention:**
+- Viewport screenshots (omit `fullPage`) at a tall window (e.g. 1440×1500); scroll if needed. Confirmed live again via viewport capture (same load) — the demo state did NOT recur.
+- Verify "is this live?" with `browser_evaluate` reading the DOM text + a bad-token scan (`NaN`/`undefined`), and `browser_wait_for` on the expected value.
+- Related: localStorage palette changes don't reliably survive a `page.goto` full reload under automation (PWA service worker + hardcoded `<html class="theme-slate">`); toggle via the in-app button instead. Real users navigate client-side, so this is an automation artifact, not a user bug.
+
+**Hotfix:** No code change (false alarm averted). Codified as AGENTS.md landmine #24. Cross-cutting QA lesson → promoted to global rulebook + auto-memory.
+
+**Cross-references:** AGENTS.md landmine #24. Global `~/.claude/AGENT_LEARNINGS.md`. Auto-memory `reference_playwright_fullpage_demo_artifact`. Related: a prior session read the HTTPS failure as "000 = no connection" when the real error was `curl (60)` cert-name-mismatch (GitHub served its `*.github.io` fallback because the Let's Encrypt cert hadn't issued) — same "observe the real error before inferring" lesson (working principle 10).
+
+---
+
+## 2026-05-31 — v3.0 | Smoke caught a hardcoded stale date + a second float-delta leak (landmine 17 recurrence)
+
+**Trigger:** Visual smoke of the live deploy across all 7 pages + 4 palettes after the HTTPS cert went live.
+
+**What went wrong:** Three real issues, none breaking:
+1. **Hardcoded dashboard date.** `Dashboard.tsx` shipped `kicker="Wednesday, 27 May"` and `breadcrumb="… · Wednesday"` as literals — frozen, so on Sunday 31 May the product's headline date read "Wednesday, 27 May" and would drift worse every day.
+2. **Float-precision leak (landmine 17 recurrence).** Macro → Commodity Exposure → Brent delta rendered `+0.350006103515625%` — a raw `brentHist[last] - brentHist[last-1]` subtraction passed verbatim to `<Delta />`. The Tier A pass fixed this class for the hero deltas with `roundTo()` but missed this demo-panel instance.
+3. **Unreachable palettes.** `linen` + `moss` were in `PALETTES` but no UI control called `setPalette` (the toggle only flipped slate↔ivory) — 2 of 4 palettes were dead. Per Adnan: keep linen/ivory/slate reachable by cycling the toggle button; remove moss.
+
+**Lesson:** A finding fixed "for the hero" isn't fixed everywhere — grep for the whole class (every verbatim-rendered computed number, every hardcoded date/label) when remediating. And dead code that looks like a feature (4 palettes, only 2 reachable) hides until something exercises it.
+
+**Prevention:**
+- Date: derive via `todayLabel()` / `weekdayName()` (`src/lib/dates.ts`, local date parts). Landmine #23.
+- Floats: round every computed `<Delta>`/verbatim value at source with `roundTo(_, 2)`. Landmine #17 (reinforced). A page-wide regex `/-?\d+\.\d{4,}/` over `body.innerText` is a cheap smoke check for leaks.
+- Palettes: toggle cycles all of `PALETTES` via `nextPalette()`; adding/removing a palette touches 6 places (landmine #22) and needs VISION.md sign-off.
+
+**Hotfix:** PR `feat-palette-cycle-date-float-fixes` (branch off `main`, 2026-05-31): `dates.ts` helpers + tests; `Dashboard.tsx` derives the date; `Macro.tsx` `roundTo(brentDelta, 2)`; `themeContext.ts`/`ThemeProvider.tsx` 3-way `nextPalette()` cycle + moss removed; `.theme-moss` block dropped from `globals.css`; "Toggle theme" → "Cycle theme". Quality gate green (tests 47, lint, build) + verified on local preview (date = "SUNDAY"; cycle slate→linen→ivory→slate; Brent = `+0.35%`, no leaks).
+
+**Deferred (not YieldScope code):** CRAR = 1.56% and NPL = 35.73% render live from EconDelta (`banking_sector_crar` / `gross_npl_ratio`) and also appear in the live briefing — EconDelta-side data-quality question, per `feedback_no_training_data_priors_for_local_metrics` deferred to Adnan/EconDelta. Pre-existing follow-ups confirmed still present: "Above repo" call-money hint, CPI "April" label.
+
+**Cross-references:** AGENTS.md landmines #17, #22, #23. PR `feat-palette-cycle-date-float-fixes`.
+
+---
+
 ## 2026-05-28 — v3.0 | Flagged correct EconDelta NPL data as anomalous based on training-data priors
 
 **Trigger:** Live PostgREST smoke of the EconDelta swap returned `gross_npl_ratio = 35.73%` for 2026-05-28. The previous session's notes (composed by the assistant) flagged this as a likely "anomaly" because training-data knowledge of Bangladesh classified-NPL pointed to the 12–17% range. Adnan corrected on resume: EconDelta data is correct; the analysis was wrong.

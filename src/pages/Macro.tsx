@@ -72,8 +72,10 @@ interface CommodityRow {
 function buildCommodities(data: ReturnType<typeof useMacro>['data']): CommodityRow[] {
   const brentSpark = data?.brentHist?.length ? data.brentHist : [78, 80, 82, 81, 83, 84, 83.5, 84.20]
   const brentVal = data?.brentUsdBarrel
+  // Round at source — <Delta /> renders the value verbatim, so a raw float
+  // subtraction leaks artifacts like +0.350006103515625 (AGENTS.md landmine 17).
   const brentDelta = data?.brentHist?.length && data.brentHist.length >= 2
-    ? data.brentHist[data.brentHist.length - 1] - data.brentHist[data.brentHist.length - 2]
+    ? (roundTo(data.brentHist[data.brentHist.length - 1] - data.brentHist[data.brentHist.length - 2], 2) ?? 0)
     : 0
   return [
     { c: 'Brent',    v: brentVal != null ? brentVal.toFixed(2) : '—', u: 'USD/bbl',   d:  brentDelta, spark: brentSpark, live: brentVal != null },

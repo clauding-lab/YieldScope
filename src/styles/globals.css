@@ -91,32 +91,6 @@
   --glass-inner:  inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
-.theme-moss {
-  --bg:        #ECEDE3;
-  --paper:     #F5F5EC;
-  --paper-2:   #EFF0E6;
-  --sunken:    #E2E3D6;
-  --ink:       #1C2218;
-  --ink-2:     #4D5648;
-  --ink-3:     #82897A;
-  --ink-4:     #B6BAAA;
-  --line:      #D6D8C8;
-  --line-2:    #BABEAA;
-  --accent:    #3D5440;
-  --accent-soft: rgba(61, 84, 64, 0.08);
-  --pos:       #54744F;
-  --neg:       #A95838;
-  --warn:      #B68233;
-  --info:      #3F6378;
-  --shadow:    0 1px 2px rgba(28, 34, 24, 0.04), 0 8px 28px rgba(28, 34, 24, 0.05);
-  --glass:        rgba(245, 245, 236, 0.62);
-  --glass-strong: rgba(245, 245, 236, 0.85);
-  --glass-edge:   rgba(255, 255, 255, 0.6);
-  --glass-rim:    rgba(255, 255, 255, 0.3);
-  --glass-shadow: 0 14px 44px rgba(28, 34, 24, 0.10), 0 2px 8px rgba(28, 34, 24, 0.04);
-  --glass-inner:  inset 0 1px 0 rgba(255, 255, 255, 0.5);
-}
-
 * { box-sizing: border-box; }
 
 html {

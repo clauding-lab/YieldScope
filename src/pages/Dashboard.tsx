@@ -6,6 +6,7 @@ import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useDashboard } from '../hooks/useDashboard'
 import { useBriefing } from '../hooks/useBriefing'
 import { BriefingBody } from '../lib/briefingMarkdown'
+import { todayLabel, weekdayName } from '../lib/dates'
 
 interface MetricRow {
   lbl: string
@@ -57,7 +58,7 @@ function DashboardMobile() {
 
   return (
     <>
-      <SectionTitle kicker="Wednesday, 27 May" title="Today" />
+      <SectionTitle kicker={todayLabel()} title="Today" />
 
       <div style={{ padding: '0 22px 24px' }}>
         {brief == null && (
@@ -194,7 +195,7 @@ function DashboardDesktop() {
 
   return (
     <>
-      <DesktopHeader section="Today" breadcrumb="YieldScope · ALCO Intelligence · Wednesday" />
+      <DesktopHeader section="Today" breadcrumb={`YieldScope · ALCO Intelligence · ${weekdayName()}`} />
 
       <div style={{ padding: '40px 48px 24px' }}>
         {brief == null && (
