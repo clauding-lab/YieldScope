@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
-import { DEFAULT_PALETTE, PALETTES, STORAGE_KEY, ThemeContext, type Palette } from './themeContext'
+import { DEFAULT_PALETTE, PALETTES, STORAGE_KEY, ThemeContext, nextPalette, type Palette } from './themeContext'
 
 function readStoredPalette(): Palette {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored === 'linen' || stored === 'ivory' || stored === 'moss' || stored === 'slate') {
+    if (stored === 'linen' || stored === 'ivory' || stored === 'slate') {
       return stored
     }
   } catch {
@@ -21,7 +21,6 @@ function applyPaletteClass(p: Palette) {
 const THEME_COLORS: Record<Palette, string> = {
   linen: '#F6F2EA',
   ivory: '#FAFAF7',
-  moss:  '#ECEDE3',
   slate: '#14171C',
 }
 
@@ -48,7 +47,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const toggleTheme = useCallback(() => {
-    setPaletteState(prev => (prev === 'slate' ? 'ivory' : 'slate'))
+    setPaletteState(nextPalette)
   }, [])
 
   const isDark = palette === 'slate'
