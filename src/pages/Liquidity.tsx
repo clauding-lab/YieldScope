@@ -2,7 +2,7 @@ import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
 import { useLiquidity } from '../hooks/useLiquidity'
 import { monthLabel } from '../lib/dates'
-import { Bar, DemoBadge, ListRow, SectionTitle } from '../components/primitives'
+import { DemoBadge, ListRow, SectionTitle } from '../components/primitives'
 import { AreaChart, BarChart, Heatmap } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 
@@ -170,13 +170,12 @@ function LiquidityMobile() {
       <div style={{ padding: '0 16px 24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 22px 10px' }}>
           <div className="caption">Reserve & money supply</div>
-          <DemoBadge />
+          {(data?.crrMaintainedPct == null || data?.slrMaintainedPct == null) && <DemoBadge />}
         </div>
         <div className="card-flat">
           <ListRow label="Money supply · M2 YoY" value={data?.m2YoY != null ? `${data.m2YoY.toFixed(1)}%` : '—'} sub={m2Vintage ?? undefined} />
-          <ListRow label="CRR utilisation"       value="92%"       sub="Reserve ratio 4.0%" />
-          <ListRow label="SLR utilisation"       value="86%"       sub="Statutory ratio 13.0%" />
-          <ListRow label="Repo from BB"          value="124.6 k Cr" last />
+          <ListRow label="CRR maintained" value={data?.crrMaintainedPct != null ? `${data.crrMaintainedPct.toFixed(2)}%` : '—'} sub="of deposits" />
+          <ListRow label="SLR maintained" value={data?.slrMaintainedPct != null ? `${data.slrMaintainedPct.toFixed(2)}%` : '—'} sub="of deposits" last />
         </div>
       </div>
     </>
@@ -274,21 +273,19 @@ function LiquidityDesktop() {
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <div className="eyebrow">Reserve utilisation</div>
-            <DemoBadge />
+            <div className="eyebrow">Reserve ratios · maintained</div>
+            {(data?.crrMaintainedPct == null || data?.slrMaintainedPct == null) && <DemoBadge />}
           </div>
           {[
-            { lbl: 'CRR',         v: 92, t: [0.7, 0.9] as [number, number] },
-            { lbl: 'SLR',         v: 86, t: [0.7, 0.9] as [number, number] },
-            { lbl: 'SLF draw',    v: 62, t: [0.6, 0.85] as [number, number] },
-            { lbl: 'BB repo borrow', v: 71, t: [0.7, 0.9] as [number, number] },
+            { lbl: 'CRR', v: data?.crrMaintainedPct ?? null },
+            { lbl: 'SLR', v: data?.slrMaintainedPct ?? null },
           ].map((r, i) => (
-            <div key={r.lbl} style={{ marginTop: i === 0 ? 14 : 18 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span className="label">{r.lbl}</span>
-                <span className="num" style={{ fontSize: 14 }}>{r.v}%</span>
+            <div key={r.lbl} style={{ marginTop: i === 0 ? 14 : 22 }}>
+              <div className="caption">{r.lbl} · of deposits</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 2 }}>
+                <span className="serif-num" style={{ fontSize: 34 }}>{r.v != null ? r.v.toFixed(2) : '—'}</span>
+                <span className="caption">%</span>
               </div>
-              <Bar value={r.v} thresholds={r.t} h={6} />
             </div>
           ))}
         </div>

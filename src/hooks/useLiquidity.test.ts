@@ -25,6 +25,8 @@ describe('useLiquidity', () => {
       if (id === 'policy_rate_sdf')                        return { asOf: '2026-04-30', value: 7.50 }
       if (id === 'policy_rate_slf')                        return { asOf: '2026-04-30', value: 11.50 }
       if (id === 'm2_growth_yoy_monthly')                  return { asOf: '2026-02-01', value: 10.52 }
+      if (id === 'crr_utilisation_pct')                    return { asOf: '2026-06-02', value: 4.9781 }
+      if (id === 'slr_utilisation_pct')                    return { asOf: '2026-06-02', value: 18.9903 }
       return null
     })
     vi.mocked(fetchSeries).mockImplementation(async (id) => {
@@ -51,6 +53,10 @@ describe('useLiquidity', () => {
     expect(result.current.data!.m2YoY).toBe(10.52)
     expect(result.current.data!.m2YoYAsOf).toBe('2026-02-01')
     expect(result.current.data!.m2Hist).toEqual([9.46, 10.40])
+    // CRR/SLR maintained reserve ratios (% of deposits) — daily metric_history
+    expect(result.current.data!.crrMaintainedPct).toBe(4.9781)
+    expect(result.current.data!.slrMaintainedPct).toBe(18.9903)
+    expect(result.current.data!.crrAsOf).toBe('2026-06-02')
   })
 
   it('returns nulls for policy corridor when EconDelta has no rows', async () => {
