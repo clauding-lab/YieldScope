@@ -5,6 +5,8 @@ import { Delta, DemoBadge, SectionTitle, Sparkline, Tabs } from '../components/p
 import { AreaChart, YieldCurve } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useYields, type TenorKey } from '../hooks/useYields'
+import { useAuctions } from '../hooks/useAuctions'
+import { fixtureToDisplay } from '../lib/auctions'
 import { spreadBps, roundTo } from '../lib/yieldMath'
 
 type YieldsTab = 'curve' | 'series' | 'auctions'
@@ -164,15 +166,20 @@ function YieldsHistoryTab() {
 }
 
 function YieldsAuctionsTab() {
+  const { data: auctions } = useAuctions()
+  const upcoming = auctions?.upcoming?.length ? auctions.upcoming : UPCOMING
+  const upcomingLive = !!auctions?.upcoming?.length
+  const recent = auctions?.results?.length ? auctions.results : fixtureToDisplay(FX.auctions)
+  const recentLive = !!auctions?.results?.length
   return (
     <>
       <div style={{ padding: '0 22px 18px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <div className="eyebrow">Upcoming · Week 23</div>
-          <DemoBadge />
+          <div className="eyebrow">Upcoming auctions</div>
+          {!upcomingLive && <DemoBadge />}
         </div>
         <div className="card-flat">
-          {UPCOMING.map((a, i, arr) => (
+          {upcoming.map((a, i, arr) => (
             <div
               key={i}
               style={{
@@ -200,10 +207,10 @@ function YieldsAuctionsTab() {
       <div style={{ padding: '20px 22px 24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <div className="eyebrow">Recent results</div>
-          <DemoBadge />
+          {!recentLive && <DemoBadge />}
         </div>
         <div className="card-flat">
-          {FX.auctions.map((a, i, arr) => (
+          {recent.map((a, i, arr) => (
             <div
               key={i}
               style={{
@@ -258,6 +265,9 @@ function YieldsMobile() {
 
 function YieldsDesktop() {
   const { data } = useYields()
+  const { data: auctions } = useAuctions()
+  const recent = auctions?.results?.length ? auctions.results : fixtureToDisplay(FX.auctions)
+  const recentLive = !!auctions?.results?.length
 
   const slopeLabel = data?.spread10Y_91D_bps != null
     ? `+${data.spread10Y_91D_bps}`
@@ -336,10 +346,10 @@ function YieldsDesktop() {
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 18 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <div className="eyebrow">Recent auctions · Week 22</div>
-              <DemoBadge />
+              <div className="eyebrow">Recent auctions</div>
+              {!recentLive && <DemoBadge />}
             </div>
-            <h3 className="display" style={{ fontSize: 24, margin: 0 }}>Six prints</h3>
+            <h3 className="display" style={{ fontSize: 24, margin: 0 }}>{recent.length} prints</h3>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button type="button" className="btn btn-sm">Filter</button>
@@ -360,7 +370,7 @@ function YieldsDesktop() {
               <span key={h} className="caption" style={{ fontWeight: 500, color: 'var(--ink-2)' }}>{h}</span>
             ))}
           </div>
-          {FX.auctions.map((a, i, arr) => (
+          {recent.map((a, i, arr) => (
             <div
               key={i}
               style={{
@@ -375,19 +385,11 @@ function YieldsDesktop() {
               <span style={{ fontSize: 13, color: 'var(--ink-2)' }}>{a.date}</span>
               <span className="num" style={{ fontSize: 13 }}>{a.size}</span>
               <span className="num" style={{ fontSize: 13 }}>{a.bid}</span>
-              <span className="num" style={{ fontSize: 13, color: a.cover < 1.2 ? 'var(--warn)' : 'var(--ink)' }}>{a.cover}x</span>
+              <span className="num" style={{ fontSize: 13, color: a.cover != null && a.cover < 1.2 ? 'var(--warn)' : 'var(--ink)' }}>{a.cover != null ? `${a.cover}x` : '—'}</span>
               <span className="num" style={{ fontSize: 13 }}>{a.wam}</span>
-              <Sparkline
-                data={[
-                  parseFloat(a.cutoff) - 0.15,
-                  parseFloat(a.cutoff) - 0.1,
-                  parseFloat(a.cutoff) - 0.05,
-                  parseFloat(a.cutoff) - 0.03,
-                  parseFloat(a.cutoff),
-                ]}
-                w={180}
-                h={20}
-              />
+              {a.cutoffHist.length >= 2
+                ? <Sparkline data={a.cutoffHist} w={180} h={20} />
+                : <span className="caption" style={{ color: 'var(--ink-3)' }}>—</span>}
               <span className="serif-num" style={{ fontSize: 20 }}>{a.cutoff}</span>
               <Delta value={a.delta} invert size="sm" />
             </div>
