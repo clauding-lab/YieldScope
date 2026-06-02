@@ -16,6 +16,10 @@ export interface LiquidityData {
   policyRepo: number | null
   policySdf: number | null
   policySlf: number | null
+  crrMaintainedPct: number | null  // crr_utilisation_pct — CRR maintained as % of deposits (the ratio, not 0–100 utilisation)
+  slrMaintainedPct: number | null  // slr_utilisation_pct — SLR maintained as % of deposits
+  crrAsOf: string | null
+  slrAsOf: string | null
   asOf: string | null
 }
 
@@ -37,7 +41,7 @@ export function useLiquidity(): UseLiquidityResult {
     let cancelled = false
     ;(async () => {
       try {
-        const [call, excess, callSer, excessSer, repo, sdf, slf, m2, m2Ser] = await Promise.all([
+        const [call, excess, callSer, excessSer, repo, sdf, slf, m2, m2Ser, crr, slr] = await Promise.all([
           fetchLatest(METRIC.CALL_MONEY),
           fetchLatest(METRIC.EXCESS_LIQ),
           fetchSeries(METRIC.CALL_MONEY, { limit: 8 }),
@@ -47,6 +51,8 @@ export function useLiquidity(): UseLiquidityResult {
           fetchLatest(METRIC.POLICY_RATE_SLF),
           fetchLatest(METRIC.M2_YOY_M),
           fetchSeries(METRIC.M2_YOY_M, { limit: 8 }),
+          fetchLatest(METRIC.CRR_UTIL),
+          fetchLatest(METRIC.SLR_UTIL),
         ])
         // M2 YoY now sourced from m2_growth_yoy_monthly (monthly, lagged).
         if (cancelled) return
@@ -63,6 +69,10 @@ export function useLiquidity(): UseLiquidityResult {
             policyRepo: repo?.value ?? null,
             policySdf: sdf?.value ?? null,
             policySlf: slf?.value ?? null,
+            crrMaintainedPct: crr?.value ?? null,
+            slrMaintainedPct: slr?.value ?? null,
+            crrAsOf: crr?.asOf ?? null,
+            slrAsOf: slr?.asOf ?? null,
             asOf: call?.asOf ?? null,
           },
         })

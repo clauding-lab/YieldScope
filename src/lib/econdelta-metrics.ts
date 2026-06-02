@@ -37,6 +37,8 @@ export const METRIC = {
   TOTAL_DEPOSITS:  'deposits_of_the_system',
   NPL_RATIO:       'gross_npl_ratio',
   CRAR:            'banking_sector_crar',
+  CRR_UTIL:        'crr_utilisation_pct',   // CRR maintained, % of deposits (daily; despite the "_pct" id it's the ratio, not 0–100 utilisation)
+  SLR_UTIL:        'slr_utilisation_pct',   // SLR maintained, % of deposits (daily)
 
   // External sector
   REMIT_MONTHLY:   'monthly_remittance',
