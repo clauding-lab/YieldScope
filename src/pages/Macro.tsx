@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import { useIsDesktop } from '../lib/hooks'
-import { FX } from '../data/fixtures'
 import { Delta, DemoBadge, ListRow, SectionTitle, Sparkline } from '../components/primitives'
 import { AreaChart, Heatmap } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
@@ -42,47 +41,59 @@ interface BopItem {
   v: string
   u: string
   d: string
-  spark: number[]
-  col: string
-  demo?: boolean
 }
 
 function fmtUsdBn(n: number | null | undefined): string {
   return n != null ? n.toFixed(2) : '—'
 }
 
-function buildBopItems(data: ReturnType<typeof useMacro>['data']): BopItem[] {
+type MacroDataT = ReturnType<typeof useMacro>['data']
+
+function buildBopItems(data: MacroDataT): BopItem[] {
   return [
-    { lbl: 'Remittances',  v: fmtUsdBn(data?.remitMonthlyUsdBn),  u: 'USD bn · monthly', d: '',  spark: FX.macro.remitHist,  col: 'var(--pos)', demo: true },
-    { lbl: 'Exports',      v: fmtUsdBn(data?.exportMonthlyUsdBn), u: 'USD bn · monthly', d: '',  spark: FX.macro.exportHist, col: 'var(--pos)', demo: true },
-    { lbl: 'Imports',      v: fmtUsdBn(data?.importMonthlyUsdBn), u: 'USD bn · monthly', d: '',  spark: FX.macro.importHist, col: 'var(--neg)', demo: true },
-    { lbl: 'Current acct', v: '−2.8', u: 'USD bn', d: '−1.9% of GDP', spark: [-4.2, -3.8, -3.4, -3.2, -3.0, -2.9, -2.8, -2.8], col: 'var(--neg)', demo: true },
+    { lbl: 'Remittances',  v: fmtUsdBn(data?.remitMonthlyUsdBn),  u: 'USD bn · monthly', d: '' },
+    { lbl: 'Exports',      v: fmtUsdBn(data?.exportMonthlyUsdBn), u: 'USD bn · monthly', d: '' },
+    { lbl: 'Imports',      v: fmtUsdBn(data?.importMonthlyUsdBn), u: 'USD bn · monthly', d: '' },
+    // current_account_balance — NOT bop_summary (landmine 19); negative = deficit is valid.
+    { lbl: 'Current acct', v: fmtUsdBn(data?.currentAccountUsdBn), u: 'USD bn', d: '' },
   ]
+}
+
+// All four BoP legs live → the panel is no longer demo.
+function bopAllLive(data: MacroDataT): boolean {
+  return data?.remitMonthlyUsdBn != null && data?.exportMonthlyUsdBn != null
+    && data?.importMonthlyUsdBn != null && data?.currentAccountUsdBn != null
 }
 
 interface CommodityRow {
   c: string
   v: string
   u: string
-  d: number
-  spark: number[]
-  live: boolean
+  d: number | null   // price delta vs prior point; null when no real history (no fabricated trend)
+  spark: number[]     // live history only; sparkline renders only when length >= 2
 }
 
-function buildCommodities(data: ReturnType<typeof useMacro>['data']): CommodityRow[] {
-  const brentSpark = data?.brentHist?.length ? data.brentHist : [78, 80, 82, 81, 83, 84, 83.5, 84.20]
+function buildCommodities(data: MacroDataT): CommodityRow[] {
   const brentVal = data?.brentUsdBarrel
+  const brentSpark = data?.brentHist ?? []
   // Round at source — <Delta /> renders the value verbatim, so a raw float
-  // subtraction leaks artifacts like +0.350006103515625 (AGENTS.md landmine 17).
-  const brentDelta = data?.brentHist?.length && data.brentHist.length >= 2
-    ? (roundTo(data.brentHist[data.brentHist.length - 1] - data.brentHist[data.brentHist.length - 2], 2) ?? 0)
-    : 0
+  // subtraction leaks artifacts like +0.350006103515625 (landmine 17).
+  const brentDelta = brentSpark.length >= 2
+    ? roundTo(brentSpark[brentSpark.length - 1] - brentSpark[brentSpark.length - 2], 2)
+    : null
+  // LNG / Wheat / Palm: World Bank pink sheet, USD. Only one monthly point lands today,
+  // so there's no live history → no sparkline, no delta (never fabricated).
   return [
-    { c: 'Brent',    v: brentVal != null ? brentVal.toFixed(2) : '—', u: 'USD/bbl',   d:  brentDelta, spark: brentSpark, live: brentVal != null },
-    { c: 'LNG',      v: '11.40', u: 'USD/MMBtu', d: -2.1, spark: [13, 12.8, 12.4, 12.0, 11.8, 11.7, 11.5, 11.40], live: false },
-    { c: 'Wheat',    v: '612',   u: 'USD/MT',    d:  0.6, spark: [598, 602, 605, 608, 610, 611, 610, 612], live: false },
-    { c: 'Palm oil', v: '3,840', u: 'MYR/MT',    d: -0.4, spark: [3900, 3880, 3860, 3850, 3845, 3850, 3845, 3840], live: false },
+    { c: 'Brent',    v: brentVal != null ? brentVal.toFixed(2) : '—',        u: 'USD/bbl',   d: brentDelta, spark: brentSpark },
+    { c: 'LNG',      v: data?.lngUsd != null ? data.lngUsd.toFixed(2) : '—', u: 'USD/MMBtu', d: null,       spark: [] },
+    { c: 'Wheat',    v: data?.wheatUsd != null ? data.wheatUsd.toFixed(2) : '—', u: 'USD/MT', d: null,       spark: [] },
+    { c: 'Palm oil', v: data?.palmOilUsd != null ? data.palmOilUsd.toFixed(2) : '—', u: 'USD/MT', d: null,   spark: [] },
   ]
+}
+
+function commoditiesAllLive(data: MacroDataT): boolean {
+  return data?.brentUsdBarrel != null && data?.lngUsd != null
+    && data?.wheatUsd != null && data?.palmOilUsd != null
 }
 
 function MacroMobile() {
@@ -150,7 +161,7 @@ function MacroMobile() {
       <div style={{ padding: '0 16px 24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 22px 10px' }}>
           <div className="caption">Balance of payments</div>
-          <DemoBadge />
+          {!bopAllLive(data) && <DemoBadge />}
         </div>
         <div className="card-flat">
           {bopItems.map((b, i, arr) => (
@@ -239,7 +250,7 @@ function MacroDesktop() {
       <div style={{ padding: '36px 48px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18 }}>
           <div className="eyebrow">Balance of payments · monthly flows</div>
-          <DemoBadge />
+          {!bopAllLive(data) && <DemoBadge />}
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 32 }}>
           {bopItems.map(b => (
@@ -250,9 +261,6 @@ function MacroDesktop() {
                 <span className="caption">{b.u}</span>
               </div>
               {b.d && <div className="caption" style={{ marginTop: 4 }}>{b.d}</div>}
-              <div style={{ marginTop: 14 }}>
-                <Sparkline data={b.spark} w={260} h={32} color={b.col} strokeWidth={1.4} />
-              </div>
             </div>
           ))}
         </div>
@@ -297,7 +305,7 @@ function MacroDesktop() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
             <div className="eyebrow">Commodity exposure · import bill</div>
-            <DemoBadge />
+            {!commoditiesAllLive(data) && <DemoBadge />}
           </div>
           <div className="card-flat">
             {commodities.map((c, i, arr) => (
@@ -313,12 +321,14 @@ function MacroDesktop() {
                 }}
               >
                 <span style={{ fontSize: 14, color: 'var(--ink)' }}>{c.c}</span>
-                <Sparkline data={c.spark} w={200} h={20} />
+                {c.spark.length >= 2
+                  ? <Sparkline data={c.spark} w={200} h={20} />
+                  : <span />}
                 <div style={{ textAlign: 'right' }}>
                   <div className="serif-num" style={{ fontSize: 18 }}>{c.v}</div>
                   <div className="caption">{c.u}</div>
                 </div>
-                <Delta value={c.d} suffix="%" invert size="sm" />
+                <Delta value={c.d} invert size="sm" />
               </div>
             ))}
           </div>

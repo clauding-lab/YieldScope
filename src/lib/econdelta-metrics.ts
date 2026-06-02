@@ -42,7 +42,8 @@ export const METRIC = {
   REMIT_MONTHLY:   'monthly_remittance',
   EXPORT_MONTHLY:  'monthly_export',
   IMPORT_MONTHLY:  'monthly_import',
-  BOP:             'bop_summary',
+  BOP:             'bop_summary',          // ≈ Overall Balance — NOT current account (landmine 19)
+  CURRENT_ACCOUNT: 'current_account_balance', // BoP current-account line, USD bn (negative = deficit)
 
   // Fiscal
   TAX_REV:         'tax_revenue',
@@ -63,6 +64,9 @@ export const METRIC = {
   BRENT:           'brent_crude_usd_barrel',
   WTI:             'wti_crude_usd_barrel',
   GOLD:            'gold_usd_oz',
+  LNG:             'lng_price_usd_mmbtu',   // World Bank pink sheet (USD/MMBtu)
+  WHEAT:           'wheat_price_usd_mt',    // World Bank pink sheet (USD/MT)
+  PALM_OIL:        'palm_oil_price_usd_mt', // World Bank pink sheet (USD/MT)
 
   // Equities
   DSEX:            'dsex',
