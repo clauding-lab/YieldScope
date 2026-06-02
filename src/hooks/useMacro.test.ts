@@ -34,6 +34,10 @@ describe('useMacro', () => {
       if (id === 'fx_reserve_gross_and_bpm6') return { asOf: '2026-05-25', value: 20.84 }
       if (id === 'reer_monthly')             return { asOf: '2026-03-01', value: 102.78 }
       if (id === 'import_cover_months_monthly') return { asOf: '2026-03-01', value: 5.86 }
+      if (id === 'current_account_balance')  return { asOf: '2026-06-02', value: -0.397 }
+      if (id === 'lng_price_usd_mmbtu')      return { asOf: '2025-12-31', value: 11.06 }
+      if (id === 'wheat_price_usd_mt')       return { asOf: '2025-12-31', value: 223.17 }
+      if (id === 'palm_oil_price_usd_mt')    return { asOf: '2025-12-31', value: 980.51 }
       return null
     })
     mockFetchSeries.mockImplementation(async (id) => {
@@ -59,6 +63,13 @@ describe('useMacro', () => {
     expect(result.current.data!.reerAsOf).toBe('2026-03-01')
     expect(result.current.data!.importCoverMonths).toBe(5.86)
     expect(result.current.data!.importCoverAsOf).toBe('2026-03-01')
+    // current account (negative = deficit, valid) — NOT bop_summary
+    expect(result.current.data!.currentAccountUsdBn).toBe(-0.397)
+    expect(result.current.data!.currentAccountAsOf).toBe('2026-06-02')
+    // commodities (World Bank pink sheet, USD)
+    expect(result.current.data!.lngUsd).toBe(11.06)
+    expect(result.current.data!.wheatUsd).toBe(223.17)
+    expect(result.current.data!.palmOilUsd).toBe(980.51)
   })
 
   it('captures error from the client', async () => {

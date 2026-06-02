@@ -19,9 +19,17 @@ export interface MacroData {
   remitMonthlyUsdBn: number | null
   exportMonthlyUsdBn: number | null
   importMonthlyUsdBn: number | null
+  currentAccountUsdBn: number | null   // current_account_balance (USD bn; negative = deficit) — NOT bop_summary
+  currentAccountAsOf: string | null
 
   brentUsdBarrel: number | null
   brentHist: number[]
+  lngUsd: number | null                // lng_price_usd_mmbtu (USD/MMBtu) — World Bank pink sheet
+  lngAsOf: string | null
+  wheatUsd: number | null              // wheat_price_usd_mt (USD/MT)
+  wheatAsOf: string | null
+  palmOilUsd: number | null            // palm_oil_price_usd_mt (USD/MT)
+  palmOilAsOf: string | null
 
   reer: number | null
   reerAsOf: string | null              // REER is a lagged monthly index — surface its vintage
@@ -60,7 +68,8 @@ export function useMacro(): UseMacroResult {
         const [
           cpiH, cpiF, cpiNF, usd, fxr, brent,
           cpiSer, foodSer, nfSer, fxSer, usdSer, brentSer,
-          rem, exp, imp,
+          rem, exp, imp, curAcct,
+          lng, wheat, palm,
           reer, impCov,
         ] = await Promise.all([
           fetchLatest(METRIC.CPI_HEADLINE),
@@ -78,6 +87,10 @@ export function useMacro(): UseMacroResult {
           fetchLatest(METRIC.REMIT_MONTHLY),
           fetchLatest(METRIC.EXPORT_MONTHLY),
           fetchLatest(METRIC.IMPORT_MONTHLY),
+          fetchLatest(METRIC.CURRENT_ACCOUNT),
+          fetchLatest(METRIC.LNG),
+          fetchLatest(METRIC.WHEAT),
+          fetchLatest(METRIC.PALM_OIL),
           fetchLatest(METRIC.REER_M),
           fetchLatest(METRIC.IMPORT_COVER_M),
         ])
@@ -103,8 +116,16 @@ export function useMacro(): UseMacroResult {
             remitMonthlyUsdBn:  rem?.value ?? null,
             exportMonthlyUsdBn: exp?.value ?? null,
             importMonthlyUsdBn: imp?.value ?? null,
+            currentAccountUsdBn: curAcct?.value ?? null,
+            currentAccountAsOf:  curAcct?.asOf ?? null,
             brentUsdBarrel: brent?.value ?? null,
             brentHist:      brentSer.map(p => p.value),
+            lngUsd:         lng?.value ?? null,
+            lngAsOf:        lng?.asOf ?? null,
+            wheatUsd:       wheat?.value ?? null,
+            wheatAsOf:      wheat?.asOf ?? null,
+            palmOilUsd:     palm?.value ?? null,
+            palmOilAsOf:    palm?.asOf ?? null,
             reer:               reer?.value ?? null,
             reerAsOf:           reer?.asOf ?? null,
             importCoverMonths:  impCov?.value ?? null,
