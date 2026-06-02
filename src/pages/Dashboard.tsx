@@ -4,6 +4,8 @@ import { Collapse, DemoBadge, SectionTitle } from '../components/primitives'
 import { YieldCurve } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useDashboard } from '../hooks/useDashboard'
+import { useAuctions } from '../hooks/useAuctions'
+import { fixtureToDisplay } from '../lib/auctions'
 import { useBriefing } from '../hooks/useBriefing'
 import { BriefingBody } from '../lib/briefingMarkdown'
 import { todayLabel, weekdayName } from '../lib/dates'
@@ -180,6 +182,9 @@ function DashboardMobile() {
 
 function DashboardDesktop() {
   const { data } = useDashboard()
+  const { data: auctions } = useAuctions()
+  const recentAuctions = (auctions?.results?.length ? auctions.results : fixtureToDisplay(FX.auctions)).slice(0, 4)
+  const auctionsLive = !!auctions?.results?.length
   const { briefings } = useBriefing()
   const brief = briefings[0] ?? null
   const moving: MovingItem[] = brief
@@ -330,9 +335,9 @@ function DashboardDesktop() {
         <div className="card-flat" style={{ padding: 22 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
             <div className="eyebrow">Recent auctions</div>
-            <DemoBadge />
+            {!auctionsLive && <DemoBadge />}
           </div>
-          {FX.auctions.slice(0, 4).map((a, i, arr) => (
+          {recentAuctions.map((a, i, arr) => (
             <div
               key={i}
               style={{
