@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
 import { useFiscal } from '../hooks/useFiscal'
+import { roundTo } from '../lib/yieldMath'
 import { Bar, DemoBadge, ListRow, SectionTitle } from '../components/primitives'
 import { AreaChart, Donut, DonutLegend, DotMatrix, RadialGauge } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
@@ -22,6 +23,9 @@ function FiscalMobile() {
   const revenuePct = data?.revenuePct ?? null
   const adpPct = data?.adpPct ?? null
   const domesticBorrowingCr = data?.domesticBorrowingCr ?? null
+  const debtGdpRatio = roundTo(data?.debtGdpRatio ?? null, 1)
+  const debtGdpAsOf = data?.debtGdpAsOf ?? null
+  const debtGdpHist = data?.debtGdpHist ?? []
   const fmtPct = (n: number | null) => n != null ? `${n}%` : '—'
   const demoLabel = (label: string): ReactNode => (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
@@ -56,7 +60,11 @@ function FiscalMobile() {
       <div style={{ padding: '0 16px 24px' }}>
         <div className="card-flat">
           <ListRow label="Revenue / target" value={fmtPct(revenuePct)} />
-          <ListRow label={demoLabel('Debt / GDP')}        value={`${F.debtToGdp}%`} />
+          <ListRow
+            label={debtGdpRatio == null ? demoLabel('Debt / GDP') : 'Debt / GDP'}
+            value={debtGdpRatio != null ? `${debtGdpRatio}%` : '—'}
+            sub={debtGdpRatio != null && debtGdpAsOf ? `FY${debtGdpAsOf.slice(0, 4)}` : undefined}
+          />
           <ListRow label={domesticBorrowingCr == null ? demoLabel('Net dom. borrow') : 'Net dom. borrow'} value={domesticBorrowingCr != null ? `${(domesticBorrowingCr / 1000).toFixed(1)} k Cr` : `${F.netDomesticBorrowingYTD} k Cr`} />
           <ListRow label={demoLabel('Ways & Means')}      value={`${F.waysMeans} k Cr`} />
           <ListRow label="ADP implementation" value={fmtPct(adpPct)} last />
@@ -90,9 +98,9 @@ function FiscalMobile() {
       <div style={{ padding: '0 22px 28px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <div className="eyebrow">Public debt / GDP</div>
-          <DemoBadge />
+          {debtGdpHist.length === 0 && <DemoBadge />}
         </div>
-        <AreaChart data={F.debtHist} w={346} h={90} color="var(--neg)" />
+        <AreaChart data={debtGdpHist.length ? debtGdpHist : F.debtHist} w={346} h={90} color="var(--neg)" />
       </div>
     </>
   )
@@ -103,6 +111,14 @@ function FiscalDesktop() {
   const { data } = useFiscal()
   const revenuePct = data?.revenuePct ?? null
   const adpPct = data?.adpPct ?? null
+  const debtGdpRatio = roundTo(data?.debtGdpRatio ?? null, 1)
+  const debtGdpAsOf = data?.debtGdpAsOf ?? null
+  const debtGdpHist = data?.debtGdpHist ?? []
+  const debtDomesticCr = data?.debtDomesticCr ?? null
+  const debtExternalCr = data?.debtExternalCr ?? null
+  const imfEffSdrMn = data?.imfEffSdrMn ?? null
+  const n = debtGdpHist.length
+  const debtGdp24mBps = n >= 3 ? roundTo((debtGdpHist[n - 1] - debtGdpHist[n - 3]) * 100, 0) : null
   const fmtPct = (n: number | null) => n != null ? `${n}%` : '—'
   const demoLabel = (label: string): ReactNode => (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
@@ -134,7 +150,11 @@ function FiscalDesktop() {
           <h2 className="display" style={{ fontSize: 36, margin: 0, color: 'var(--warn)' }}>Elevated.</h2>
           <div className="card-flat" style={{ padding: 18, marginTop: 22, maxWidth: 540 }}>
             <ListRow label="Revenue / target" value={fmtPct(revenuePct)} />
-            <ListRow label={demoLabel('Debt / GDP')}        value={`${F.debtToGdp}%`} />
+            <ListRow
+              label={debtGdpRatio == null ? demoLabel('Debt / GDP') : 'Debt / GDP'}
+              value={debtGdpRatio != null ? `${debtGdpRatio}%` : '—'}
+              sub={debtGdpRatio != null && debtGdpAsOf ? `FY${debtGdpAsOf.slice(0, 4)}` : undefined}
+            />
             <ListRow label={demoLabel('W&M usage')}         value="46%" />
             <ListRow label="ADP implementation" value={fmtPct(adpPct)} last />
           </div>
@@ -174,20 +194,23 @@ function FiscalDesktop() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
             <div className="eyebrow">Public debt / GDP</div>
-            <DemoBadge />
+            {debtGdpRatio == null && <DemoBadge />}
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span className="serif-num" style={{ fontSize: 44, color: 'var(--neg)' }}>{F.debtToGdp}</span>
+            <span className="serif-num" style={{ fontSize: 44, color: 'var(--neg)' }}>{debtGdpRatio != null ? debtGdpRatio : '—'}</span>
             <span className="caption">%</span>
           </div>
-          <div className="caption" style={{ marginTop: 4 }}>↑ 260 bps in 24m</div>
+          <div className="caption" style={{ marginTop: 4 }}>
+            {debtGdpRatio != null && debtGdpAsOf ? `FY${debtGdpAsOf.slice(0, 4)}` : ''}
+            {debtGdp24mBps != null ? `${debtGdpAsOf ? ' · ' : ''}${debtGdp24mBps >= 0 ? '↑' : '↓'} ${Math.abs(debtGdp24mBps)} bps / 24m` : ''}
+          </div>
           <div style={{ marginTop: 14 }}>
-            <AreaChart data={F.debtHist} w={360} h={100} color="var(--neg)" />
+            <AreaChart data={debtGdpHist.length ? debtGdpHist : F.debtHist} w={360} h={100} color="var(--neg)" />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-            <div><div className="caption">Domestic</div><div className="serif-num" style={{ fontSize: 18 }}>23.8%</div></div>
-            <div><div className="caption">External</div><div className="serif-num" style={{ fontSize: 18 }}>17.4%</div></div>
-            <div><div className="caption">IMF EFF</div><div className="serif-num" style={{ fontSize: 18 }}>4.7B</div></div>
+            <div><div className="caption">Domestic</div><div className="serif-num" style={{ fontSize: 18 }}>{debtDomesticCr != null ? `৳${(debtDomesticCr / 100000).toFixed(1)}L cr` : '—'}</div></div>
+            <div><div className="caption">External</div><div className="serif-num" style={{ fontSize: 18 }}>{debtExternalCr != null ? `৳${(debtExternalCr / 100000).toFixed(1)}L cr` : '—'}</div></div>
+            <div><div className="caption">IMF EFF</div><div className="serif-num" style={{ fontSize: 18 }}>{imfEffSdrMn != null ? `SDR ${(imfEffSdrMn / 1000).toFixed(2)}B` : '—'}</div></div>
           </div>
         </div>
         <div>

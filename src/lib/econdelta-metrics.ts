@@ -54,6 +54,10 @@ export const METRIC = {
   DOMESTIC_BORROW: 'domestic_borrowing_for_budget_deficit',
   BANK_BORROW:     'bank_borrowing_for_deficit_financing',
   NSC_OUT:         'nsc_outstanding',
+  DEBT_GDP:        'debt_gdp_ratio',           // IMF annual series (actuals + projections) + off-cycle MoF print
+  DEBT_DOMESTIC:   'debt_domestic_stock_cr',   // domestic public debt stock (BDT crore)
+  DEBT_EXTERNAL:   'debt_external_stock_cr',   // external public debt stock (BDT crore)
+  IMF_EFF:         'imf_eff_outstanding_sdr_mn', // IMF EFF outstanding (SDR million)
 
   // Commodities
   BRENT:           'brent_crude_usd_barrel',
