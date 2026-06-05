@@ -21,8 +21,8 @@ export function Heatmap<T = number>({
     <div style={{ width: '100%' }}>
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, marginBottom: 6 }}>
         <div style={{ width: leftW, flexShrink: 0 }} />
-        {cols.map(c => (
-          <div key={c} className="caption" style={{ flex: 1, textAlign: 'center', fontSize: 10 }}>{c}</div>
+        {cols.map((c, j) => (
+          <div key={j} className="caption" style={{ flex: 1, textAlign: 'center', fontSize: 10 }}>{c}</div>
         ))}
       </div>
       {rows.map((r, i) => (
@@ -39,12 +39,12 @@ export function Heatmap<T = number>({
           >
             {r}
           </div>
-          {cols.map((c, j) => {
+          {cols.map((_c, j) => {
             const v = data[i][j]
             const col = getColor(v, i, j)
             return (
               <div
-                key={c}
+                key={j}
                 style={{
                   flex: 1,
                   height: cellH,
