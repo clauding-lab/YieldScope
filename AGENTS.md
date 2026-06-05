@@ -135,6 +135,16 @@ Numbered, named, and specific enough to keep a fresh AI session from stepping on
 
 29. **Several panels stay Demo BY DESIGN — don't try to "wire" them.** After the 2026-06-02 Tier-2 wire (PRs #13–#16): Banking NPL-by-segment + deposits-by-ownership donut (R3 descoped — QFSAR has no clean ownership table), SLF-draw + BB-repo (retired EconDelta PR #62, BB CAPTCHA wall — dropped from Liquidity, still demo on Banking), LCR/NSFR + top-10-banks heatmap (no per-bank source), Core CPI + fiscal-pressure composite (no source), Fiscal revenue-split donut + Ways&Means (gapped: `non_nbr_tax_revenue`/`ways_means_usage_cr` return 0 rows today — will light up only if EconDelta populates them). Backlog + rationale: `docs/econdelta-wishlist.md`.
 
+## 30. Library/framework API calls → Context7 first
+
+Before writing or editing code that calls a third-party library or framework API,
+query **Context7** for current, version-pinned docs — do NOT rely on training-cutoff memory.
+
+- **Flow:** `resolve-library-id` (name → `/org/project` ID) → `query-docs` (PIN the version this repo ships, e.g. `/reactjs/react.dev/v19`).
+- **Applies to:** `react` / `react-dom` 19 (hooks, `useId`, `lazy`/`Suspense`, concurrent rendering), `react-router-dom` 7 (lazy routes, `BrowserRouter` `basename`, data APIs), and `@supabase/supabase-js` 2 (query builder, `.from().select()`, filters, realtime) — the EconDelta data seam.
+- **Skip for:** business/domain logic, general programming concepts, or libraries Context7 does not index.
+- **Query specifically:** library + version + exact task (e.g. `@supabase/supabase-js v2 select with .order() and .limit() on metric_history`), never one-word topics like "auth".
+
 ## Communication & timezone
 
 - **All times in BDT (UTC+6).** When generating timestamps, dates, or schedules, convert to BDT and label it.
