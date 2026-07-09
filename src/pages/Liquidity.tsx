@@ -97,6 +97,14 @@ function CorridorViz({ tall = false, callRate, repo, sdf, slf }: CorridorVizProp
   )
 }
 
+// Excess-liquidity display thresholds, in LAKH crore (the unit the panel renders).
+// These are a straight 100x rescale of the previous thousand-crore thresholds
+// (warn < 200 → < 2.0; ref line 150 → 1.5), correcting the same k-vs-lakh unit
+// confusion that produced the 100x label bug. FINANCIAL-JUDGMENT values — the exact
+// warn/floor levels are flagged for Adnan's confirmation.
+const EXCESS_LIQ_WARN_LAKH_CR = 2.0   // bars below this render warn (tightening liquidity)
+const EXCESS_LIQ_FLOOR_LAKH_CR = 1.5  // reference line on the desktop bar chart
+
 const INTRADAY_ROWS = ['Monday', 'Tuesday', 'Wed', 'Thursday', 'Sunday']
 const INTRADAY_COLS = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00']
 const INTRADAY_DATA = [
@@ -156,13 +164,13 @@ function LiquidityMobile() {
           <div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
               <span className="serif-num" style={{ fontSize: 36 }}>
-                {data?.excessLiquidityKCr?.toFixed(1) ?? '—'}
+                {data?.excessLiquidityLakhCr?.toFixed(1) ?? '—'}
               </span>
-              <span className="caption">k Cr</span>
+              <span className="caption">lakh Cr</span>
             </div>
           </div>
-          {data?.excessHistKCr?.length ? (
-            <AreaChart data={data.excessHistKCr} w={140} h={48} color="var(--neg)" />
+          {data?.excessHistLakhCr?.length ? (
+            <AreaChart data={data.excessHistLakhCr} w={140} h={48} color="var(--neg)" />
           ) : null}
         </div>
       </div>
@@ -237,22 +245,22 @@ function LiquidityDesktop() {
           <div className="eyebrow" style={{ marginBottom: 10 }}>Excess liquidity</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span className="serif-num" style={{ fontSize: 48 }}>
-              {data?.excessLiquidityKCr?.toFixed(1) ?? '—'}
+              {data?.excessLiquidityLakhCr?.toFixed(1) ?? '—'}
             </span>
-            <span className="caption">k Cr</span>
+            <span className="caption">lakh Cr</span>
           </div>
-          {data?.excessHistKCr?.length ? (
+          {data?.excessHistLakhCr?.length ? (
             <div style={{ marginTop: 16 }}>
               <BarChart
                 w={400}
                 h={130}
-                threshold={150}
+                threshold={EXCESS_LIQ_FLOOR_LAKH_CR}
                 data={['W14', 'W15', 'W16', 'W17', 'W18', 'W19', 'W20', 'W21'].map((w, i) => ({
                   label: w,
-                  value: data.excessHistKCr[i],
-                  color: data.excessHistKCr[i] < 200 ? 'var(--warn)' : 'var(--accent)',
+                  value: data.excessHistLakhCr[i],
+                  color: data.excessHistLakhCr[i] < EXCESS_LIQ_WARN_LAKH_CR ? 'var(--warn)' : 'var(--accent)',
                 }))}
-                fmt={v => String(Math.round(v))}
+                fmt={v => v.toFixed(1)}
               />
             </div>
           ) : null}

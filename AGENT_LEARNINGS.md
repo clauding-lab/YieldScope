@@ -37,6 +37,25 @@ When something ships broken, when a methodology gap is exposed, or when a smoke 
 
 ## Entries (most recent first)
 
+## 2026-07-09 — v3.0 | Excess-liquidity label understated by 100× ("k Cr" vs "lakh Cr")
+
+**Trigger:** 2026-07-04 ecosystem review (two Opus 4.8 passes, live + Supabase reads). The Liquidity page rendered excess liquidity as "3.9 k Cr" — reads as ৳3,900 crore — when the live `excess_liquid_asset_total_minimum` is **385,992.24 BDT crore** (≈ ৳3.86 **lakh** crore, ~৳386,000 crore). A 100× understatement on an ALCO tool.
+
+**What went wrong:** `useLiquidity.ts` divided the raw crore value by `CR_PER_KCR = 100000` — which is arithmetically the correct divisor for *lakh* crore (1 lakh crore = 100,000 crore), producing 3.86. But the constant, the field (`excessLiquidityKCr`), and the rendered unit label all said "**k**Cr" (thousand crore). "k" = 1,000; "lakh" = 100,000. The number 3.86 was right for lakh-crore; the label was wrong by 100×. Two render sites (mobile + desktop) plus two desktop BarChart thresholds (`threshold={150}`, warn `< 200`) were all calibrated to the old thousand-crore fixture scale, so the bug had four surfaces, not one.
+
+**Lesson:** In BD-finance UIs, `k` (thousand) and `lakh` (100,000) are a 100× trap. A divisor can be numerically correct while the unit *word* attached to it is off by two orders of magnitude — the value looks plausible, so the error hides. Grep the whole class (constant name + field name + every render label + every threshold on that scale), not just the one number the reviewer pointed at.
+
+**Prevention:**
+- Name the unit in the identifier: `excessLiquidityLakhCr`, `CR_PER_LAKH_CR` — a mislabel becomes visible at the call site.
+- Synthetic test fixtures mirror the real producer's magnitude (385,992.24 crore), not an idealized small number, so a unit-scale regression fails the assertion (`excessLiquidityLakhCr ≈ 3.86`).
+- Thresholds carry their unit in the constant name (`EXCESS_LIQ_WARN_LAKH_CR`) and rescale together with the label.
+
+**Hotfix:** Branch `fix/f1-liquidity-100x-label`: renamed constant/fields to `...LakhCr`; relabeled both render sites "k Cr" → "lakh Cr" (displayed number stays 3.9; the magnitude it communicates goes 3,900 → ~386,000 crore); rescaled the two BarChart thresholds ÷100 (warn `< 2.0`, ref line `1.5`) as named constants; BarChart `fmt` now shows one decimal (was `Math.round`, which collapsed every ~3.86 bar to "4"). Test mock updated to the real producer magnitude. Gate green (lint 0, tests, tsc 0); verified live at 375px + 1440px (reads "3.9 lakh Cr", zero "k Cr" on the page). **Merge gated on Adnan's confirmation of the corrected magnitude** (VISION currency/data-seam sign-off).
+
+**Cross-references:** Handoff F1 (`docs/handoff/2026-07-04-review-fixes.md`). AGENTS.md currency conventions. Engineering-discipline rule 2 (fixtures mirror the real producer).
+
+---
+
 ## 2026-05-31 — v3.0 | Playwright `fullPage` screenshot photographed a live page as all-"Demo data"
 
 **Trigger:** Post-HTTPS visual smoke of the live site. A `fullPage` screenshot of the Dashboard showed the demo hero copy, "Demo data" badges on every panel, and empty metric tiles — even though a `browser_evaluate` taken seconds earlier on the same load reported fully live values (91d 10.15%, the live briefing, FX 35.1bn). The two contradicted each other.

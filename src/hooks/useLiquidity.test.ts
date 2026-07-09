@@ -19,7 +19,8 @@ describe('useLiquidity', () => {
   it('maps call money + excess liquidity + M2 + policy corridor from EconDelta', async () => {
     vi.mocked(fetchLatest).mockImplementation(async (id) => {
       if (id === 'call_money_rate')                       return { asOf: '2026-05-27', value: 9.34 }
-      if (id === 'excess_liquid_asset_total_minimum')     return { asOf: '2026-05-26', value: 18420000 }
+      // Real producer emits BDT crore (~3.86 lakh crore). Mirror it, not an idealized figure.
+      if (id === 'excess_liquid_asset_total_minimum')     return { asOf: '2026-06-05', value: 385992.24 }
       if (id === 'broad_money')                            return { asOf: '2026-04-30', value: 12500000 }
       if (id === 'policy_rate_repo')                       return { asOf: '2026-04-30', value: 10.00 }
       if (id === 'policy_rate_sdf')                        return { asOf: '2026-04-30', value: 7.50 }
@@ -31,7 +32,7 @@ describe('useLiquidity', () => {
     })
     vi.mocked(fetchSeries).mockImplementation(async (id) => {
       if (id === 'call_money_rate')                   return [{ asOf: '2026-05-20', value: 8.42 }, { asOf: '2026-05-27', value: 9.34 }]
-      if (id === 'excess_liquid_asset_total_minimum') return [{ asOf: '2026-03-01', value: 28400000 }, { asOf: '2026-05-26', value: 18420000 }]
+      if (id === 'excess_liquid_asset_total_minimum') return [{ asOf: '2026-03-01', value: 402150.00 }, { asOf: '2026-06-05', value: 385992.24 }]
       if (id === 'm2_growth_yoy_monthly')             return [{ asOf: '2026-01-01', value: 9.46 }, { asOf: '2026-02-01', value: 10.40 }]
       return []
     })
@@ -41,9 +42,10 @@ describe('useLiquidity', () => {
 
     expect(result.current.data!.callMoneyRate).toBe(9.34)
     expect(result.current.data!.callSpark.length).toBe(2)
-    // Excess liquidity stored in BDT crore; hook converts to lakh crore (k Cr) by dividing by 100000
-    expect(result.current.data!.excessLiquidityKCr).toBeCloseTo(184.2, 1)
-    expect(result.current.data!.excessHistKCr.length).toBe(2)
+    // Excess liquidity stored in BDT crore; hook converts to LAKH crore by dividing by 100000.
+    // 385,992.24 crore ÷ 100,000 = 3.86 lakh crore — the label MUST read "lakh Cr", never "k Cr".
+    expect(result.current.data!.excessLiquidityLakhCr).toBeCloseTo(3.86, 2)
+    expect(result.current.data!.excessHistLakhCr).toEqual([4.0215, 3.8599224])
     // Policy corridor — values land from BB MEI bulletin page 10.
     expect(result.current.data!.policyRepo).toBe(10.00)
     expect(result.current.data!.policySdf).toBe(7.50)
