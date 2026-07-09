@@ -5,8 +5,11 @@ import { METRIC } from '../lib/econdelta-metrics'
 export interface LiquidityData {
   callMoneyRate: number | null
   callSpark: number[]
-  excessLiquidityKCr: number | null  // in lakh crore (KCr = 100k crore)
-  excessHistKCr: number[]
+  // Excess liquidity in LAKH crore (1 lakh crore = 100,000 crore). Named
+  // "...LakhCr" — NOT "KCr" — because the old name conflated k (thousand) with
+  // lakh (100k), which drove a 100x-understated display label (fixed 2026-07-09).
+  excessLiquidityLakhCr: number | null
+  excessHistLakhCr: number[]
   m2YoY: number | null
   m2YoYAsOf: string | null  // M2 YoY is a lagged monthly print — surface its vintage
   m2Hist: number[]          // M2 YoY trajectory (monthly), ascending
@@ -29,8 +32,9 @@ interface UseLiquidityResult {
   error: Error | null
 }
 
-// EconDelta stores excess liquidity in BDT crore; UI shows lakh crore (= ÷ 100000).
-const CR_PER_KCR = 100000
+// EconDelta stores excess liquidity in BDT crore; UI shows LAKH crore (÷ 100000).
+// 1 lakh crore = 100,000 crore. The label MUST read "lakh Cr", never "k Cr".
+const CR_PER_LAKH_CR = 100000
 
 export function useLiquidity(): UseLiquidityResult {
   const [state, setState] = useState<UseLiquidityResult>({
@@ -61,8 +65,8 @@ export function useLiquidity(): UseLiquidityResult {
           data: {
             callMoneyRate: call?.value ?? null,
             callSpark: callSer.map(p => p.value),
-            excessLiquidityKCr: excess ? excess.value / CR_PER_KCR : null,
-            excessHistKCr: excessSer.map(p => p.value / CR_PER_KCR),
+            excessLiquidityLakhCr: excess ? excess.value / CR_PER_LAKH_CR : null,
+            excessHistLakhCr: excessSer.map(p => p.value / CR_PER_LAKH_CR),
             m2YoY: m2?.value ?? null,
             m2YoYAsOf: m2?.asOf ?? null,
             m2Hist: m2Ser.map(p => p.value),
