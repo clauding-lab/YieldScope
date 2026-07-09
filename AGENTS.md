@@ -4,7 +4,9 @@ Operational rules for AI coding agents (Claude Code, Cursor, Codex CLI, etc.) wo
 
 ## What this project is
 
-**YieldScope** is a banker-grade Bangladesh ALCO (Asset-Liability Committee) Intelligence Platform — a mobile-first PWA aimed at treasury teams at Bangladeshi banks. It surfaces government securities yields, T-bill/T-bond auctions, money-market liquidity, macro indicators (CPI, FX reserves, BoP), fiscal pressure (revenue, ADP, debt/GDP), and banking-sector health (NPL, CAR, repo borrowing). The app is a single-page React 19 + Vite + TypeScript application deployed to GitHub Pages at `/YieldScope/`. Charts are hand-rolled SVG (no chart library); typography is Geist + Geist Mono; design system uses 3 palettes (Slate / Ivory / Linen) applied via `theme-*` classes on `<html>` (Linen is the base `:root`, empty class). Moss was removed 2026-05-31. Version 3.0 (2026-05-28) is a ground-up rebuild from a Claude Design package handoff — `src/data/fixtures.ts` is the temporary data layer until the EconDelta swap (see `docs/superpowers/plans/2026-05-28-econdelta-data-swap.md`).
+**YieldScope** is a banker-grade Bangladesh ALCO (Asset-Liability Committee) Intelligence Platform — a mobile-first PWA aimed at treasury teams at Bangladeshi banks. It surfaces government securities yields, T-bill/T-bond auctions, money-market liquidity, macro indicators (CPI, FX reserves, BoP), fiscal pressure (revenue, ADP, debt/GDP), and banking-sector health (NPL, CAR, repo borrowing). The app is a single-page React 19 + Vite + TypeScript application deployed to GitHub Pages at the **custom domain `yieldscope.clauding-lab.com`** (base path `/`; a `public/CNAME` pins the domain). Charts are hand-rolled SVG (no chart library); typography is Geist + Geist Mono; design system uses 3 palettes (Slate / Ivory / Linen) applied via `theme-*` classes on `<html>` (Linen is the base `:root`, empty class). Moss was removed 2026-05-31. Version 3.0 (2026-05-28) is a ground-up rebuild from a Claude Design package handoff.
+
+**Data layer status (the EconDelta swap SHIPPED, PRs #10–#17, May 28–Jun 5 2026).** Pages read **live** EconDelta data from Supabase (`metric_history` / `metric_history_monthly` / `briefings` / `auction_results` / `auction_calendar`) through per-domain hooks (`useYields`, `useLiquidity`, `useBanking`, `useAuctions`, `useDashboard`, `useBriefing`, …) via `src/lib/econdelta.ts` + `src/lib/supabase.ts`, using a read-only anon key (anon-read RLS proven on all five tables). `src/data/fixtures.ts` is **no longer the data layer** — it now backs only the yield-curve chart (`YieldCurve.tsx`, still fixture pending an axis decision) and a handful of `<DemoBadge />` panels with no live source yet (see `docs/econdelta-wishlist.md`).
 
 Owner: solo dev (Adnan, Bangladesh, UTC+6). Vibe-coded — Adnan directs AI agents, does not hand-write code himself. All explanations, summaries, and prose should be in **plain English with technical terms briefly explained**, never assume Adnan reads code.
 
@@ -15,7 +17,8 @@ Owner: solo dev (Adnan, Bangladesh, UTC+6). Vibe-coded — Adnan directs AI agen
 ├── src/
 │   ├── App.tsx                       Lazy routes + AppShell wrap
 │   ├── main.tsx                      ThemeProvider → ErrorBoundary → Router → App
-│   ├── data/fixtures.ts              TEMPORARY data layer (FX) — EconDelta swap pending
+│   ├── hooks/                        Per-domain LIVE data hooks (useYields, useLiquidity, useBanking, useAuctions, …)
+│   ├── data/fixtures.ts              Fixture fallback (FX) — backs only the yield curve + a few Demo panels post-swap
 │   ├── theme/
 │   │   ├── themeContext.ts           Palette types, PALETTES, ThemeContext, useTheme hook
 │   │   └── ThemeProvider.tsx         Provider component only (HMR-safe split)
@@ -33,17 +36,19 @@ Owner: solo dev (Adnan, Bangladesh, UTC+6). Vibe-coded — Adnan directs AI agen
 │   └── econdelta-wishlist.md         Catalog of placeholder panels + 4 effort tiers for live data
 ├── public/                           favicon.svg, icons/ (PWA)
 ├── index.html                        Vite entry, `<html class="theme-slate">` default
-├── vite.config.ts                    Base `/YieldScope/`, PWA manifest, vendor-react chunk
+├── vite.config.ts                    Base `/` (custom domain), PWA manifest, vendor-react chunk
+├── public/CNAME                      `yieldscope.clauding-lab.com` (pins the GitHub Pages custom domain)
 ├── package.json                      v3.0.0 — React 19 + Vite 6 + Tailwind 4 + react-router-dom 7
-├── .github/workflows/deploy.yml      Build + push to GitHub Pages
-└── scripts/, .github/workflows/scrape-data.yml, update-app.yml   STALE — left over from v2.0, slated for deletion (deps removed, would fail at runtime)
+└── .github/workflows/deploy.yml      Build + publish to GitHub Pages (the ONLY workflow)
 ```
+
+> The v2.0 `scripts/*.mjs` and the `scrape-data.yml` / `update-app.yml` workflows were **deleted in PR #5** (`ff1926f`). They are gone from the tree — do not expect them.
 
 ## Build, Test, Run
 
 | Goal | Command |
 |---|---|
-| Dev server | `npm run dev` (Vite, http://localhost:5173/YieldScope/) |
+| Dev server | `npm run dev` (Vite, http://localhost:5173/) |
 | Production build | `npm run build` (runs `tsc -b && vite build`) |
 | Lint | `npm run lint` (ESLint, must be green to merge) |
 | Local preview of prod build | `npm run preview` |
@@ -54,13 +59,13 @@ Build gotchas:
 
 - **`tsc -b` runs FIRST in `build`** — TypeScript errors fail the build. Don't push past tsc by skipping it.
 - **Dev server must run in tmux per Adnan's session-hook setup**: `tmux new-session -d -s dev "npm run dev"` and `tmux attach -t dev` to view logs. A plain `npm run dev` background gets blocked by the harness pre-bash hook.
-- **GitHub Pages base path is `/YieldScope/`** — set in BOTH `vite.config.ts` (`base`) and `src/main.tsx` (`BrowserRouter basename`). Changing one without the other breaks routing on the deployed site.
+- **GitHub Pages base path is `/`** (custom domain `yieldscope.clauding-lab.com`). Set in `vite.config.ts` (`base: '/'`) and the PWA manifest (`start_url` / `scope`). `src/main.tsx` derives its `BrowserRouter basename` from `import.meta.env.BASE_URL`, so it auto-follows `base` — don't hardcode it. See landmine 5.
 
 ## Release flow
 
-- Push to `main` → `.github/workflows/deploy.yml` triggers → builds with `npm run build` → publishes `dist/` to GitHub Pages.
+- Push to `main` → `.github/workflows/deploy.yml` triggers → builds with `npm run build` → publishes `dist/` to GitHub Pages (served at `yieldscope.clauding-lab.com` via the `public/CNAME`).
 - No tag-based releases. No semantic versioning enforced beyond `package.json`'s `version` field.
-- The two workflows `scrape-data.yml` and `update-app.yml` are **stale** (depend on v2.0 deps that were removed); they should not run. Slated for deletion in a future cleanup session — requires explicit user sign-off because they're tracked files.
+- `deploy.yml` is the **only** workflow. The v2.0 `scrape-data.yml` / `update-app.yml` were deleted in PR #5.
 
 ## Coding style
 
@@ -82,8 +87,8 @@ Shape rules that govern HOW code/configs/data are named, structured, and wired t
 - **Pages have separate Mobile and Desktop sub-layouts.** A page like `src/pages/Yields.tsx` exports a default that switches on `useIsDesktop()` at `>= 1024px`. Mobile uses tab-style segmented controls; desktop uses multi-column grids. They are intentionally not collapsed into a single responsive component because the IA differs.
 - **Page chrome (header + nav) comes from `AppShell`, not from individual pages.** Mobile gets `<MobileHeader />` + floating `<BottomNav />`. Desktop gets `<DesktopSideNav />` + each page renders its own `<DesktopHeader section="..." breadcrumb="..." />` at the top of its desktop layout.
 - **All charts are hand-rolled SVG.** No `recharts`, no `lightweight-charts`, no `d3-*`. If a chart shape is needed that doesn't exist, add it to `src/components/charts/` as a new `.tsx` file with the same SVG-and-CSS-variables pattern.
-- **Data seam is `src/data/fixtures.ts`.** Pages import `FX` from this single file. The EconDelta swap (planned) replaces this file with hooks. Until then, all data lives in `FX`.
-- **`Demo data` chip pattern (post-EconDelta-swap):** when a panel doesn't have a live source yet, attach `<DemoBadge />` next to the eyebrow label. Don't silently render fixture data as if it were live.
+- **Live data seam is the per-domain hooks** (`src/hooks/use*.ts`) reading Supabase through `src/lib/econdelta.ts` (+ `src/lib/auctions.ts` for the row-shaped auction tables). Pages call these hooks. The EconDelta swap (SHIPPED, PRs #10–#17) replaced the old single-file `FX` seam. `src/data/fixtures.ts` (`FX`) survives only as the fixture fallback (yield curve + Demo panels) — do NOT route new live data through it.
+- **`Demo data` chip pattern:** when a panel has no live source yet (or renders fixture/synthetic data), attach `<DemoBadge />` next to the eyebrow label. Don't silently render fixture data as if it were live. This applies to EVERY mount of a fixture-only component (e.g. `YieldCurve` on Dashboard + Yields) — badge them all, not just one.
 - **Font family is `Geist` (sans) and `Geist Mono` only.** No italics, no serif. The v2.0 design briefly used Instrument Serif italic and was rejected as "unprofessional" — don't reintroduce.
 - **CSS custom properties drive everything visual** — colors, spacing, type — via `src/styles/globals.css`. Don't introduce Tailwind `text-slate-100` style classes for theming; they bypass the palette system.
 
@@ -95,11 +100,11 @@ Numbered, named, and specific enough to keep a fresh AI session from stepping on
 2. **`useMediaQuery` does NOT call `setMatches(mql.matches)` inside `useEffect`.** State is initialized lazily via `useState(() => …)`; the effect only registers the `addEventListener('change', …)` listener. Adding the sync line back triggers `react-hooks/set-state-in-effect` (cascading-renders warning).
 3. **`Donut` uses `reduce` for arc offset accumulation, not `let runningOffset` + `.map()`.** Mutation-in-render fails the `react-hooks/immutability` lint rule. If you add another chart with cumulative offsets, follow the `reduce<{...}>([...], (acc, seg) => …)` pattern.
 4. **Empty `catch {}` blocks fail `no-empty`.** Add a brief comment in every catch: `} catch { /* localStorage unavailable */ }`. Empty catches without comments are a lint failure.
-5. **GitHub Pages base path is `/YieldScope/`** — set in BOTH `vite.config.ts` (`base`) and `src/main.tsx` (`BrowserRouter basename`). Changing one without the other breaks routing on the deployed site. PWA manifest's `start_url` / `scope` also reference this path.
+5. **GitHub Pages base path is `/`** (custom domain `yieldscope.clauding-lab.com`, pinned by `public/CNAME`). Set in `vite.config.ts` (`base: '/'`) and the PWA manifest (`start_url` / `scope`). `src/main.tsx` derives its `BrowserRouter basename` from `import.meta.env.BASE_URL`, so it auto-follows `base` — do NOT hardcode a basename. The dev server serves at **`http://localhost:5173/`** (NOT `/YieldScope/`). Migrated from the old `/YieldScope/` project-pages path in PR #5 — if you see `/YieldScope/` anywhere, it's stale.
 6. **PWA `theme_color` / `background_color` must match the `:root` background of the default palette** (Slate, `#14171C`). Set in `vite.config.ts` PWA manifest AND `index.html` `<meta name="theme-color">`. If you change the default palette, update both.
 7. **No AI / Anthropic SDK in client code (yet).** v2.0 had `dangerouslyAllowBrowser: true` with a hardcoded model ID (`claude-opus-4-6`, which doesn't exist) — every call silently 404'd for 2+ months. v3.0 deliberately drops the SDK. If AI features re-enter scope, do it behind a server-side proxy and centralize the model ID in ONE place.
 8. **No `process.exit(0)` on errors in scripts.** v2.0 scripts swallowed every failure with exit-0, masking errors from CI. Use `process.exit(1)` (or just throw) so failures show as red in GitHub Actions.
-9. **`scripts/*.mjs`, `.github/workflows/scrape-data.yml`, `.github/workflows/update-app.yml` are STALE and DISABLED.** They reference removed deps (`@anthropic-ai/sdk`, `cheerio`) and will fail at runtime. Both workflows were disabled via `gh workflow disable` on 2026-05-28 (they were firing cron commits against `public/data/*.json` files that v3.0 deleted). Files remain in the repo pending explicit user sign-off to delete (tracked files). Don't try to revive them — the work belongs in the EconDelta swap.
+9. **RETIRED (2026-07-09) — the stale v2.0 files are GONE, not just disabled.** `scripts/*.mjs`, `.github/workflows/scrape-data.yml`, and `.github/workflows/update-app.yml` were **deleted in PR #5** (`ff1926f`); only `deploy.yml` remains. This landmine formerly warned not to revive them — there is nothing left to revive. All scraping/data work lives in EconDelta (the swap shipped, PRs #10–#17). Kept as a numbered tombstone so later landmine references don't shift.
 10. **Admin password gates are forbidden.** v2.0 had `const ADMIN_PASSWORD = 'yieldscope2008$'` in `Header.tsx` — visible in View Source, security theater. v3.0 removed Settings entirely. If a settings UI is needed later, do it without any client-side "password" gate.
 11. **Vite plugin order matters: `react()` BEFORE `tailwindcss()` BEFORE `VitePWA()`.** Reordering can break HMR or PWA precaching. The current order in `vite.config.ts` is correct.
 12. **CSS `@import url(...)` for Google Fonts must come BEFORE `@import "tailwindcss"`** in `src/styles/globals.css`. Tailwind 4's import expands into rules, so a later `@import` violates the CSS spec ("@import rules must precede all rules"). The build warns about this; keep the Google Fonts import on line 1.
@@ -156,11 +161,10 @@ query **Context7** for current, version-pinned docs — do NOT rely on training-
 
 Do not, without explicit user sign-off:
 
-- Delete `scripts/*.mjs`, `.github/workflows/scrape-data.yml`, or `.github/workflows/update-app.yml` (they're stale but tracked).
-- Delete or rewrite `.github/workflows/deploy.yml` (production deploy).
+- Delete or rewrite `.github/workflows/deploy.yml` (production deploy — the only workflow left).
 - Add new dependencies to `package.json`.
 - Re-introduce `@anthropic-ai/sdk`, `recharts`, `lightweight-charts`, `html-to-image`, `cheerio`, or `date-fns` (deliberately dropped in v3.0).
-- Change the `/YieldScope/` GitHub Pages base path.
+- Change the `/` base path or the `yieldscope.clauding-lab.com` custom domain (`vite.config.ts` base + PWA manifest + `public/CNAME` move together).
 - Change the default palette away from Slate.
 - Modify the currency symbol convention (`৳`) anywhere in source.
 - Flip the up-is-red / down-is-green convention on yield / inflation / CPI panels.

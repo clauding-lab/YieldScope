@@ -2,7 +2,7 @@
 
 **A banker-grade Bangladesh ALCO Intelligence Platform** — a mobile-first PWA that helps treasury and Asset-Liability Committee (ALCO) teams at Bangladeshi banks read the government-securities curve, money-market liquidity, macro indicators, and fiscal pressure at a glance.
 
-🌐 **Live:** https://clauding-lab.github.io/YieldScope/
+🌐 **Live:** https://yieldscope.clauding-lab.com
 
 ---
 
@@ -35,12 +35,12 @@ Live data comes from **[EconDelta](https://github.com/clauding-lab/econdelta)** 
 
 - **React 19** + **TypeScript 5.7** + **Vite 6**
 - **Tailwind CSS 4** for styling; design system in `src/styles/globals.css`
-- **React Router 7** (hash-free, `/YieldScope/` base path)
+- **React Router 7** (hash-free, `/` base path on the `yieldscope.clauding-lab.com` custom domain)
 - **@supabase/supabase-js 2** for live data
 - **vite-plugin-pwa** — installable, offline-capable PWA
 - **Vitest 2** + Testing Library for the data-hook test suite
 - **No chart library** — all charts are hand-rolled SVG primitives in `src/components/charts/`
-- Typography: **Geist** + **Geist Mono**; four switchable palettes (Slate / Ivory / Linen / Moss) applied via `theme-*` classes on `<html>`
+- Typography: **Geist** + **Geist Mono**; three switchable palettes (Slate / Ivory / Linen) applied via `theme-*` classes on `<html>` (Moss was removed 2026-05-31)
 - Performance target: **≤ 100 kB gzip** total
 
 ## Project structure
@@ -78,7 +78,7 @@ Without `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` in the environment, the a
 
 Pushes to `main` are built and deployed to **GitHub Pages** automatically via `.github/workflows/deploy.yml`. Vite bakes the public `VITE_SUPABASE_URL` and the RLS-scoped `VITE_SUPABASE_ANON_KEY` (from a repo secret) into the static bundle at build time.
 
-The base path `/YieldScope/` is set in three places that must always move together: `vite.config` `base`, the `BrowserRouter` basename, and the PWA manifest `start_url` / `scope`.
+The base path is `/` (custom domain `yieldscope.clauding-lab.com`, pinned by `public/CNAME`). It's set in `vite.config` `base` and the PWA manifest `start_url` / `scope`; the `BrowserRouter` basename derives from `import.meta.env.BASE_URL`, so it follows `base` automatically. (Migrated from the old `/YieldScope/` project-pages path in PR #5.)
 
 ## Governance
 
