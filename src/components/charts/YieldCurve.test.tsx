@@ -24,46 +24,72 @@ beforeEach(() => {
   vi.mocked(isLiveDataAvailable).mockReset()
 })
 
-describe('YieldCurve — live mode (Option A: 11-tenor axis, honest gaps)', () => {
+describe('YieldCurve — live mode (Option B: 7-tenor live axis)', () => {
   beforeEach(() => {
     vi.mocked(isLiveDataAvailable).mockReturnValue(true)
     vi.mocked(useYields).mockReturnValue({ data: LIVE_DATA, loading: false, error: null })
   })
 
-  it('plots exactly the 7 live points (no dot on a gapped tenor)', () => {
+  it('plots exactly the 7 live points', () => {
     const { container } = render(<YieldCurve />)
     expect(container.querySelectorAll('circle')).toHaveLength(7)
   })
 
-  it('keeps all 11 axis labels, including the gapped tenors', () => {
+  it('the axis carries ONLY the 7 live tenors — 7D/14D/28D/15Y are gone entirely', () => {
     const { container } = render(<YieldCurve />)
     const labels = [...container.querySelectorAll('text')].map(t => t.textContent)
-    for (const t of ['7D', '14D', '28D', '91D', '15Y', '20Y']) {
+    for (const t of ['91D', '182D', '364D', '2Y', '5Y', '10Y', '20Y']) {
       expect(labels).toContain(t)
+    }
+    for (const gone of ['7D', '14D', '28D', '15Y']) {
+      expect(labels).not.toContain(gone)
     }
   })
 
-  it('draws the 10Y→20Y span as a dashed bridge, not a solid measured segment', () => {
+  it('full coverage draws 6 solid segments and ZERO bridges', () => {
     const { container } = render(<YieldCurve />)
-    const bridged = container.querySelectorAll('path[data-bridged]')
-    expect(bridged).toHaveLength(1)
-    expect(bridged[0].getAttribute('stroke-dasharray')).toBeTruthy()
-    // 6 segments total: 5 solid + 1 bridged
+    expect(container.querySelectorAll('path[data-bridged]')).toHaveLength(0)
     const allSegs = [...container.querySelectorAll('path')].filter(p => p.getAttribute('stroke') === 'var(--accent)')
     expect(allSegs).toHaveLength(6)
   })
 
-  it('shows the live coverage note with gaps + monthly vintage, and NO Demo badge', () => {
+  it('shows "Live · 91D–20Y" + monthly vintage, no "no print", no Demo badge', () => {
     render(<YieldCurve />)
-    expect(screen.getByText(/Live · 7 of 11 tenors/)).toBeInTheDocument()
-    expect(screen.getByText(/no print: 7D · 14D · 28D · 15Y/)).toBeInTheDocument()
+    expect(screen.getByText(/Live · 91D–20Y/)).toBeInTheDocument()
     expect(screen.getByText(/2Y\/20Y Apr '26/)).toBeInTheDocument()
+    expect(screen.queryByText(/no print/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/7 of 11/)).not.toBeInTheDocument()
     expect(screen.queryByText(/demo data/i)).not.toBeInTheDocument()
   })
 
   it('shows no fixture overlay legend in live mode', () => {
     render(<YieldCurve />)
     expect(screen.queryByText('1 year ago')).not.toBeInTheDocument()
+  })
+})
+
+describe('YieldCurve — live mode with a genuinely missing print (gap honesty survives Option B)', () => {
+  beforeEach(() => {
+    vi.mocked(isLiveDataAvailable).mockReturnValue(true)
+    vi.mocked(useYields).mockReturnValue({
+      data: { ...LIVE_DATA, yields: { ...LIVE_DATA.yields, '5Y': null } },
+      loading: false,
+      error: null,
+    })
+  })
+
+  it('drops the missing print to 6 dots and bridges 2Y→10Y as dashed', () => {
+    const { container } = render(<YieldCurve />)
+    expect(container.querySelectorAll('circle')).toHaveLength(6)
+    const bridged = container.querySelectorAll('path[data-bridged]')
+    expect(bridged).toHaveLength(1)
+    expect(bridged[0].getAttribute('stroke-dasharray')).toBeTruthy()
+  })
+
+  it('the coverage note downgrades to a count and names the gap', () => {
+    render(<YieldCurve />)
+    expect(screen.getByText(/Live · 6 of 7 tenors/)).toBeInTheDocument()
+    expect(screen.getByText(/no print: 5Y/)).toBeInTheDocument()
   })
 })
 
@@ -78,6 +104,14 @@ describe('YieldCurve — fixture mode (no credentials)', () => {
     expect(screen.getByText(/demo data/i)).toBeInTheDocument()
     expect(screen.getByText('1 year ago')).toBeInTheDocument()
     expect(screen.queryByText(/Live · /)).not.toBeInTheDocument()
+  })
+
+  it('keeps its own 11-tenor fixture axis (deliberately independent of the 7-tenor live axis)', () => {
+    const { container } = render(<YieldCurve />)
+    const labels = [...container.querySelectorAll('text')].map(t => t.textContent)
+    for (const t of ['7D', '14D', '28D', '91D', '15Y', '20Y']) {
+      expect(labels).toContain(t)
+    }
   })
 })
 
