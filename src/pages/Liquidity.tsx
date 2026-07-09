@@ -148,7 +148,7 @@ function LiquidityMobile() {
       <div style={{ padding: '0 22px 28px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
           <div className="eyebrow">Policy corridor</div>
-          {(data?.policyRepo == null || data?.policySdf == null || data?.policySlf == null) && <DemoBadge />}
+          {(data?.policyRepo == null || data?.policySdf == null || data?.policySlf == null || data?.corridorCoherent === false) && <DemoBadge />}
         </div>
         <CorridorViz
           callRate={data?.callMoneyRate}
@@ -227,7 +227,7 @@ function LiquidityDesktop() {
       <div style={{ padding: '36px 48px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 22 }}>
           <div className="eyebrow">Policy rate corridor</div>
-          {(data?.policyRepo == null || data?.policySdf == null || data?.policySlf == null) && <DemoBadge />}
+          {(data?.policyRepo == null || data?.policySdf == null || data?.policySlf == null || data?.corridorCoherent === false) && <DemoBadge />}
         </div>
         <CorridorViz
           tall

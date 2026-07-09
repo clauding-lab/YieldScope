@@ -59,6 +59,21 @@ describe('useLiquidity', () => {
     expect(result.current.data!.crrMaintainedPct).toBe(4.9781)
     expect(result.current.data!.slrMaintainedPct).toBe(18.9903)
     expect(result.current.data!.crrAsOf).toBe('2026-06-02')
+    // Real corridor SDF 7.5 < repo 10 < SLF 11.5 is coherent
+    expect(result.current.data!.corridorCoherent).toBe(true)
+  })
+
+  it('flags corridor incoherence when SDF is not below repo', async () => {
+    vi.mocked(fetchLatest).mockImplementation(async (id) => {
+      if (id === 'policy_rate_repo') return { asOf: '2026-07-09', value: 8.0 }
+      if (id === 'policy_rate_sdf')  return { asOf: '2026-07-09', value: 9.0 }  // above repo — misparsed
+      if (id === 'policy_rate_slf')  return { asOf: '2026-07-09', value: 11.5 }
+      return null
+    })
+    vi.mocked(fetchSeries).mockResolvedValue([])
+    const { result } = renderHook(() => useLiquidity())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.data!.corridorCoherent).toBe(false)
   })
 
   it('returns nulls for policy corridor when EconDelta has no rows', async () => {

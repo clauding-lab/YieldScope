@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { fetchLatest, fetchSeries } from '../lib/econdelta'
 import { METRIC } from '../lib/econdelta-metrics'
+import { corridorCoherent } from '../lib/plausibility'
 
 export interface LiquidityData {
   callMoneyRate: number | null
@@ -19,6 +20,7 @@ export interface LiquidityData {
   policyRepo: number | null
   policySdf: number | null
   policySlf: number | null
+  corridorCoherent: boolean  // SDF < repo < SLF; false => a rate is misparsed, badge the corridor
   crrMaintainedPct: number | null  // crr_utilisation_pct — CRR maintained as % of deposits (the ratio, not 0–100 utilisation)
   slrMaintainedPct: number | null  // slr_utilisation_pct — SLR maintained as % of deposits
   crrAsOf: string | null
@@ -73,6 +75,7 @@ export function useLiquidity(): UseLiquidityResult {
             policyRepo: repo?.value ?? null,
             policySdf: sdf?.value ?? null,
             policySlf: slf?.value ?? null,
+            corridorCoherent: corridorCoherent(sdf?.value ?? null, repo?.value ?? null, slf?.value ?? null),
             crrMaintainedPct: crr?.value ?? null,
             slrMaintainedPct: slr?.value ?? null,
             crrAsOf: crr?.asOf ?? null,
