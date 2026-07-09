@@ -37,6 +37,25 @@ When something ships broken, when a methodology gap is exposed, or when a smoke 
 
 ## Entries (most recent first)
 
+## 2026-07-09 — v3.0 | Stale governance docs (AGENTS.md/README) actively misled a review
+
+**Trigger:** The 2026-07-04 ecosystem review was run partly off `AGENTS.md` + `README.md`, which still described a **deleted world**: `AGENTS.md:7` called `src/data/fixtures.ts` "the temporary data layer until the EconDelta swap" (the swap had shipped weeks earlier, PRs #10–#17); landmine 9 defended `scripts/*.mjs` + two workflows that were **deleted in PR #5**; landmine 5 documented the `/YieldScope/` base path (migrated to `/` on the custom domain); the README linked the old GitHub-Pages URL and listed "four palettes … Moss" (Moss removed 2026-05-31). A reviewer taking these at face value would (and did) start from a false premise — e.g. F4's original framing "no consumer reads the auction tables" was wrong (they'd been wired in PR #14); only a cold-reader pass caught it.
+
+**What went wrong:** Docs drifted behind the code. The swap, the base-path migration, the workflow/scripts deletion, and the palette prune all shipped, but the three governance files (the thing a fresh agent reads FIRST, before any code) were never reconciled. Because these files are explicitly the source of truth a new session trusts, their staleness doesn't just fail to help — it injects wrong priors that survive into findings and handoffs.
+
+**Lesson:** Governance docs are load-bearing precisely because agents read them before the code — so a stale landmine is worse than a missing one. When a swap/migration/deletion ships, reconciling AGENTS.md/README/VISION is part of that change's definition of done, not a later cleanup. A landmine that defends deleted files should become a numbered tombstone, not linger as a live warning.
+
+**Prevention:**
+- On any base-path / data-seam / dependency / file-deletion change, grep the governance triad for the old world (`/YieldScope/`, "temporary data layer", the deleted filenames, retired palettes) in the SAME PR.
+- Retire a landmine by rewriting it to a tombstone (keep the number so downstream references don't shift), never by silent deletion.
+- A quick reality check before trusting AGENTS.md: `ls .github/workflows`, `grep base vite.config.ts`, `cat public/CNAME` — cheap, and it catches drift.
+
+**Hotfix:** Branch `fix/f5-docs-reconciliation`: AGENTS.md data-layer status rewritten (swap shipped, anon-RLS live seam), landmine 5 rewritten for `/` + custom domain + `localhost:5173/`, landmine 9 retired to a tombstone, repo-structure + release-flow + out-of-scope lists corrected; README URL/palettes/base-path fixed. Verified against the tree (`base: '/'`, `public/CNAME` = yieldscope.clauding-lab.com, only `deploy.yml` present, no `scripts/`).
+
+**Cross-references:** Handoff F5. AGENTS.md landmines 5, 9. Working principle 10 (show the work — a stale doc is an unverified premise). Related econdelta-side edit is item E3.1 in the econdelta handoff.
+
+---
+
 ## 2026-07-09 — v3.0 | Flagship yield curve was the last unbadged fixture — under a LIVE headline
 
 **Trigger:** 2026-07-04 ecosystem review. On the Dashboard the yield curve rendered under a **live** "Slope 10y–91d" headline with zero DemoBadges; the fixture curve plots 91D ≈ 11% while the live hero tile inches away reads 9.44%. Mobile Yields rendered the same fixture curve unbadged; only *desktop* Yields badged it. Two contradictory numbers for the same instrument, side by side, one implicitly presented as live.
