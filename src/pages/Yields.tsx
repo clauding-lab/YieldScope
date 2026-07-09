@@ -65,10 +65,8 @@ function YieldsCurveTab() {
             </div>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-          <div className="eyebrow">Sovereign yield curve</div>
-          <DemoBadge />
-        </div>
+        {/* Honesty chrome (Demo badge / live coverage note) is rendered by YieldCurve itself. */}
+        <div className="eyebrow" style={{ marginBottom: 10 }}>Sovereign yield curve</div>
         <YieldCurve w={346} h={190} />
       </div>
 
@@ -171,15 +169,19 @@ function YieldsHistoryTab() {
 }
 
 function YieldsAuctionsTab() {
-  const { data: auctions } = useAuctions()
+  const { data: auctions, loading: auctionsLoading, error: auctionsError } = useAuctions()
   // With live credentials we show ONLY real forward-dated auctions (the mapper
   // already filters auction_date >= today) or an honest empty state — never
   // stale fixture dates. The fixture list is the offline/no-key fallback only,
-  // and is unambiguously badged as demo.
+  // and is unambiguously badged as demo. The definitive "No scheduled auctions"
+  // claim may only render on a SUCCESSFUL fetch that returned zero future
+  // auctions — loading renders nothing, a failed fetch renders an error line.
   const liveAvail = isLiveDataAvailable()
   const liveUpcoming = auctions?.upcoming ?? []
   const upcoming = liveAvail ? liveUpcoming : UPCOMING
-  const noScheduled = liveAvail && liveUpcoming.length === 0
+  const noScheduled = liveAvail && !auctionsLoading && auctionsError == null && liveUpcoming.length === 0
+  const upcomingErrored = liveAvail && !auctionsLoading && auctionsError != null
+  const upcomingPending = liveAvail && auctionsLoading
   const recent = auctions?.results?.length ? auctions.results : fixtureToDisplay(FX.auctions)
   const recentLive = !!auctions?.results?.length
   return (
@@ -189,7 +191,12 @@ function YieldsAuctionsTab() {
           <div className="eyebrow">Upcoming auctions</div>
           {!liveAvail && <DemoBadge />}
         </div>
-        {noScheduled ? (
+        {upcomingPending ? null : upcomingErrored ? (
+          <div className="card-flat" style={{ padding: '20px 18px' }}>
+            <div style={{ fontSize: 14, color: 'var(--warn)' }}>Couldn't load the auction calendar</div>
+            <div className="caption" style={{ marginTop: 4 }}>The forward-calendar fetch failed — retry by reloading.</div>
+          </div>
+        ) : noScheduled ? (
           <div className="card-flat" style={{ padding: '20px 18px' }}>
             <div style={{ fontSize: 14, color: 'var(--ink-2)' }}>No scheduled auctions</div>
             <div className="caption" style={{ marginTop: 4 }}>The BB forward calendar has no dated auctions ahead of today.</div>
@@ -348,11 +355,11 @@ function YieldsDesktop() {
       <div style={{ padding: '32px 48px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <div className="eyebrow">Sovereign yield curve</div>
-              <DemoBadge />
-            </div>
-            <h3 className="display" style={{ fontSize: 28, margin: 0 }}>11 tenors · 5 overlays</h3>
+            {/* Honesty chrome (Demo badge / live coverage note) is rendered by YieldCurve itself. */}
+            <div className="eyebrow" style={{ marginBottom: 6 }}>Sovereign yield curve</div>
+            <h3 className="display" style={{ fontSize: 28, margin: 0 }}>
+              {isLiveDataAvailable() ? '11-tenor axis · 7 live' : '11 tenors · 5 overlays'}
+            </h3>
           </div>
         </div>
         <YieldCurve w={1280} h={300} defaultOverlays={['latest', 'weekAgo', 'monthAgo', 'quarterAgo', 'yearAgo']} />

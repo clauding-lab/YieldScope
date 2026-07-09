@@ -1,17 +1,5 @@
 // Shared fixture data — illustrative Bangladesh treasury context.
-// Swap to EconDelta-sourced data in a later phase.
-
-export interface SnapshotRow {
-  code: string
-  label: string
-  value: string
-  unit: string
-  change: number
-  dir: 'up' | 'down' | 'flat'
-  spark: number[]
-  source: string
-  ts: string
-}
+// Post-EconDelta-swap this backs only the no-credentials fallback + Demo panels.
 
 export interface CurveSeries {
   tenors: string[]
@@ -50,8 +38,6 @@ export interface LiquidityFx {
   repo: number
   sdf: number
   slf: number
-  excessKCr: number
-  excessHistKCr: number[]
   m2YoY: number
   m2Hist: number[]
   crrUtil: number
@@ -115,7 +101,6 @@ export interface FxData {
     standingLendFacility: number
   }
   ticker: { code: string; value: string; delta: string; dir: 'up' | 'down' }[]
-  snapshots: SnapshotRow[]
   curve: CurveSeries
   alerts: AlertRow[]
   auctions: AuctionRow[]
@@ -146,17 +131,6 @@ export const FX: FxData = {
     { code: 'USD/BDT', value: '119.62', delta: '+0.04', dir: 'up' },
     { code: 'CPI',     value: '9.20',   delta: '-0.18', dir: 'down' },
     { code: 'FXR',     value: '20.84',  delta: '-0.42', dir: 'down' },
-  ],
-
-  snapshots: [
-    { code: 'YT-091', label: '91D T-Bill',  value: '11.42',  unit: '%',    change: -0.08, dir: 'down', spark: [11.85, 11.78, 11.72, 11.65, 11.58, 11.52, 11.50, 11.42], source: 'BB AUCTION · 26.05', ts: 'T-1' },
-    { code: 'YT-364', label: '364D T-Bill', value: '11.71',  unit: '%',    change:  0.02, dir: 'up',   spark: [11.42, 11.48, 11.55, 11.60, 11.64, 11.69, 11.70, 11.71], source: 'BB AUCTION · 26.05', ts: 'T-1' },
-    { code: 'BG-010', label: '10Y BGTB',    value: '12.18',  unit: '%',    change: -0.02, dir: 'down', spark: [12.04, 12.10, 12.15, 12.18, 12.22, 12.24, 12.20, 12.18], source: 'BB REVALUATION',    ts: 'EOD' },
-    { code: 'CM-OVN', label: 'Call Money',  value: '9.34',   unit: '%',    change:  0.12, dir: 'up',   spark: [8.91, 8.95, 9.04, 9.12, 9.18, 9.22, 9.22, 9.34],         source: 'BB DEALER POLL',    ts: '10:00' },
-    { code: 'EX-LIQ', label: 'Excess Liq.', value: '184.2',  unit: 'KCr',  change: -3.4,  dir: 'down', spark: [212, 208, 201, 197, 192, 188, 187, 184],                source: 'BB MONETARY',       ts: 'EOD' },
-    { code: 'CPI-HD', label: 'CPI Headline',value: '9.20',   unit: '%y',   change: -0.18, dir: 'down', spark: [9.94, 9.86, 9.74, 9.62, 9.58, 9.42, 9.38, 9.20],         source: 'BBS APR',           ts: 'M-1' },
-    { code: 'FX-RES', label: 'FX Reserves', value: '20.84',  unit: 'USDB', change: -0.42, dir: 'down', spark: [22.4, 22.1, 21.8, 21.5, 21.3, 21.1, 21.0, 20.84],        source: 'BB WEEKLY',         ts: 'W-1' },
-    { code: 'USDBDT', label: 'USD/BDT',     value: '119.62', unit: '',     change:  0.04, dir: 'up',   spark: [118.4, 118.8, 119.1, 119.3, 119.4, 119.5, 119.58, 119.62], source: 'BB MID-RATE',     ts: '10:00' },
   ],
 
   curve: {
@@ -190,8 +164,6 @@ export const FX: FxData = {
     repo: 9.00,
     sdf: 6.50,
     slf: 10.50,
-    excessKCr: 184.2,
-    excessHistKCr: [284, 256, 232, 218, 212, 201, 192, 184],
     m2YoY: 8.4,
     m2Hist: [11.2, 10.4, 9.8, 9.2, 8.8, 8.6, 8.5, 8.4],
     crrUtil: 0.92,

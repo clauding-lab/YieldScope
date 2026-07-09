@@ -84,8 +84,14 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
   const pvtCreditYoY = liveData?.pvtCreditYoY ?? null
   const pvtCreditVintage = monthLabel(liveData?.pvtCreditYoYAsOf)
   const cdRatio  = liveData?.cdRatio ?? null
-  const prudential: { lbl: string; v: number | null; max: number; unit: string; live: boolean; vintage?: string | null }[] = [
-    { lbl: 'CAR',  v: crar,   max: 16,  unit: '%', live: true, vintage: crarVintage },
+  const crarStale = liveData?.crarStale ?? false
+  // Provenance qualifier comes from the HOOK, keyed to the specific print's
+  // as_of (#25 review HIGH) — e.g. "BB QFSAR pre-shock" is true of the
+  // Sep-2025 1.56% print only. A newer quarterly print arrives with vintage
+  // alone; hardcoding the string here would attach a false provenance to it.
+  const crarQualifier = liveData?.crarQualifier ?? undefined
+  const prudential: { lbl: string; v: number | null; max: number; unit: string; live: boolean; vintage?: string | null; qualifier?: string; stale?: boolean }[] = [
+    { lbl: 'CAR',  v: crar,   max: 16,  unit: '%', live: true, vintage: crarVintage, qualifier: crarQualifier, stale: crarStale },
     { lbl: 'LCR',  v: B.lcr,  max: 180, unit: '%', live: false },
     { lbl: 'NSFR', v: B.nsfr, max: 140, unit: '%', live: false },
   ]
@@ -106,7 +112,11 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
 
       <div style={{ padding: '0 16px 24px' }}>
         <div className="card-flat">
-          <ListRow label="NPL · industry"          value={nplRatio != null ? `${nplRatio.toFixed(1)}%` : '—'} sub={nplVintage ?? undefined} />
+          <ListRow
+            label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>NPL · industry {nplRatio == null && <DemoBadge />}</span> as ReactNode}
+            value={nplRatio != null ? `${nplRatio.toFixed(1)}%` : '—'}
+            sub={nplVintage ?? undefined}
+          />
           <ListRow
             label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>Pvt sector credit · YoY {pvtCreditYoY == null && <DemoBadge />}</span> as ReactNode}
             value={pvtCreditYoY != null ? `${pvtCreditYoY.toFixed(1)}%` : '—'}
@@ -146,20 +156,27 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
           <div className="eyebrow">Basel-III ratios</div>
         </div>
-        {prudential.map(p => (
-          <div key={p.lbl} style={{ marginBottom: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-              <span className="label" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                {p.lbl}
-                {/* Badge when not-live OR when a live value was gated out (implausible/absent) */}
-                {(!p.live || p.v == null) && <DemoBadge />}
-                {p.vintage && <span className="caption">{p.vintage}</span>}
-              </span>
-              <span className="serif-num" style={{ fontSize: 18 }}>{p.v != null ? `${p.v}${p.unit}` : '—'}</span>
+        {prudential.map(p => {
+          const provenance = p.qualifier && p.v != null
+            ? `${p.qualifier}${p.vintage ? ` · ${p.vintage}` : ''}`
+            : p.vintage ?? null
+          return (
+            <div key={p.lbl} style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                <span className="label" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                  {p.lbl}
+                  {/* Badge when not-live OR when a live value was gated out (data fault/absent) */}
+                  {(!p.live || p.v == null) && <DemoBadge />}
+                  {provenance && <span className="caption">{provenance}</span>}
+                  {p.stale && p.v != null && <span className="chip chip-warn">stale</span>}
+                </span>
+                <span className="serif-num" style={{ fontSize: 18 }}>{p.v != null ? `${p.v}${p.unit}` : '—'}</span>
+              </div>
+              {/* Bar is a 0-based magnitude — skip it for a negative print (possible under the widened CAR band). */}
+              {p.v != null && p.v >= 0 && <Bar value={p.v} max={p.max} h={4} thresholds={[0.2, 0.5]} />}
             </div>
-            {p.v != null && <Bar value={p.v} max={p.max} h={4} thresholds={[0.2, 0.5]} />}
-          </div>
-        ))}
+          )
+        })}
       </div>
 
     </>
@@ -195,7 +212,10 @@ function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
           </div>
         </div>
         <div>
-          <div className="eyebrow" style={{ marginBottom: 8 }}>NPL · industry</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <div className="eyebrow">NPL · industry</div>
+            {nplRatio == null && <DemoBadge />}
+          </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
             <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>{nplRatio != null ? nplRatio.toFixed(1) : '—'}</span>
             <span className="caption">%</span>

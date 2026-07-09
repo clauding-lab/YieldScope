@@ -17,13 +17,26 @@ describe('gateMetric — plausibility band', () => {
     expect(g.implausible).toBe(false)
   })
 
-  it('nulls the fabricated CRAR (1.56%) below the CAR band — never a clean wrong number', () => {
+  it('renders the REAL distress CRAR (1.56%, BB QFSAR pre-shock) — owner decision: never suppress a true figure', () => {
     const g = gateMetric(1.56, '2025-09-30', { band: CAR_BAND, cadence: 'quarterly', now: NOW })
-    expect(g.value).toBeNull()
-    expect(g.implausible).toBe(true)
+    expect(g.value).toBe(1.56)
+    expect(g.implausible).toBe(false)
   })
 
-  it('nulls a value above the band (e.g. a 100x unit error)', () => {
+  it('admits a plausible negative CAR print (BB stress-test trajectory makes one possible)', () => {
+    const g = gateMetric(-5.2, '2026-03-31', { band: CAR_BAND, now: NOW })
+    expect(g.value).toBe(-5.2)
+    expect(g.implausible).toBe(false)
+  })
+
+  it('nulls truly absurd CAR values (unit/parse faults) outside the producer band -50..30', () => {
+    expect(gateMetric(500, '2025-09-30', { band: CAR_BAND, now: NOW }).value).toBeNull()
+    expect(gateMetric(500, '2025-09-30', { band: CAR_BAND, now: NOW }).implausible).toBe(true)
+    expect(gateMetric(-80, '2025-09-30', { band: CAR_BAND, now: NOW }).value).toBeNull()
+    expect(gateMetric(-80, '2025-09-30', { band: CAR_BAND, now: NOW }).implausible).toBe(true)
+  })
+
+  it('nulls a value above the band (e.g. a 10x unit error)', () => {
     const g = gateMetric(156, '2025-09-30', { band: CAR_BAND, now: NOW })
     expect(g.value).toBeNull()
     expect(g.implausible).toBe(true)

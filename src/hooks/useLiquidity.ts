@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { fetchLatest, fetchSeries } from '../lib/econdelta'
 import { METRIC } from '../lib/econdelta-metrics'
-import { corridorCoherent } from '../lib/plausibility'
+import { corridorCoherent, gateMetric, POLICY_RATE_BAND } from '../lib/plausibility'
 
 export interface LiquidityData {
   callMoneyRate: number | null
@@ -62,6 +62,13 @@ export function useLiquidity(): UseLiquidityResult {
         ])
         // M2 YoY now sourced from m2_growth_yoy_monthly (monthly, lagged).
         if (cancelled) return
+        // Band-gate the corridor rates: a uniform scale error (e.g. a
+        // basis-points parse, 1000 for 10.00) passes the ordering check but not
+        // the 0–20% band — out-of-band rates null out (→ DemoBadge), never a
+        // clean wrong number. Coherence is then judged on the gated values.
+        const repoGated = gateMetric(repo?.value, repo?.asOf, { band: POLICY_RATE_BAND }).value
+        const sdfGated  = gateMetric(sdf?.value,  sdf?.asOf,  { band: POLICY_RATE_BAND }).value
+        const slfGated  = gateMetric(slf?.value,  slf?.asOf,  { band: POLICY_RATE_BAND }).value
         setState({
           loading: false, error: null,
           data: {
@@ -72,10 +79,10 @@ export function useLiquidity(): UseLiquidityResult {
             m2YoY: m2?.value ?? null,
             m2YoYAsOf: m2?.asOf ?? null,
             m2Hist: m2Ser.map(p => p.value),
-            policyRepo: repo?.value ?? null,
-            policySdf: sdf?.value ?? null,
-            policySlf: slf?.value ?? null,
-            corridorCoherent: corridorCoherent(sdf?.value ?? null, repo?.value ?? null, slf?.value ?? null),
+            policyRepo: repoGated,
+            policySdf: sdfGated,
+            policySlf: slfGated,
+            corridorCoherent: corridorCoherent(sdfGated, repoGated, slfGated),
             crrMaintainedPct: crr?.value ?? null,
             slrMaintainedPct: slr?.value ?? null,
             crrAsOf: crr?.asOf ?? null,
