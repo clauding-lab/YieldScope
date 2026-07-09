@@ -85,11 +85,13 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
   const pvtCreditVintage = monthLabel(liveData?.pvtCreditYoYAsOf)
   const cdRatio  = liveData?.cdRatio ?? null
   const crarStale = liveData?.crarStale ?? false
+  // Provenance qualifier comes from the HOOK, keyed to the specific print's
+  // as_of (#25 review HIGH) — e.g. "BB QFSAR pre-shock" is true of the
+  // Sep-2025 1.56% print only. A newer quarterly print arrives with vintage
+  // alone; hardcoding the string here would attach a false provenance to it.
+  const crarQualifier = liveData?.crarQualifier ?? undefined
   const prudential: { lbl: string; v: number | null; max: number; unit: string; live: boolean; vintage?: string | null; qualifier?: string; stale?: boolean }[] = [
-    // CAR renders with its provenance qualifier (owner decision 2026-07-09):
-    // 1.56% is BB QFSAR's REAL pre-shock system CAR — the label is what makes
-    // printing a distress figure defensible.
-    { lbl: 'CAR',  v: crar,   max: 16,  unit: '%', live: true, vintage: crarVintage, qualifier: 'BB QFSAR pre-shock', stale: crarStale },
+    { lbl: 'CAR',  v: crar,   max: 16,  unit: '%', live: true, vintage: crarVintage, qualifier: crarQualifier, stale: crarStale },
     { lbl: 'LCR',  v: B.lcr,  max: 180, unit: '%', live: false },
     { lbl: 'NSFR', v: B.nsfr, max: 140, unit: '%', live: false },
   ]

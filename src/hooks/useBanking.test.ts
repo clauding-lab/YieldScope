@@ -63,9 +63,28 @@ describe('useBanking', () => {
     expect(result.current.data!.crarImplausible).toBe(false)
     expect(result.current.data!.crarVintage).toBe("Sep '25")
     expect(result.current.data!.crarStale).toBe(true)
+    // The qualifier is keyed to THIS print's as_of (2025-09-30) — the one
+    // date the "BB QFSAR pre-shock" claim was verified against.
+    expect(result.current.data!.crarQualifier).toBe('BB QFSAR pre-shock')
     // NPL 32.26 passes the wide band and carries its quarterly vintage
     expect(result.current.data!.nplRatio).toBe(32.26)
     expect(result.current.data!.nplVintage).toBe("Mar '26")
+  })
+
+  it('does NOT attach the pre-shock qualifier to a NEWER quarterly print (false-provenance guard)', async () => {
+    vi.mocked(fetchLatest).mockImplementation(async (id) => {
+      // The next quarter arrives via a routine data refresh: an ordinary value,
+      // inside the wide band. It must render with vintage ONLY — inheriting
+      // "BB QFSAR pre-shock" would be a false claim about a print nobody verified.
+      if (id === 'banking_sector_crar') return { asOf: '2025-12-31', value: 9.8 }
+      return null
+    })
+    vi.mocked(fetchSeries).mockResolvedValue([])
+    const { result } = renderHook(() => useBanking())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.data!.crar).toBe(9.8)
+    expect(result.current.data!.crarQualifier).toBeNull()
+    expect(result.current.data!.crarVintage).toBe("Dec '25")
   })
 
   it('nulls a truly absurd CRAR (unit/parse fault, e.g. 500) — a data fault never renders clean', async () => {

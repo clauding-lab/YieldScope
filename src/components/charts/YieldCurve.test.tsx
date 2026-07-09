@@ -94,7 +94,7 @@ describe('YieldCurve — skeleton (credentials present, fetch pending)', () => {
 })
 
 describe('YieldCurve — DB-empty fallback (credentials present, fetch settled, <2 live tenors)', () => {
-  it('falls back to the badged fixture curve', () => {
+  it('falls back to the badged fixture curve WITHOUT the fetch-error note (settled emptiness is not an error)', () => {
     vi.mocked(isLiveDataAvailable).mockReturnValue(true)
     vi.mocked(useYields).mockReturnValue({
       data: { ...LIVE_DATA, yields: { '91D': null, '182D': null, '364D': null, '2Y': null, '5Y': null, '10Y': null, '20Y': null } },
@@ -103,5 +103,24 @@ describe('YieldCurve — DB-empty fallback (credentials present, fetch settled, 
     })
     render(<YieldCurve />)
     expect(screen.getByText(/demo data/i)).toBeInTheDocument()
+    expect(screen.queryByText(/live fetch failed/i)).not.toBeInTheDocument()
+  })
+})
+
+describe('YieldCurve — fetch error (credentials present, fetch rejected)', () => {
+  it('badges the fixture AND says the live fetch failed — error is not presented as settled emptiness', () => {
+    vi.mocked(isLiveDataAvailable).mockReturnValue(true)
+    vi.mocked(useYields).mockReturnValue({ data: null, loading: false, error: new Error('network') })
+    render(<YieldCurve />)
+    expect(screen.getByText('Demo data')).toBeInTheDocument() // exact chip text (the error note also contains "demo data")
+    expect(screen.getByText(/live fetch failed — showing demo data/i)).toBeInTheDocument()
+  })
+
+  it('no-credentials fixture mode does NOT show the fetch-error note', () => {
+    vi.mocked(isLiveDataAvailable).mockReturnValue(false)
+    vi.mocked(useYields).mockReturnValue({ data: null, loading: false, error: null })
+    render(<YieldCurve />)
+    expect(screen.getByText(/demo data/i)).toBeInTheDocument()
+    expect(screen.queryByText(/live fetch failed/i)).not.toBeInTheDocument()
   })
 })

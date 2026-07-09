@@ -50,7 +50,7 @@ const SERIES: SeriesDef[] = [
  */
 export function YieldCurve({ w = 480, h = 240, showLegend = true, defaultOverlays = ['latest', 'weekAgo', 'yearAgo'] }: YieldCurveProps) {
   const liveAvail = isLiveDataAvailable()
-  const { data, loading } = useYields()
+  const { data, loading, error } = useYields()
   const [scrubIdx, setScrubIdx] = useState<number | null>(null)
   const [active, setActive] = useState<OverlayKey[]>(defaultOverlays)
 
@@ -104,11 +104,21 @@ export function YieldCurve({ w = 480, h = 240, showLegend = true, defaultOverlay
 
   const scrubLive = scrubIdx != null && mode === 'live' ? scrubValueAt(points, scrubIdx) : null
 
+  // Honest error note (#25 review MEDIUM, narrow wire): with credentials, a
+  // rejected fetch lands in fixture mode — say so, don't let the badged demo
+  // read as "settled, DB simply empty". (PostgREST-level errors are still
+  // swallowed to null/[] by the shared econdelta fetchers — the throw-through
+  // fix, mirroring lib/auctions.ts, is a known fast-follow outside this PR.)
+  const fetchErrored = liveAvail && !loading && error != null
+
   return (
     <div>
       {mode === 'fixture' && (
-        <div style={{ marginBottom: 8 }}>
+        <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           <DemoBadge />
+          {fetchErrored && (
+            <span className="caption" style={{ color: 'var(--warn)' }}>Live fetch failed — showing demo data</span>
+          )}
         </div>
       )}
       <svg
