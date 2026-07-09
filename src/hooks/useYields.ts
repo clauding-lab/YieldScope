@@ -8,6 +8,9 @@ export type TenorKey = '91D' | '182D' | '364D' | '2Y' | '5Y' | '10Y' | '20Y'
 export interface YieldsData {
   yields: Record<TenorKey, number | null>
   series: Record<TenorKey, number[]>
+  // Per-tenor as_of (landmine 21): 2Y/20Y are lagged MONTHLY prints whose
+  // vintage differs from the daily anchor — consumers must not date them "today".
+  tenorAsOf: Record<TenorKey, string | null>
   spread10Y_91D_bps: number | null
   asOf: string | null
 }
@@ -69,6 +72,10 @@ export function useYields(): UseYieldsResult {
               '5Y':   s5y.map(p => p.value),
               '10Y':  s10y.map(p => p.value),
               '20Y':  s20y.map(p => p.value),
+            },
+            tenorAsOf: {
+              '91D': y91?.asOf ?? null, '182D': y182?.asOf ?? null, '364D': y364?.asOf ?? null,
+              '2Y': y2y?.asOf ?? null, '5Y': y5y?.asOf ?? null, '10Y': y10y?.asOf ?? null, '20Y': y20y?.asOf ?? null,
             },
             spread10Y_91D_bps: spreadBps(v10y, v91),
             asOf: y91?.asOf ?? y10y?.asOf ?? null,

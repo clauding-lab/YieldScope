@@ -43,6 +43,11 @@ describe('useYields', () => {
     expect(d.yields['10Y']).toBe(12.18)
     expect(d.yields['20Y']).toBe(11.23)
     expect(d.spread10Y_91D_bps).toBe(76) // (12.18 - 11.42) * 100 = 76 bps
+    // Per-tenor vintages (landmine 21): the monthly 2Y/20Y carry their OWN
+    // as_of, distinct from the daily anchor — the live curve labels them.
+    expect(d.tenorAsOf['2Y']).toBe('2026-03-01')
+    expect(d.tenorAsOf['20Y']).toBe('2026-03-01')
+    expect(d.tenorAsOf['91D']).toBe('2026-05-26')
   })
 
   it('returns null spread when either end is missing', async () => {

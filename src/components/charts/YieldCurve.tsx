@@ -1,5 +1,17 @@
 import { useState, type MouseEvent, type TouchEvent } from 'react'
 import { FX } from '../../data/fixtures'
+import { useYields } from '../../hooks/useYields'
+import { isLiveDataAvailable } from '../../lib/econdelta'
+import { monthLabel } from '../../lib/dates'
+import { DemoBadge } from '../primitives/DemoBadge'
+import {
+  CURVE_AXIS,
+  MIN_LIVE_POINTS,
+  liveCurvePoints,
+  liveCurveSegments,
+  scrubValueAt,
+  gapTenors,
+} from '../../lib/curveLive'
 
 type OverlayKey = 'yearAgo' | 'quarterAgo' | 'monthAgo' | 'weekAgo' | 'latest'
 
@@ -25,21 +37,62 @@ const SERIES: SeriesDef[] = [
   { key: 'latest',     label: 'Today',      color: 'var(--accent)' },
 ]
 
+/**
+ * Sovereign yield curve. Option A (Adnan, 2026-07-09): the axis keeps all 11
+ * tenors. With live credentials the curve plots the 7 EconDelta tenors from
+ * metric_history; 7D/14D/28D/15Y stay as labelled gaps and any span across
+ * them draws as a dashed bridge — never presented as measured data
+ * (landmines 15/18). The scrub readout on a gapped tenor shows "— no live
+ * print", never a fabricated value. The fixture curve (with its 5 overlays)
+ * renders ONLY in no-credentials builds, self-badged with `Demo data`. The
+ * component owns its own honesty chrome so every mount (Dashboard
+ * mobile/desktop, Yields mobile/desktop) stays consistent — the F3 lesson.
+ */
 export function YieldCurve({ w = 480, h = 240, showLegend = true, defaultOverlays = ['latest', 'weekAgo', 'yearAgo'] }: YieldCurveProps) {
-  const tenors = FX.curve.tenors
+  const liveAvail = isLiveDataAvailable()
+  const { data, loading } = useYields()
   const [scrubIdx, setScrubIdx] = useState<number | null>(null)
   const [active, setActive] = useState<OverlayKey[]>(defaultOverlays)
 
+  const points = liveCurvePoints(CURVE_AXIS, data?.yields ?? null)
+  // live: enough real points · skeleton: creds present, fetch not settled ·
+  // fixture: no creds (or a settled fetch with <2 live tenors — DB empty).
+  const mode: 'live' | 'skeleton' | 'fixture' = liveAvail
+    ? (loading ? 'skeleton' : points.length >= MIN_LIVE_POINTS ? 'live' : 'fixture')
+    : 'fixture'
+
+  const tenors: readonly string[] = mode === 'fixture' ? FX.curve.tenors : CURVE_AXIS
   const series = SERIES.filter(s => active.includes(s.key))
 
   const padL = 38, padR = 16, padT = 14, padB = 30
-  const allY = series.flatMap(s => FX.curve[s.key])
-  const minY = Math.min(...allY)
-  const maxY = Math.max(...allY)
+  let minY: number, maxY: number
+  if (mode === 'live') {
+    const vals = points.map(p => p.value)
+    minY = Math.min(...vals) - 0.25
+    maxY = Math.max(...vals) + 0.25
+  } else if (mode === 'fixture') {
+    const allY = series.flatMap(s => FX.curve[s.key])
+    minY = Math.min(...allY)
+    maxY = Math.max(...allY)
+  } else {
+    // Skeleton: neutral scaffold range; y-value labels are suppressed below.
+    minY = 8
+    maxY = 12
+  }
   const range = maxY - minY || 1
   const dx = (w - padL - padR) / (tenors.length - 1)
   const xFor = (i: number) => padL + i * dx
   const yFor = (v: number) => padT + (1 - (v - minY) / range) * (h - padT - padB)
+
+  const liveTenorSet = new Set(points.map(p => p.tenor))
+  const segments = mode === 'live' ? liveCurveSegments(points) : []
+
+  // Compact vintage note for the lagged monthly rungs (2Y/20Y — landmine 21).
+  const v2y = monthLabel(data?.tenorAsOf?.['2Y'])
+  const v20y = monthLabel(data?.tenorAsOf?.['20Y'])
+  const monthlyVintage = v2y && v20y
+    ? (v2y === v20y ? `2Y/20Y ${v2y}` : `2Y ${v2y} · 20Y ${v20y}`)
+    : v2y ? `2Y ${v2y}` : v20y ? `20Y ${v20y}` : null
 
   function handleMove(e: MouseEvent<SVGSVGElement> | TouchEvent<SVGSVGElement>) {
     const rect = (e.currentTarget as SVGSVGElement).getBoundingClientRect()
@@ -49,8 +102,15 @@ export function YieldCurve({ w = 480, h = 240, showLegend = true, defaultOverlay
     if (idx >= 0 && idx < tenors.length) setScrubIdx(idx)
   }
 
+  const scrubLive = scrubIdx != null && mode === 'live' ? scrubValueAt(points, scrubIdx) : null
+
   return (
     <div>
+      {mode === 'fixture' && (
+        <div style={{ marginBottom: 8 }}>
+          <DemoBadge />
+        </div>
+      )}
       <svg
         width="100%"
         viewBox={`0 0 ${w} ${h}`}
@@ -66,18 +126,32 @@ export function YieldCurve({ w = 480, h = 240, showLegend = true, defaultOverlay
           return (
             <g key={t}>
               <line x1={padL} x2={w - padR} y1={y} y2={y} stroke="var(--line)" />
-              <text x={padL - 8} y={y + 4} textAnchor="end" fontSize="10" fill="var(--ink-3)" fontFamily="var(--sans)">
-                {v.toFixed(1)}
-              </text>
+              {mode !== 'skeleton' && (
+                <text x={padL - 8} y={y + 4} textAnchor="end" fontSize="10" fill="var(--ink-3)" fontFamily="var(--sans)">
+                  {v.toFixed(1)}
+                </text>
+              )}
             </g>
           )
         })}
-        {tenors.map((t, i) => (
-          <text key={t} x={xFor(i)} y={h - 10} textAnchor="middle" fontSize="10" fill="var(--ink-3)" fontFamily="var(--sans)">
-            {t}
-          </text>
-        ))}
-        {series.map(s => {
+        {tenors.map((t, i) => {
+          const gapped = mode === 'live' && !liveTenorSet.has(t)
+          return (
+            <text
+              key={t}
+              x={xFor(i)}
+              y={h - 10}
+              textAnchor="middle"
+              fontSize="10"
+              fill="var(--ink-3)"
+              fontFamily="var(--sans)"
+              opacity={gapped ? 0.45 : 1}
+            >
+              {t}
+            </text>
+          )
+        })}
+        {mode === 'fixture' && series.map(s => {
           const path = FX.curve[s.key].map((v, i) => `${i === 0 ? 'M' : 'L'}${xFor(i)},${yFor(v)}`).join(' ')
           const isLatest = s.key === 'latest'
           return (
@@ -92,13 +166,29 @@ export function YieldCurve({ w = 480, h = 240, showLegend = true, defaultOverlay
             />
           )
         })}
-        {active.includes('latest') && FX.curve.latest.map((v, i) => (
+        {mode === 'fixture' && active.includes('latest') && FX.curve.latest.map((v, i) => (
           <circle key={i} cx={xFor(i)} cy={yFor(v)} r="2.5" fill="var(--accent)" />
         ))}
-        {scrubIdx != null && (
+        {mode === 'live' && segments.map(seg => (
+          <path
+            key={`${seg.from.tenor}-${seg.to.tenor}`}
+            d={`M${xFor(seg.from.index)},${yFor(seg.from.value)} L${xFor(seg.to.index)},${yFor(seg.to.value)}`}
+            fill="none"
+            stroke="var(--accent)"
+            strokeWidth={seg.bridged ? 1.4 : 1.8}
+            strokeDasharray={seg.bridged ? '3 4' : undefined}
+            opacity={seg.bridged ? 0.65 : 1}
+            strokeLinecap="round"
+            data-bridged={seg.bridged || undefined}
+          />
+        ))}
+        {mode === 'live' && points.map(p => (
+          <circle key={p.tenor} cx={xFor(p.index)} cy={yFor(p.value)} r="2.5" fill="var(--accent)" />
+        ))}
+        {scrubIdx != null && mode !== 'skeleton' && (
           <g>
             <line x1={xFor(scrubIdx)} x2={xFor(scrubIdx)} y1={padT} y2={h - padB} stroke="var(--ink-3)" strokeDasharray="2 3" />
-            {series.map(s => (
+            {mode === 'fixture' && series.map(s => (
               <circle
                 key={s.key}
                 cx={xFor(scrubIdx)}
@@ -109,10 +199,22 @@ export function YieldCurve({ w = 480, h = 240, showLegend = true, defaultOverlay
                 strokeWidth="1.5"
               />
             ))}
+            {mode === 'live' && scrubLive != null && (
+              <circle cx={xFor(scrubIdx)} cy={yFor(scrubLive)} r="4" fill="var(--paper)" stroke="var(--accent)" strokeWidth="1.5" />
+            )}
           </g>
         )}
       </svg>
-      {scrubIdx != null ? (
+      {scrubIdx != null && mode === 'live' ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, paddingTop: 14, fontSize: 13 }}>
+          <span style={{ fontSize: 18, color: 'var(--accent)' }}>{tenors[scrubIdx]}</span>
+          {scrubLive != null ? (
+            <span className="num" style={{ color: 'var(--accent)', fontWeight: 500 }}>{scrubLive.toFixed(2)}</span>
+          ) : (
+            <span className="caption">— no live print</span>
+          )}
+        </div>
+      ) : scrubIdx != null && mode === 'fixture' ? (
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, paddingTop: 14, fontSize: 13 }}>
           <span style={{ fontSize: 18, color: 'var(--accent)' }}>{tenors[scrubIdx]}</span>
           {series.map(s => (
@@ -124,7 +226,13 @@ export function YieldCurve({ w = 480, h = 240, showLegend = true, defaultOverlay
             </span>
           ))}
         </div>
-      ) : showLegend && (
+      ) : mode === 'live' ? (
+        <div className="caption" style={{ paddingTop: 14 }}>
+          Live · {points.length} of {tenors.length} tenors
+          {gapTenors(CURVE_AXIS, points).length > 0 && ` · no print: ${gapTenors(CURVE_AXIS, points).join(' · ')}`}
+          {monthlyVintage && ` · ${monthlyVintage}`}
+        </div>
+      ) : mode === 'fixture' && showLegend ? (
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, paddingTop: 14, flexWrap: 'wrap' }}>
           {SERIES.map(s => {
             const isOn = active.includes(s.key)
@@ -161,7 +269,7 @@ export function YieldCurve({ w = 480, h = 240, showLegend = true, defaultOverlay
             )
           })}
         </div>
-      )}
+      ) : null}
     </div>
   )
 }
