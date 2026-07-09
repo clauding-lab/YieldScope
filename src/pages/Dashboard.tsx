@@ -43,6 +43,25 @@ function sevFromAnomaly(s: 'up' | 'down' | 'warn'): 'warn' | 'neg' | 'pos' {
   return s === 'up' ? 'neg' : s === 'down' ? 'pos' : 'warn'
 }
 
+// Provenance line for briefing-sourced content (hero title + "what's moving").
+// Lifted from Intelligence.tsx's `staleNote` so the weekly-snapshot figures on
+// the Dashboard aren't read as same-moment truth beside the live tiles.
+interface BriefingDisclosureProps {
+  weekOf: string
+  dataAsOf: string
+  staleCount: number
+}
+
+function BriefingDisclosure({ weekOf, dataAsOf, staleCount }: BriefingDisclosureProps) {
+  return (
+    <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+      <span className="label" style={{ color: 'var(--ink-3)' }}>From this week's briefing</span>
+      <span className="caption">{weekOf} · data as of {dataAsOf}</span>
+      {staleCount > 0 && <span className="chip chip-warn">{staleCount} series stale</span>}
+    </div>
+  )
+}
+
 function DashboardMobile() {
   const { data } = useDashboard()
   const { briefings } = useBriefing()
@@ -79,6 +98,9 @@ function DashboardMobile() {
         >
           {brief ? brief.title : HERO_LINE}
         </p>
+        {brief && (
+          <BriefingDisclosure weekOf={brief.weekOf} dataAsOf={brief.dataAsOf} staleCount={brief.staleSeries.length} />
+        )}
       </div>
 
       <div style={{ padding: '0 16px' }}>
@@ -222,6 +244,9 @@ function DashboardDesktop() {
         >
           {brief ? brief.title : HERO_LINE}
         </p>
+        {brief && (
+          <BriefingDisclosure weekOf={brief.weekOf} dataAsOf={brief.dataAsOf} staleCount={brief.staleSeries.length} />
+        )}
       </div>
 
       <div
