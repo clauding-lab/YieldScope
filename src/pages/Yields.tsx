@@ -7,6 +7,7 @@ import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useYields, type TenorKey } from '../hooks/useYields'
 import { useAuctions } from '../hooks/useAuctions'
 import { fixtureToDisplay } from '../lib/auctions'
+import { isLiveDataAvailable } from '../lib/econdelta'
 import { spreadBps, roundTo } from '../lib/yieldMath'
 
 type YieldsTab = 'curve' | 'series' | 'auctions'
@@ -171,8 +172,14 @@ function YieldsHistoryTab() {
 
 function YieldsAuctionsTab() {
   const { data: auctions } = useAuctions()
-  const upcoming = auctions?.upcoming?.length ? auctions.upcoming : UPCOMING
-  const upcomingLive = !!auctions?.upcoming?.length
+  // With live credentials we show ONLY real forward-dated auctions (the mapper
+  // already filters auction_date >= today) or an honest empty state — never
+  // stale fixture dates. The fixture list is the offline/no-key fallback only,
+  // and is unambiguously badged as demo.
+  const liveAvail = isLiveDataAvailable()
+  const liveUpcoming = auctions?.upcoming ?? []
+  const upcoming = liveAvail ? liveUpcoming : UPCOMING
+  const noScheduled = liveAvail && liveUpcoming.length === 0
   const recent = auctions?.results?.length ? auctions.results : fixtureToDisplay(FX.auctions)
   const recentLive = !!auctions?.results?.length
   return (
@@ -180,32 +187,39 @@ function YieldsAuctionsTab() {
       <div style={{ padding: '0 22px 18px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <div className="eyebrow">Upcoming auctions</div>
-          {!upcomingLive && <DemoBadge />}
+          {!liveAvail && <DemoBadge />}
         </div>
-        <div className="card-flat">
-          {upcoming.map((a, i, arr) => (
-            <div
-              key={i}
-              style={{
-                padding: '14px 18px',
-                borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none',
-                display: 'grid',
-                gridTemplateColumns: '70px 1fr auto',
-                gap: 14,
-                alignItems: 'center',
-              }}
-            >
-              <div>
-                <div className="serif-num" style={{ fontSize: 20 }}>{a.date}</div>
-                <div className="caption">{a.day}</div>
+        {noScheduled ? (
+          <div className="card-flat" style={{ padding: '20px 18px' }}>
+            <div style={{ fontSize: 14, color: 'var(--ink-2)' }}>No scheduled auctions</div>
+            <div className="caption" style={{ marginTop: 4 }}>The BB forward calendar has no dated auctions ahead of today.</div>
+          </div>
+        ) : (
+          <div className="card-flat">
+            {upcoming.map((a, i, arr) => (
+              <div
+                key={i}
+                style={{
+                  padding: '14px 18px',
+                  borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none',
+                  display: 'grid',
+                  gridTemplateColumns: '70px 1fr auto',
+                  gap: 14,
+                  alignItems: 'center',
+                }}
+              >
+                <div>
+                  <div className="serif-num" style={{ fontSize: 20 }}>{a.date}</div>
+                  <div className="caption">{a.day}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, color: 'var(--ink)' }}>{a.tenor}</div>
+                  <div className="caption" style={{ marginTop: 2 }}>Notional {a.size}</div>
+                </div>
               </div>
-              <div>
-                <div style={{ fontSize: 13, color: 'var(--ink)' }}>{a.tenor}</div>
-                <div className="caption" style={{ marginTop: 2 }}>Notional {a.size}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div style={{ padding: '20px 22px 24px' }}>

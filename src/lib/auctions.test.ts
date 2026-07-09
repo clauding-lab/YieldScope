@@ -86,4 +86,12 @@ describe('toUpcomingAuctions', () => {
     const up = toUpcomingAuctions(cal, now, 4)
     expect(up.some(u => u.date === '30 May')).toBe(false)
   })
+
+  it('returns an empty list when every calendar date is in the past (drives the honest empty state, not stale fixture dates)', () => {
+    const allPast: AuctionCalendarEntry[] = [
+      { date: '2026-06-01', tenor: '91D', notionalCr: 4000 },
+      { date: '2026-06-09', tenor: '5Y', notionalCr: 3500 },
+    ]
+    expect(toUpcomingAuctions(allPast, new Date('2026-07-09T00:00:00Z'), 4)).toEqual([])
+  })
 })
