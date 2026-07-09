@@ -28,10 +28,12 @@ const SAMPLE = {
 }
 
 describe('useBriefing', () => {
-  it('starts in loading state', () => {
+  it('starts in loading state', async () => {
     vi.mocked(fetchRecentBriefings).mockResolvedValue([])
     const { result } = renderHook(() => useBriefing())
     expect(result.current.loading).toBe(true)
+    // Settle the pending async effect inside act() to avoid an update-after-test warning.
+    await waitFor(() => expect(result.current.loading).toBe(false))
   })
 
   it('maps briefings (newest first) from EconDelta', async () => {

@@ -86,11 +86,13 @@ describe('useLiquidity', () => {
     expect(result.current.data!.policySlf).toBeNull()
   })
 
-  it('starts in loading state', () => {
+  it('starts in loading state', async () => {
     vi.mocked(fetchLatest).mockResolvedValue(null)
     vi.mocked(fetchSeries).mockResolvedValue([])
     const { result } = renderHook(() => useLiquidity())
     expect(result.current.loading).toBe(true)
+    // Settle the pending async effect inside act() to avoid an update-after-test warning.
+    await waitFor(() => expect(result.current.loading).toBe(false))
   })
 
   it('captures error', async () => {

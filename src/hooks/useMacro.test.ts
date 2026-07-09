@@ -19,12 +19,14 @@ beforeEach(() => {
 })
 
 describe('useMacro', () => {
-  it('starts in loading state', () => {
+  it('starts in loading state', async () => {
     mockFetchLatest.mockResolvedValue({ asOf: '2026-04-01', value: 9.2 })
     mockFetchSeries.mockResolvedValue([])
     const { result } = renderHook(() => useMacro())
     expect(result.current.loading).toBe(true)
     expect(result.current.data).toBeNull()
+    // Settle the pending async effect inside act() to avoid an update-after-test warning.
+    await waitFor(() => expect(result.current.loading).toBe(false))
   })
 
   it('resolves with mapped data', async () => {
