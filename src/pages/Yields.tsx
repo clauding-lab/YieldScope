@@ -64,6 +64,10 @@ function YieldsCurveTab() {
             </div>
           </div>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          <div className="eyebrow">Sovereign yield curve</div>
+          <DemoBadge />
+        </div>
         <YieldCurve w={346} h={190} />
       </div>
 

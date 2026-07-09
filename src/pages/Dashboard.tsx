@@ -110,7 +110,9 @@ function DashboardMobile() {
 
       <div style={{ padding: '32px 22px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div className="eyebrow">Yield curve</div>
+          <div className="eyebrow" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            Yield curve <DemoBadge />
+          </div>
           <span className="caption">
             Slope 10y – 91d ·{' '}
             <span className="num" style={{ color: 'var(--accent)' }}>
@@ -257,7 +259,9 @@ function DashboardDesktop() {
         <div>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 18 }}>
             <div>
-              <div className="eyebrow" style={{ marginBottom: 6 }}>Sovereign curve</div>
+              <div className="eyebrow" style={{ marginBottom: 6, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                Sovereign curve <DemoBadge />
+              </div>
               <h3 className="display" style={{ fontSize: 26, margin: 0 }}>
                 {data?.spread10Y_91D_bps != null ? `+${data.spread10Y_91D_bps} bps` : '—'}
               </h3>

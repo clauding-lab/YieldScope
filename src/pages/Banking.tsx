@@ -78,12 +78,14 @@ function severityColor(sev: 'neg' | 'warn' | 'pos') {
 function BankingMobile({ liveData }: { liveData: BankingData | null }) {
   const B = FX.banking
   const nplRatio = liveData?.nplRatio ?? null
-  const crar     = liveData?.crar     ?? null
+  const nplVintage = liveData?.nplVintage ?? null
+  const crar     = liveData?.crar     ?? null  // plausibility-gated: null when fabricated/absent
+  const crarVintage = liveData?.crarVintage ?? null
   const pvtCreditYoY = liveData?.pvtCreditYoY ?? null
   const pvtCreditVintage = monthLabel(liveData?.pvtCreditYoYAsOf)
   const cdRatio  = liveData?.cdRatio ?? null
-  const prudential: { lbl: string; v: number | null; max: number; unit: string; live: boolean }[] = [
-    { lbl: 'CAR',  v: crar,   max: 16,  unit: '%', live: true  },
+  const prudential: { lbl: string; v: number | null; max: number; unit: string; live: boolean; vintage?: string | null }[] = [
+    { lbl: 'CAR',  v: crar,   max: 16,  unit: '%', live: true, vintage: crarVintage },
     { lbl: 'LCR',  v: B.lcr,  max: 180, unit: '%', live: false },
     { lbl: 'NSFR', v: B.nsfr, max: 140, unit: '%', live: false },
   ]
@@ -104,7 +106,7 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
 
       <div style={{ padding: '0 16px 24px' }}>
         <div className="card-flat">
-          <ListRow label="NPL · industry"          value={nplRatio != null ? `${nplRatio.toFixed(1)}%` : '—'} />
+          <ListRow label="NPL · industry"          value={nplRatio != null ? `${nplRatio.toFixed(1)}%` : '—'} sub={nplVintage ?? undefined} />
           <ListRow
             label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>Pvt sector credit · YoY {pvtCreditYoY == null && <DemoBadge />}</span> as ReactNode}
             value={pvtCreditYoY != null ? `${pvtCreditYoY.toFixed(1)}%` : '—'}
@@ -149,7 +151,9 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
               <span className="label" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                 {p.lbl}
-                {!p.live && <DemoBadge />}
+                {/* Badge when not-live OR when a live value was gated out (implausible/absent) */}
+                {(!p.live || p.v == null) && <DemoBadge />}
+                {p.vintage && <span className="caption">{p.vintage}</span>}
               </span>
               <span className="serif-num" style={{ fontSize: 18 }}>{p.v != null ? `${p.v}${p.unit}` : '—'}</span>
             </div>
@@ -165,6 +169,7 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
 function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
   const B = FX.banking
   const nplRatio = liveData?.nplRatio ?? null
+  const nplVintage = liveData?.nplVintage ?? null
   const nplHist  = liveData?.nplHist?.length ? liveData.nplHist : null
   const cdRatio  = liveData?.cdRatio ?? null
   return (
@@ -195,6 +200,7 @@ function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
             <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>{nplRatio != null ? nplRatio.toFixed(1) : '—'}</span>
             <span className="caption">%</span>
           </div>
+          {nplVintage && <div className="caption" style={{ marginTop: 4 }}>{nplVintage}</div>}
           {nplHist && (
             <div style={{ marginTop: 18 }}>
               <AreaChart data={nplHist} w={400} h={100} color="var(--neg)" />

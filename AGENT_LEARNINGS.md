@@ -37,6 +37,24 @@ When something ships broken, when a methodology gap is exposed, or when a smoke 
 
 ## Entries (most recent first)
 
+## 2026-07-09 — v3.0 | Flagship yield curve was the last unbadged fixture — under a LIVE headline
+
+**Trigger:** 2026-07-04 ecosystem review. On the Dashboard the yield curve rendered under a **live** "Slope 10y–91d" headline with zero DemoBadges; the fixture curve plots 91D ≈ 11% while the live hero tile inches away reads 9.44%. Mobile Yields rendered the same fixture curve unbadged; only *desktop* Yields badged it. Two contradictory numbers for the same instrument, side by side, one implicitly presented as live.
+
+**What went wrong:** `YieldCurve.tsx` renders EXCLUSIVELY from `FX.curve` (fixture) — no live-data prop exists. The Tier-A/Tier-2 wiring lit up the surrounding scalars (slope, front/long tiles) live but left the curve component on fixtures, and the honesty pass badged only one of its three mount sites (desktop Yields). The chart is the product's identity object, so it was the easiest place to forget and the worst place to be wrong — exactly AGENTS.md landmine 18 (live headline over unbadged fixture chart).
+
+**Lesson:** A shared chart component mounted in N places needs the same honesty treatment at ALL N mounts — badging one and missing two is worse than badging none, because the badged one implies the others were audited. When a component has no live-data path at all, every mount is a fixture and every mount must say so until it's wired.
+
+**Prevention:**
+- Grep every `<YieldCurve` (and any fixture-only chart) mount and confirm each carries a DemoBadge or a live gate — don't trust that "the page was reviewed."
+- Step-1 hotfix here badges all three unbadged mounts (Dashboard mobile + desktop, Yields mobile). Step-2 (wire the curve to `useYields`) is deferred pending Adnan's axis decision (keep the 11-tenor axis with 4 gapped non-EconDelta tenors vs shrink to the 7 live tenors) — mocked both, not shipped.
+
+**Hotfix:** Branch `fix/f3-yield-curve-demobadge`: DemoBadge added to the curve on Dashboard (mobile + desktop) and mobile Yields to match desktop. Gate green; verified live at 375/1440px. Live-wiring intentionally NOT shipped (design decision open).
+
+**Cross-references:** AGENTS.md landmine 18 (+15). Handoff F3. Related to the 100× label entry above (same review).
+
+---
+
 ## 2026-07-09 — v3.0 | Excess-liquidity label understated by 100× ("k Cr" vs "lakh Cr")
 
 **Trigger:** 2026-07-04 ecosystem review (two Opus 4.8 passes, live + Supabase reads). The Liquidity page rendered excess liquidity as "3.9 k Cr" — reads as ৳3,900 crore — when the live `excess_liquid_asset_total_minimum` is **385,992.24 BDT crore** (≈ ৳3.86 **lakh** crore, ~৳386,000 crore). A 100× understatement on an ALCO tool.

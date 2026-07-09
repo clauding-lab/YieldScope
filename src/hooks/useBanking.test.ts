@@ -48,6 +48,25 @@ describe('useBanking', () => {
     expect(result.current.data!.cdRatio).toBeCloseTo(89.5, 1)
   })
 
+  it('gates out a fabricated CRAR (1.56%) — nulled + flagged, never rendered clean', async () => {
+    vi.mocked(fetchLatest).mockImplementation(async (id) => {
+      if (id === 'banking_sector_crar') return { asOf: '2025-09-30', value: 1.56 }  // fabricated LLM fallback
+      if (id === 'gross_npl_ratio')     return { asOf: '2026-03-31', value: 32.26 } // legitimately high in BD
+      return null
+    })
+    vi.mocked(fetchSeries).mockResolvedValue([])
+    const { result } = renderHook(() => useBanking())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    // CAR 1.56 is below the CAR plausibility band -> nulled, badged as demo
+    expect(result.current.data!.crar).toBeNull()
+    expect(result.current.data!.crarImplausible).toBe(true)
+    expect(result.current.data!.crarVintage).toBe("Sep '25")
+    expect(result.current.data!.crarStale).toBe(true)
+    // NPL 32.26 passes the wide band and carries its quarterly vintage
+    expect(result.current.data!.nplRatio).toBe(32.26)
+    expect(result.current.data!.nplVintage).toBe("Mar '26")
+  })
+
   it('returns null cdRatio when deposits are missing (no divide-by-null)', async () => {
     vi.mocked(fetchLatest).mockImplementation(async (id) => {
       if (id === 'private_sector_credit') return { asOf: '2026-05-30', value: 1785976 }
