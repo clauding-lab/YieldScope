@@ -5,7 +5,7 @@ import { isLiveDataAvailable } from '../../lib/econdelta'
 import { monthLabel } from '../../lib/dates'
 import { DemoBadge } from '../primitives/DemoBadge'
 import {
-  CURVE_AXIS,
+  LIVE_CURVE_AXIS,
   MIN_LIVE_POINTS,
   liveCurvePoints,
   liveCurveSegments,
@@ -38,12 +38,14 @@ const SERIES: SeriesDef[] = [
 ]
 
 /**
- * Sovereign yield curve. Option A (Adnan, 2026-07-09): the axis keeps all 11
- * tenors. With live credentials the curve plots the 7 EconDelta tenors from
- * metric_history; 7D/14D/28D/15Y stay as labelled gaps and any span across
- * them draws as a dashed bridge — never presented as measured data
- * (landmines 15/18). The scrub readout on a gapped tenor shows "— no live
- * print", never a fabricated value. The fixture curve (with its 5 overlays)
+ * Sovereign yield curve. Option B (Adnan's revised axis decision, 2026-07-09,
+ * superseding the same-day Option A): the LIVE axis is exactly the 7 EconDelta
+ * tenors (91D–20Y) — the four never-live tenors (7D/14D/28D/15Y) are off the
+ * axis entirely. The gap machinery survives for genuinely missing prints
+ * WITHIN the 7: a tenor with no row renders as a labelled gap, any span
+ * across it draws as a dashed bridge, and the scrub readout shows "— no live
+ * print" — never interpolated, never a fabricated value (landmines 15/18).
+ * The fixture curve keeps its own 11-tenor axis (with its 5 overlays) and
  * renders ONLY in no-credentials builds, self-badged with `Demo data`. The
  * component owns its own honesty chrome so every mount (Dashboard
  * mobile/desktop, Yields mobile/desktop) stays consistent — the F3 lesson.
@@ -54,14 +56,17 @@ export function YieldCurve({ w = 480, h = 240, showLegend = true, defaultOverlay
   const [scrubIdx, setScrubIdx] = useState<number | null>(null)
   const [active, setActive] = useState<OverlayKey[]>(defaultOverlays)
 
-  const points = liveCurvePoints(CURVE_AXIS, data?.yields ?? null)
+  const points = liveCurvePoints(LIVE_CURVE_AXIS, data?.yields ?? null)
   // live: enough real points · skeleton: creds present, fetch not settled ·
   // fixture: no creds (or a settled fetch with <2 live tenors — DB empty).
   const mode: 'live' | 'skeleton' | 'fixture' = liveAvail
     ? (loading ? 'skeleton' : points.length >= MIN_LIVE_POINTS ? 'live' : 'fixture')
     : 'fixture'
 
-  const tenors: readonly string[] = mode === 'fixture' ? FX.curve.tenors : CURVE_AXIS
+  // Live/skeleton use the 7-tenor live axis; fixture keeps its own 11-tenor
+  // axis (deliberate: the fixture is a demo artefact, not a claim about live
+  // coverage, and it stays badged — the two axes no longer need to match).
+  const tenors: readonly string[] = mode === 'fixture' ? FX.curve.tenors : LIVE_CURVE_AXIS
   const series = SERIES.filter(s => active.includes(s.key))
 
   const padL = 38, padR = 16, padT = 14, padB = 30
@@ -238,8 +243,12 @@ export function YieldCurve({ w = 480, h = 240, showLegend = true, defaultOverlay
         </div>
       ) : mode === 'live' ? (
         <div className="caption" style={{ paddingTop: 14 }}>
-          Live · {points.length} of {tenors.length} tenors
-          {gapTenors(CURVE_AXIS, points).length > 0 && ` · no print: ${gapTenors(CURVE_AXIS, points).join(' · ')}`}
+          {/* Full coverage reads "Live · 91D–20Y"; a missing print downgrades
+              to an explicit count + names the gap (Option B keeps gap honesty). */}
+          Live · {points.length === LIVE_CURVE_AXIS.length
+            ? `${LIVE_CURVE_AXIS[0]}–${LIVE_CURVE_AXIS[LIVE_CURVE_AXIS.length - 1]}`
+            : `${points.length} of ${LIVE_CURVE_AXIS.length} tenors`}
+          {gapTenors(LIVE_CURVE_AXIS, points).length > 0 && ` · no print: ${gapTenors(LIVE_CURVE_AXIS, points).join(' · ')}`}
           {monthlyVintage && ` · ${monthlyVintage}`}
         </div>
       ) : mode === 'fixture' && showLegend ? (

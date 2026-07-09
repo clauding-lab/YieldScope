@@ -358,7 +358,7 @@ function YieldsDesktop() {
             {/* Honesty chrome (Demo badge / live coverage note) is rendered by YieldCurve itself. */}
             <div className="eyebrow" style={{ marginBottom: 6 }}>Sovereign yield curve</div>
             <h3 className="display" style={{ fontSize: 28, margin: 0 }}>
-              {isLiveDataAvailable() ? '11-tenor axis · 7 live' : '11 tenors · 5 overlays'}
+              {isLiveDataAvailable() ? '7 live tenors · 91D–20Y' : '11 tenors · 5 overlays'}
             </h3>
           </div>
         </div>
