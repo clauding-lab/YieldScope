@@ -42,8 +42,11 @@ export function useBanking(): UseBankingResult {
           fetchLatest(METRIC.TOTAL_DEPOSITS),
         ])
         if (cancelled) return
-        // Plausibility + vintage gate: CAR and NPL are quarterly. A fabricated
-        // or badly-stale print is nulled/flagged here rather than rendered clean.
+        // Plausibility + vintage gate: CAR and NPL are quarterly. A data-fault
+        // print (outside the band) is nulled; a badly-stale print is flagged.
+        // NOTE: the low CAR (1.56%, Sep-2025) is REAL — BB QFSAR pre-shock
+        // system CAR — and renders with a provenance label (owner decision
+        // 2026-07-09), so the band admits distress figures down to -50.
         const nplGate = gateMetric(npl?.value, npl?.asOf, { band: NPL_BAND, cadence: 'quarterly' })
         const crarGate = gateMetric(crar?.value, crar?.asOf, { band: CAR_BAND, cadence: 'quarterly' })
         setState({
@@ -57,7 +60,9 @@ export function useBanking(): UseBankingResult {
             crarVintage: crarGate.vintage,
             crarStale: crarGate.stale,
             crarImplausible: crarGate.implausible,
-            nplHist:  nplSer.map(p => p.value),
+            // Gate the series too: a bad point must not render in the trend
+            // chart while the headline is gated (same band as the headline).
+            nplHist:  nplSer.map(p => p.value).filter(v => v >= NPL_BAND.min && v <= NPL_BAND.max),
             pvtCreditYoY: pcy?.value ?? null,
             pvtCreditYoYAsOf: pcy?.asOf ?? null,
             cdRatio: (pc?.value != null && dep?.value) ? (pc.value / dep.value) * 100 : null,

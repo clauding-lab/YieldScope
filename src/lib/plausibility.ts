@@ -3,23 +3,30 @@
  *
  * The existing honesty gate is `value ?? null → DemoBadge` everywhere — great
  * for MISSING data, defenceless against present-but-WRONG data (e.g. a
- * fabricated `banking_sector_crar = 1.56%`, or a quarterly print that went
- * months stale while its `as_of` kept re-stamping today — landmine 16). This
- * module adds a lightweight second line: a plausibility band per metric and a
- * max-age-by-cadence check. A breach nulls the value so the page renders
- * `—` / DemoBadge / a stale chip — never a clean but wrong number.
+ * basis-points parse rendering a policy rate as 1000, or a quarterly print
+ * that went months stale while its `as_of` kept re-stamping today — landmine
+ * 16). This module adds a lightweight second line: a plausibility band per
+ * metric and a max-age-by-cadence check. A breach nulls the value so the page
+ * renders `—` / DemoBadge / a stale chip — never a clean but wrong number.
  *
- * The bands below are FINANCIAL-JUDGMENT constants. They are deliberately wide
- * (catch fabrications and unit errors, not legitimately unusual prints) and are
- * flagged for Adnan's confirmation before being trusted as hard gates.
+ * The bands below are FINANCIAL-JUDGMENT constants, approved by Adnan
+ * 2026-07-09 (CAR band widened the same day — see below). They are
+ * deliberately wide: they catch data faults and unit errors, never suppress a
+ * true figure.
  */
 
 import { monthLabel } from './dates'
 
-// ---- Plausibility bands (percent) — confirm with Adnan before hardening ----
-// Basel-III CAR: real BD system CRAR runs ~10–13%; a sub-5% or >30% print is
-// almost certainly a data fault, not a real capital position.
-export const CAR_BAND: Band = { min: 5, max: 30 }
+// ---- Plausibility bands (percent) — approved by Adnan 2026-07-09 ----
+// Basel-III CAR: matches the upstream producer's own validation band
+// (econdelta validate_value: -50..30 for banking_sector_crar). Deliberately
+// admits genuine distress prints — the Sep-2025 pre-shock system CAR of 1.56%
+// is REAL (verified against BB's QFSAR PDF, p13 exec summary), and BB's
+// stress-test trajectory makes a future NEGATIVE print plausible. Owner
+// decision (2026-07-09): render real distress data with a provenance label
+// ("BB QFSAR pre-shock · Sep '25"), never suppress a true figure. The band
+// still nulls truly absurd values (e.g. 500 or -80 — unit/parse faults).
+export const CAR_BAND: Band = { min: -50, max: 30 }
 // BB corridor / policy rates: repo, SDF, SLF, call — all live in single digits
 // to low-teens; anything outside 0–20% is a parse/unit fault.
 export const POLICY_RATE_BAND: Band = { min: 0, max: 20 }

@@ -76,6 +76,25 @@ describe('useLiquidity', () => {
     expect(result.current.data!.corridorCoherent).toBe(false)
   })
 
+  it('band-gates an out-of-band policy rate (e.g. a basis-points parse) to null — ordering alone would pass it', async () => {
+    vi.mocked(fetchLatest).mockImplementation(async (id) => {
+      // Uniform bp-scale fault: 750 < 1000 < 1150 is corridor-ORDERED but
+      // outside the 0–20% band — each rate must null out, not render clean.
+      if (id === 'policy_rate_repo') return { asOf: '2026-07-09', value: 1000 }
+      if (id === 'policy_rate_sdf')  return { asOf: '2026-07-09', value: 750 }
+      if (id === 'policy_rate_slf')  return { asOf: '2026-07-09', value: 1150 }
+      return null
+    })
+    vi.mocked(fetchSeries).mockResolvedValue([])
+    const { result } = renderHook(() => useLiquidity())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.data!.policyRepo).toBeNull()
+    expect(result.current.data!.policySdf).toBeNull()
+    expect(result.current.data!.policySlf).toBeNull()
+    // All legs nulled -> coherence is unjudgeable, not falsely flagged
+    expect(result.current.data!.corridorCoherent).toBe(true)
+  })
+
   it('returns nulls for policy corridor when EconDelta has no rows', async () => {
     vi.mocked(fetchLatest).mockResolvedValue(null)
     vi.mocked(fetchSeries).mockResolvedValue([])
