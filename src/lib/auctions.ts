@@ -53,7 +53,11 @@ export async function fetchAuctionResults(limit = 12): Promise<AuctionResult[]> 
     .select('auction_date, tenor, size, bid, cover, wam, cutoff')
     .order('auction_date', { ascending: false })
     .limit(limit)
-  if (error || !data) return []
+  // A PostgREST error must NOT masquerade as "zero auctions" — throw so the
+  // hook's error state can render an honest error line instead of a definitive
+  // empty-state claim built on a failed fetch.
+  if (error) throw new Error(`auction_results fetch failed: ${error.message}`)
+  if (!data) return []
   return (data as AuctionResultRow[]).map(r => ({
     date: r.auction_date,
     tenor: normalizeTenor(r.tenor),
@@ -73,7 +77,8 @@ export async function fetchAuctionCalendar(limit = 24): Promise<AuctionCalendarE
     .select('auction_date, tenor, notional')
     .order('auction_date', { ascending: true })
     .limit(limit)
-  if (error || !data) return []
+  if (error) throw new Error(`auction_calendar fetch failed: ${error.message}`)
+  if (!data) return []
   return (data as AuctionCalendarRow[]).map(r => ({
     date: r.auction_date,
     tenor: normalizeTenor(r.tenor),
