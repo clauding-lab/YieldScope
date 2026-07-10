@@ -28,7 +28,12 @@ export async function fetchLatest(metricId: MetricId | string): Promise<MetricPo
     .order('as_of', { ascending: false })
     .limit(1)
 
-  if (error || !data || data.length === 0) return null
+  // A Supabase error must NOT masquerade as "no rows" — throw so the consuming
+  // hook's error branch can render an honest outage instead of silently falling
+  // back to fixture/empty UI (mirrors src/lib/auctions.ts). A successful query
+  // with zero rows is honest emptiness → still null.
+  if (error) throw new Error(`${tableFor(metricId)} fetch failed (${metricId}): ${error.message}`)
+  if (!data || data.length === 0) return null
   const row = data[0] as { as_of: string; value: number }
   return { asOf: row.as_of, value: Number(row.value) }
 }
@@ -52,7 +57,10 @@ export async function fetchSeries(
   const { data, error } = await query
     .order('as_of', { ascending: false })
     .limit(limit)
-  if (error || !data) return []
+  // Throw on a Supabase error (see fetchLatest) — a failed fetch must reach the
+  // hook's error state, not be swallowed into an empty series. No rows = [].
+  if (error) throw new Error(`${tableFor(metricId)} fetch failed (${metricId}): ${error.message}`)
+  if (!data) return []
 
   return (data as { as_of: string; value: number }[])
     .map(r => ({ asOf: r.as_of, value: Number(r.value) }))
@@ -129,7 +137,11 @@ export async function fetchRecentBriefings(limit = 12): Promise<Briefing[]> {
     .order('week_of', { ascending: false })
     .limit(limit)
 
-  if (error || !data) return []
+  // Throw on a Supabase error (see fetchLatest) — a failed briefings fetch must
+  // reach useBriefing's error state, not be swallowed into an empty list. No
+  // rows = [].
+  if (error) throw new Error(`briefings fetch failed: ${error.message}`)
+  if (!data) return []
   return (data as BriefingRow[]).map(mapBriefing)
 }
 
