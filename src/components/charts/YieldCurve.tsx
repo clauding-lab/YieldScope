@@ -111,9 +111,9 @@ export function YieldCurve({ w = 480, h = 240, showLegend = true, defaultOverlay
 
   // Honest error note (#25 review MEDIUM, narrow wire): with credentials, a
   // rejected fetch lands in fixture mode — say so, don't let the badged demo
-  // read as "settled, DB simply empty". (PostgREST-level errors are still
-  // swallowed to null/[] by the shared econdelta fetchers — the throw-through
-  // fix, mirroring lib/auctions.ts, is a known fast-follow outside this PR.)
+  // read as "settled, DB simply empty". The shared econdelta fetchers now THROW
+  // on a Supabase error (mirroring lib/auctions.ts), so a live-data outage
+  // reaches useYields' error state and this branch actually fires.
   const fetchErrored = liveAvail && !loading && error != null
 
   return (

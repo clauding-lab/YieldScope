@@ -61,6 +61,21 @@ describe('fetchLatest', () => {
     await fetchLatest('cpi_12m_avg_monthly')
     expect(mockFrom).toHaveBeenCalledWith('metric_history_monthly')
   })
+
+  // error ≠ empty: a Supabase error must THROW (mirrors lib/auctions.ts) so the
+  // hook's error branch fires, instead of being swallowed into a "no data" null
+  // that silently renders fixture/empty UI on a live-data outage.
+  it('throws on a Supabase error (does NOT masquerade as no rows)', async () => {
+    mockLimit.mockResolvedValueOnce({ data: null, error: { message: 'boom' } })
+    const { fetchLatest } = await import('./econdelta')
+    await expect(fetchLatest('brent_crude_usd_barrel')).rejects.toThrow(/boom/)
+  })
+
+  it('still returns null on a successful query with no rows (empty is honest emptiness, not an error)', async () => {
+    mockLimit.mockResolvedValueOnce({ data: [], error: null })
+    const { fetchLatest } = await import('./econdelta')
+    expect(await fetchLatest('brent_crude_usd_barrel')).toBeNull()
+  })
 })
 
 describe('fetchRecentBriefings', () => {
@@ -84,8 +99,16 @@ describe('fetchRecentBriefings', () => {
     expect(out[0].staleSeries).toEqual([])
   })
 
-  it('returns empty array on error', async () => {
+  // error ≠ empty: a Supabase error must THROW so useBriefing's error branch can
+  // fire, rather than being swallowed into an empty briefing list.
+  it('throws on a Supabase error (does NOT masquerade as an empty briefing list)', async () => {
     mockLimit.mockResolvedValueOnce({ data: null, error: { message: 'oops' } })
+    const { fetchRecentBriefings } = await import('./econdelta')
+    await expect(fetchRecentBriefings()).rejects.toThrow(/oops/)
+  })
+
+  it('still returns [] on a successful query with no rows (honest emptiness, not an error)', async () => {
+    mockLimit.mockResolvedValueOnce({ data: [], error: null })
     const { fetchRecentBriefings } = await import('./econdelta')
     expect(await fetchRecentBriefings()).toEqual([])
   })
@@ -108,11 +131,18 @@ describe('fetchSeries', () => {
     expect(series.map(p => p.value)).toEqual([9.22, 9.34])
   })
 
-  it('returns empty array on PostgREST error', async () => {
+  // error ≠ empty: a PostgREST error must THROW so the consuming hook's error
+  // branch can fire, rather than being swallowed into a "no data" empty series.
+  it('throws on a PostgREST error (does NOT masquerade as an empty series)', async () => {
     mockLimit.mockResolvedValueOnce({ data: null, error: { message: 'oops' } })
     const { fetchSeries } = await import('./econdelta')
-    const result = await fetchSeries('brent_crude_usd_barrel', { limit: 8 })
-    expect(result).toEqual([])
+    await expect(fetchSeries('brent_crude_usd_barrel', { limit: 8 })).rejects.toThrow(/oops/)
+  })
+
+  it('still returns [] on a successful query with no rows (honest emptiness, not an error)', async () => {
+    mockLimit.mockResolvedValueOnce({ data: [], error: null })
+    const { fetchSeries } = await import('./econdelta')
+    expect(await fetchSeries('brent_crude_usd_barrel', { limit: 8 })).toEqual([])
   })
 
   it('returns empty array when supabase client is missing', async () => {
