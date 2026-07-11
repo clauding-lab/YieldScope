@@ -20,13 +20,11 @@ const ISSUANCE_T_BOND = [ 0, 15,  0,  0, 12,  0,  0, 18,  0,  0, 14,  0]
 function FiscalMobile() {
   const F = FX.fiscal
   const { data } = useFiscal()
-  const revenuePct = data?.revenuePct ?? null
-  const adpPct = data?.adpPct ?? null
+  const nbrFytdCr = data?.nbrFytdCr ?? null
   const domesticBorrowingCr = data?.domesticBorrowingCr ?? null
   const debtGdpRatio = roundTo(data?.debtGdpRatio ?? null, 1)
   const debtGdpAsOf = data?.debtGdpAsOf ?? null
   const debtGdpHist = data?.debtGdpHist ?? []
-  const fmtPct = (n: number | null) => n != null ? `${n}%` : '—'
   const demoLabel = (label: string): ReactNode => (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
       {label}
@@ -59,7 +57,7 @@ function FiscalMobile() {
 
       <div style={{ padding: '0 16px 24px' }}>
         <div className="card-flat">
-          <ListRow label="Revenue / target" value={fmtPct(revenuePct)} />
+          <ListRow label="Revenue / target" value={'—'} />
           <ListRow
             label={debtGdpRatio == null ? demoLabel('Debt / GDP') : 'Debt / GDP'}
             value={debtGdpRatio != null ? `${debtGdpRatio}%` : '—'}
@@ -67,14 +65,14 @@ function FiscalMobile() {
           />
           <ListRow label={domesticBorrowingCr == null ? demoLabel('Net dom. borrow') : 'Net dom. borrow'} value={domesticBorrowingCr != null ? `${(domesticBorrowingCr / 1000).toFixed(1)} k Cr` : `${F.netDomesticBorrowingYTD} k Cr`} />
           <ListRow label={demoLabel('Ways & Means')}      value={`${F.waysMeans} k Cr`} />
-          <ListRow label="ADP implementation" value={fmtPct(adpPct)} last />
+          <ListRow label="ADP implementation" value={'—'} last />
         </div>
       </div>
 
       <div style={{ padding: '12px 22px 28px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
           <div className="eyebrow">Revenue progress</div>
-          {revenuePct == null && <DemoBadge />}
+          {nbrFytdCr == null && <DemoBadge />}
         </div>
         <div style={{ position: 'relative', height: 8, background: 'var(--sunken)', borderRadius: 99 }}>
           <div
@@ -83,7 +81,7 @@ function FiscalMobile() {
               left: 0,
               top: 0,
               bottom: 0,
-              width: `${revenuePct ?? 0}%`,
+              width: '0%',
               background: 'var(--accent)',
               borderRadius: 99,
             }}
@@ -109,8 +107,6 @@ function FiscalMobile() {
 function FiscalDesktop() {
   const F = FX.fiscal
   const { data } = useFiscal()
-  const revenuePct = data?.revenuePct ?? null
-  const adpPct = data?.adpPct ?? null
   const debtGdpRatio = roundTo(data?.debtGdpRatio ?? null, 1)
   const debtGdpAsOf = data?.debtGdpAsOf ?? null
   const debtGdpHist = data?.debtGdpHist ?? []
@@ -119,7 +115,6 @@ function FiscalDesktop() {
   const imfEffSdrMn = data?.imfEffSdrMn ?? null
   const n = debtGdpHist.length
   const debtGdp24mBps = n >= 3 ? roundTo((debtGdpHist[n - 1] - debtGdpHist[n - 3]) * 100, 0) : null
-  const fmtPct = (n: number | null) => n != null ? `${n}%` : '—'
   const demoLabel = (label: string): ReactNode => (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
       {label}
@@ -149,14 +144,14 @@ function FiscalDesktop() {
           </div>
           <h2 className="display" style={{ fontSize: 36, margin: 0, color: 'var(--warn)' }}>Elevated.</h2>
           <div className="card-flat" style={{ padding: 18, marginTop: 22, maxWidth: 540 }}>
-            <ListRow label="Revenue / target" value={fmtPct(revenuePct)} />
+            <ListRow label="Revenue / target" value={'—'} />
             <ListRow
               label={debtGdpRatio == null ? demoLabel('Debt / GDP') : 'Debt / GDP'}
               value={debtGdpRatio != null ? `${debtGdpRatio}%` : '—'}
               sub={debtGdpRatio != null && debtGdpAsOf ? `FY${debtGdpAsOf.slice(0, 4)}` : undefined}
             />
             <ListRow label={demoLabel('W&M usage')}         value="46%" />
-            <ListRow label="ADP implementation" value={fmtPct(adpPct)} last />
+            <ListRow label="ADP implementation" value={'—'} last />
           </div>
         </div>
       </div>
@@ -188,7 +183,7 @@ function FiscalDesktop() {
             </div>
           </div>
           <div className="caption" style={{ marginTop: 14 }}>
-            <span className="num" style={{ color: 'var(--ink)' }}>{fmtPct(revenuePct)}</span> of target
+            <span className="num" style={{ color: 'var(--ink)' }}>{'—'}</span> of target
           </div>
         </div>
         <div>

@@ -49,9 +49,6 @@ export const METRIC = {
 
   // Fiscal
   TAX_REV:         'tax_revenue',
-  TOTAL_REV:       'total_revenue_budget_vs_actual',
-  BUDGET_OPEX:     'budget_opex_of_the_fy_vs_utilization',
-  BUDGET_ADPEX:    'budget_adpex_of_the_fy_vs_utilization',
   TAX_GDP:         'tax_gdp_ratio',
   REV_GDP:         'rev_gdp_ratio',
   DOMESTIC_BORROW: 'domestic_borrowing_for_budget_deficit',

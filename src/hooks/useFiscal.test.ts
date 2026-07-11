@@ -48,22 +48,35 @@ describe('useFiscal', () => {
   it('maps fiscal indicators from EconDelta', async () => {
     vi.mocked(fetchLatest).mockImplementation(async (id) => {
       switch (id) {
-        case 'total_revenue_budget_vs_actual':              return { asOf: '2026-04-30', value: 74.4 }
-        case 'budget_adpex_of_the_fy_vs_utilization':       return { asOf: '2026-04-30', value: 58.4 }
         case 'tax_gdp_ratio':                                return { asOf: '2026-04-30', value: 7.5 }
         case 'domestic_borrowing_for_budget_deficit':        return { asOf: '2026-04-30', value: 8450000 }
         default: return null
       }
     })
+    vi.mocked(fetchSeries).mockImplementation(async () => [])
 
     const { result } = renderHook(() => useFiscal())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     const d = result.current.data!
-    expect(d.revenuePct).toBe(74.4)
-    expect(d.adpPct).toBe(58.4)
     expect(d.taxToGdp).toBe(7.5)
     expect(d.domesticBorrowingCr).toBe(8450000)
+  })
+
+  it('exposes NBR FYTD collection from tax_revenue and no longer fetches retired ids', async () => {
+    vi.mocked(fetchLatest).mockImplementation(async (id: string) =>
+      id === 'tax_revenue' ? { asOf: '2026-06-30', value: 312400 } : null)
+    vi.mocked(fetchSeries).mockImplementation(async (id: string) =>
+      id === 'tax_revenue'
+        ? [{ asOf: '2026-05-31', value: 285000 }, { asOf: '2026-06-30', value: 312400 }]
+        : [])
+    const { result } = renderHook(() => useFiscal())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.data?.nbrFytdCr).toBe(312400)
+    expect(result.current.data?.nbrFytdHist).toEqual([285000, 312400])
+    const fetchedIds = vi.mocked(fetchLatest).mock.calls.map(c => c[0])
+    expect(fetchedIds).not.toContain('total_revenue_budget_vs_actual')
+    expect(fetchedIds).not.toContain('budget_adpex_of_the_fy_vs_utilization')
   })
 
   it('maps debt metrics: latest year-end Debt/GDP actual + stocks + IMF EFF', async () => {
