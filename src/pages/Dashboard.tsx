@@ -62,6 +62,16 @@ function BriefingDisclosure({ weekOf, dataAsOf, staleCount }: BriefingDisclosure
   )
 }
 
+function NoBriefNote({ pad }: { pad: string }) {
+  return (
+    <div style={{ padding: pad }}>
+      <div className="caption" style={{ color: 'var(--ink-2)' }}>
+        No weekly briefing yet — generated Monday mornings (BDT).
+      </div>
+    </div>
+  )
+}
+
 function DashboardMobile() {
   const { data } = useDashboard()
   const { briefings } = useBriefing()
@@ -82,11 +92,6 @@ function DashboardMobile() {
       <SectionTitle kicker={todayLabel()} title="Today" />
 
       <div style={{ padding: '0 22px 24px' }}>
-        {brief == null && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <DemoBadge />
-          </div>
-        )}
         <p
           style={{
             margin: 0,
@@ -149,7 +154,6 @@ function DashboardMobile() {
       <div style={{ padding: '32px 22px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div className="eyebrow">What's moving</div>
-          {brief == null && <DemoBadge />}
         </div>
       </div>
       <div style={{ padding: '0 22px 16px' }}>
@@ -187,13 +191,12 @@ function DashboardMobile() {
           eyebrow={
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
               Weekly briefing
-              {brief == null && <DemoBadge />}
             </span>
           }
           title={brief ? brief.title : 'The short end is rotating, not relaxing'}
           summary="Three forces are squeezing the front — read full analysis."
         >
-          <BriefingBody markdown={brief ? brief.body : FX.intel.weekly} baseSize={14} />
+          {brief ? <BriefingBody markdown={brief.body} baseSize={14} /> : <NoBriefNote pad="0" />}
           <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
             <button type="button" className="btn btn-sm">Open full notes</button>
           </div>
@@ -226,11 +229,6 @@ function DashboardDesktop() {
       <DesktopHeader section="Today" breadcrumb={`YieldScope · ALCO Intelligence · ${weekdayName()}`} />
 
       <div style={{ padding: '40px 48px 24px' }}>
-        {brief == null && (
-          <div style={{ marginBottom: 14 }}>
-            <DemoBadge />
-          </div>
-        )}
         <p
           style={{
             margin: 0,
@@ -297,7 +295,6 @@ function DashboardDesktop() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
             <div className="eyebrow">What's moving</div>
-            {brief == null && <DemoBadge />}
           </div>
           {moving.map((a, i, arr) => (
             <div
@@ -346,13 +343,12 @@ function DashboardDesktop() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <div className="eyebrow">Weekly briefing · drafted by Claude</div>
-            {brief == null && <DemoBadge />}
           </div>
           <h3 className="display" style={{ fontSize: 28, margin: 0 }}>
             {brief ? brief.title : 'The short end is rotating, not relaxing.'}
           </h3>
           <div style={{ marginTop: 14, maxWidth: 640 }}>
-            <BriefingBody markdown={brief ? brief.body : FX.intel.weekly} baseSize={15} />
+            {brief ? <BriefingBody markdown={brief.body} baseSize={15} /> : <NoBriefNote pad="0" />}
           </div>
           <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
             <button type="button" className="btn">Open full briefing</button>
