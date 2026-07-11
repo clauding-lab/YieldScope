@@ -31,19 +31,6 @@ export interface AuctionRow {
   flag?: string
 }
 
-export interface LiquidityFx {
-  callRange: [number, number]
-  callAvg: number
-  callSpark: number[]
-  repo: number
-  sdf: number
-  slf: number
-  m2YoY: number
-  m2Hist: number[]
-  crrUtil: number
-  slrUtil: number
-}
-
 export interface MacroFx {
   cpiHist: number[]
   coreHist: number[]
@@ -58,40 +45,6 @@ export interface MacroFx {
   cadPctGDP: number
 }
 
-export interface FiscalFx {
-  revenueYTD: number
-  revenueTarget: number
-  revenuePct: number
-  netDomesticBorrowingYTD: number
-  nbTarget: number
-  waysMeans: number
-  waysMeansLimit: number
-  debtToGdp: number
-  debtHist: number[]
-  adpPct: number
-  adpTrend: number[]
-}
-
-export interface BankingFx {
-  cdRatio: number
-  cdHist: number[]
-  advancesYoY: number
-  depositsYoY: number
-  nplRatio: number
-  nplHist: number[]
-  car: number
-  lcr: number
-  nsfr: number
-  repoBorrow: number
-  repoSpark: number[]
-}
-
-export interface IntelFx {
-  weekly: string
-  anomalies: { code: string; label: string; sev: 'warn' | 'up' | 'down' }[]
-  decisions: { code: string; topic: string; status: 'SIGNED' | 'PENDING' | 'DRAFT' }[]
-}
-
 export interface FxData {
   meta: {
     asOf: string
@@ -104,11 +57,7 @@ export interface FxData {
   curve: CurveSeries
   alerts: AlertRow[]
   auctions: AuctionRow[]
-  liquidity: LiquidityFx
   macro: MacroFx
-  fiscal: FiscalFx
-  banking: BankingFx
-  intel: IntelFx
 }
 
 export const FX: FxData = {
@@ -157,19 +106,6 @@ export const FX: FxData = {
     { date: '14 MAY', tenor: '2Y',   size: '5 KCr',  bid: '7.1 KCr', cutoff: '11.85', wam: '11.82', cover: 1.42, dir: 'up',   delta:  0.04 },
   ],
 
-  liquidity: {
-    callRange: [8.42, 9.34],
-    callAvg: 8.86,
-    callSpark: [8.42, 8.51, 8.60, 8.78, 8.92, 9.04, 9.18, 9.34],
-    repo: 9.00,
-    sdf: 6.50,
-    slf: 10.50,
-    m2YoY: 8.4,
-    m2Hist: [11.2, 10.4, 9.8, 9.2, 8.8, 8.6, 8.5, 8.4],
-    crrUtil: 0.92,
-    slrUtil: 0.86,
-  },
-
   macro: {
     cpiHist:    [9.94, 9.86, 9.74, 9.62, 9.58, 9.42, 9.38, 9.20],
     coreHist:   [8.40, 8.32, 8.18, 8.04, 7.94, 7.82, 7.74, 7.62],
@@ -182,47 +118,5 @@ export const FX: FxData = {
     importHist: [5.8, 5.7, 5.9, 5.6, 5.8, 5.7, 5.8, 5.6],
     cad:        -2.8,
     cadPctGDP:  -1.9,
-  },
-
-  fiscal: {
-    revenueYTD: 312.4,
-    revenueTarget: 420.0,
-    revenuePct: 74.4,
-    netDomesticBorrowingYTD: 84.5,
-    nbTarget: 132.4,
-    waysMeans: 18.2,
-    waysMeansLimit: 40.0,
-    debtToGdp: 41.2,
-    debtHist: [38.6, 39.1, 39.6, 40.0, 40.4, 40.8, 41.0, 41.2],
-    adpPct: 58.4,
-    adpTrend: [22, 28, 34, 41, 47, 51, 55, 58],
-  },
-
-  banking: {
-    cdRatio: 81.4,
-    cdHist: [78.2, 78.8, 79.2, 79.6, 80.1, 80.6, 81.0, 81.4],
-    advancesYoY: 9.2,
-    depositsYoY: 7.4,
-    nplRatio: 11.8,
-    nplHist: [9.4, 9.8, 10.2, 10.5, 11.0, 11.3, 11.6, 11.8],
-    car: 11.6,
-    lcr: 142,
-    nsfr: 118,
-    repoBorrow: 124.6,
-    repoSpark: [88, 96, 102, 110, 116, 118, 122, 124.6],
-  },
-
-  intel: {
-    weekly: "Three forces are squeezing the short end. (1) The 91-day cleared at 11.42% — eight basis points lower despite undersubscription pressure on the 364, suggesting PD demand is rotating short to lock liquidity ahead of June quarter-end. (2) Call money breached 9.34% overnight, the second session through the repo rate, on the back of a 28 thousand crore VAT outflow that wasn't fully sterilised. (3) FX reserves slipped below USD 21Bn — the import-cover ratio is now 2.94 months, inside the IMF EFF programme floor with the next review due in week 24. The implication for the curve: front-end pressure is tactical, not directional; the policy stance remains restrictive and the 10Y at 12.18 is fairly priced relative to inflation expectations falling toward 8.5% by year-end.",
-    anomalies: [
-      { code: 'X-CRV', label: 'Curve inversion 28D > 91D (+32bps)',  sev: 'warn' },
-      { code: 'X-LIQ', label: 'Call rate 2σ above 30D mean',          sev: 'up'   },
-      { code: 'X-FX',  label: 'Reserves -1.9% w/w (vs. -0.4% trend)', sev: 'down' },
-    ],
-    decisions: [
-      { code: 'D-01', topic: 'ALCO position re: liquidity buffer', status: 'PENDING' },
-      { code: 'D-02', topic: 'BDT funding ladder — Q3 plan',       status: 'DRAFT'   },
-      { code: 'D-03', topic: 'NPL provisioning Q1 review',         status: 'SIGNED'  },
-    ],
   },
 }

@@ -2,7 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 
 // Honesty pin: with no live briefing, the Dashboard must show a plain
-// "no briefing yet" note — never the FX.intel.weekly fixture essay.
+// "no briefing yet" note — never a fabricated weekly-intel essay (the old
+// FX.intel.weekly fixture was deleted 2026-07-11; this is a permanent empty-state pin).
 
 vi.mock('../lib/hooks', () => ({ useIsDesktop: vi.fn(), useMediaQuery: vi.fn() }))
 vi.mock('../hooks/useDashboard', () => ({ useDashboard: vi.fn() }))
