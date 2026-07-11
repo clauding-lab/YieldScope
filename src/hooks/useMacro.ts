@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { fetchLatest, fetchSeries, type MetricPoint } from '../lib/econdelta'
+import { fetchLatest, fetchSeries } from '../lib/econdelta'
 import { METRIC } from '../lib/econdelta-metrics'
 
 export interface MacroData {
@@ -9,7 +9,6 @@ export interface MacroData {
   cpiHist: number[]
   foodHist: number[]
   nonFoodHist: number[]
-  cpiMonths: string[]
 
   usdBdt: number | null
   usdBdtHist: number[]
@@ -43,15 +42,6 @@ interface UseMacroResult {
   data: MacroData | null
   loading: boolean
   error: Error | null
-}
-
-const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-
-function monthsFromSeries(series: MetricPoint[]): string[] {
-  return series.map(p => {
-    const d = new Date(p.asOf)
-    return Number.isNaN(d.getTime()) ? '' : MONTH_SHORT[d.getUTCMonth()]
-  })
 }
 
 export function useMacro(): UseMacroResult {
@@ -108,7 +98,6 @@ export function useMacro(): UseMacroResult {
             cpiHist:       cpiSer.map(p => p.value),
             foodHist:      foodSer.map(p => p.value),
             nonFoodHist:   nfSer.map(p => p.value),
-            cpiMonths:     monthsFromSeries(cpiSer),
             usdBdt:        usd?.value ?? null,
             usdBdtHist:    usdSer.map(p => p.value),
             fxReservesUsdBn: fxr?.value ?? null,
