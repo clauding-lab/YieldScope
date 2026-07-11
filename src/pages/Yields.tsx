@@ -14,17 +14,6 @@ type YieldsTab = 'curve' | 'series' | 'auctions'
 
 const HISTORY_TENORS: TenorKey[] = ['91D', '182D', '364D', '2Y', '5Y', '10Y', '20Y']
 
-const TENOR_LADDER: { tenor: string; yld: number; delta: number }[] = [
-  { tenor: '91D',  yld: 11.42, delta: -0.08 },
-  { tenor: '182D', yld: 11.60, delta: -0.05 },
-  { tenor: '364D', yld: 11.71, delta:  0.02 },
-  { tenor: '2Y',   yld: 11.85, delta:  0.04 },
-  { tenor: '5Y',   yld: 12.04, delta:  0.01 },
-  { tenor: '10Y',  yld: 12.18, delta: -0.02 },
-  { tenor: '15Y',  yld: 12.31, delta:  0.00 },
-  { tenor: '20Y',  yld: 12.40, delta:  0.00 },
-]
-
 const UPCOMING = [
   { date: '02 Jun', day: 'Tue', tenor: '91D · 182D · 364D', size: '50k Cr' },
   { date: '04 Jun', day: 'Thu', tenor: '5Y · 10Y',          size: '15k Cr' },
@@ -34,10 +23,11 @@ const UPCOMING = [
 function YieldsCurveTab() {
   const { data } = useYields()
 
-  const liveYields = data?.yields ?? {} as Record<string, number | null | undefined>
-  const tenorLadder = TENOR_LADDER.map(row => {
-    const live = (liveYields as Record<string, number | null | undefined>)[row.tenor]
-    return live != null ? { ...row, yld: live } : row
+  const tenorLadder = HISTORY_TENORS.map(t => {
+    const yld = data?.yields[t] ?? null
+    const spark = data?.series[t] ?? []
+    const delta = spark.length >= 2 ? roundTo(spark[spark.length - 1] - spark[spark.length - 2], 2) : null
+    return { tenor: t, yld, spark, delta }
   })
 
   const slopeLabel = data?.spread10Y_91D_bps != null
@@ -48,10 +38,12 @@ function YieldsCurveTab() {
   const spread5y2y = spreadBps(data?.yields['5Y'] ?? null, data?.yields['2Y'] ?? null)
   const fmtBps = (n: number) => `${n >= 0 ? '+' : ''}${n}`
 
+  const spread91dSdf = data?.spread91D_SDF_bps ?? null
+
   const liveSpreads = [
     { lbl: '10y – 91d', v: slopeLabel, u: 'bps', demo: false },
-    { lbl: '5y – 2y',   v: spread5y2y != null ? fmtBps(spread5y2y) : '+19', u: 'bps', demo: spread5y2y == null },
-    { lbl: '91d – SDF', v: '+492',     u: 'bps', demo: true  },
+    { lbl: '5y – 2y',   v: spread5y2y != null ? fmtBps(spread5y2y) : '—', u: 'bps', demo: spread5y2y == null },
+    { lbl: '91d – SDF', v: spread91dSdf != null ? fmtBps(spread91dSdf) : '—', u: 'bps', demo: spread91dSdf == null },
   ]
 
   return (
@@ -87,10 +79,7 @@ function YieldsCurveTab() {
       </div>
 
       <div style={{ padding: '24px 22px 24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <div className="eyebrow">Tenor ladder</div>
-          <DemoBadge />
-        </div>
+        <div className="eyebrow" style={{ marginBottom: 12 }}>Tenor ladder</div>
         <div className="card-flat">
           {tenorLadder.map((row, i, arr) => (
             <div
@@ -104,15 +93,14 @@ function YieldsCurveTab() {
                 alignItems: 'center',
               }}
             >
-              <span style={{ fontSize: 13, color: 'var(--ink-2)' }}>{row.tenor}</span>
-              <Sparkline
-                data={[row.yld - 0.2, row.yld - 0.15, row.yld - 0.1, row.yld - 0.05, row.yld - 0.02, row.yld]}
-                w={120}
-                h={20}
-              />
+              <span style={{ fontSize: 13, color: 'var(--ink-2)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                {row.tenor}
+                {row.yld == null && <DemoBadge />}
+              </span>
+              {row.spark.length >= 2 ? <Sparkline data={row.spark} w={120} h={20} /> : <span />}
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-                <span className="serif-num" style={{ fontSize: 20 }}>{row.yld.toFixed(2)}</span>
-                <Delta value={row.delta} invert size="sm" />
+                <span className="serif-num" style={{ fontSize: 20 }}>{row.yld != null ? row.yld.toFixed(2) : '—'}</span>
+                {row.delta != null && <Delta value={row.delta} invert size="sm" />}
               </div>
             </div>
           ))}

@@ -12,6 +12,7 @@ export interface YieldsData {
   // vintage differs from the daily anchor — consumers must not date them "today".
   tenorAsOf: Record<TenorKey, string | null>
   spread10Y_91D_bps: number | null
+  spread91D_SDF_bps: number | null
   asOf: string | null
 }
 
@@ -33,6 +34,7 @@ export function useYields(): UseYieldsResult {
         const [
           y91, y182, y364, y2y, y5y, y10y, y20y,
           s91, s182, s364, s2y, s5y, s10y, s20y,
+          sdf,
         ] = await Promise.all([
           fetchLatest(METRIC.TBILL_91),
           fetchLatest(METRIC.TBILL_182),
@@ -48,6 +50,7 @@ export function useYields(): UseYieldsResult {
           fetchSeries(METRIC.TBOND_5Y,  { limit: 11 }),
           fetchSeries(METRIC.TBOND_10Y, { limit: 11 }),
           fetchSeries(METRIC.YIELD_20Y_M, { limit: 11 }),
+          fetchLatest(METRIC.POLICY_RATE_SDF),
         ])
         if (cancelled) return
 
@@ -58,6 +61,7 @@ export function useYields(): UseYieldsResult {
         const v5y  = y5y?.value  ?? null
         const v10y = y10y?.value ?? null
         const v20y = y20y?.value ?? null
+        const vSdf = sdf?.value ?? null
 
         setState({
           loading: false,
@@ -78,6 +82,7 @@ export function useYields(): UseYieldsResult {
               '2Y': y2y?.asOf ?? null, '5Y': y5y?.asOf ?? null, '10Y': y10y?.asOf ?? null, '20Y': y20y?.asOf ?? null,
             },
             spread10Y_91D_bps: spreadBps(v10y, v91),
+            spread91D_SDF_bps: spreadBps(v91, vSdf),
             asOf: y91?.asOf ?? y10y?.asOf ?? null,
           },
         })
