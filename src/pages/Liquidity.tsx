@@ -1,7 +1,7 @@
 import { useIsDesktop } from '../lib/hooks'
 import { useLiquidity } from '../hooks/useLiquidity'
 import { monthLabel } from '../lib/dates'
-import { DemoBadge, ListRow, SectionTitle } from '../components/primitives'
+import { DemoBadge, ListRow, OutageChip, SectionTitle } from '../components/primitives'
 import { AreaChart, BarChart } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 
@@ -105,12 +105,12 @@ const EXCESS_LIQ_WARN_LAKH_CR = 2.0   // bars below this render warn (tightening
 const EXCESS_LIQ_FLOOR_LAKH_CR = 1.5  // reference line on the desktop bar chart
 
 function LiquidityMobile() {
-  const { data } = useLiquidity()
+  const { data, error } = useLiquidity()
   const m2Vintage = monthLabel(data?.m2YoYAsOf)
 
   return (
     <>
-      <SectionTitle kicker="System pulse" title="Liquidity" />
+      <SectionTitle kicker="System pulse" title="Liquidity" action={error != null ? <OutageChip /> : undefined} />
 
       <div style={{ padding: '0 22px 28px' }}>
         <div className="caption">Call money · overnight</div>
@@ -173,11 +173,11 @@ function LiquidityMobile() {
 }
 
 function LiquidityDesktop() {
-  const { data } = useLiquidity()
+  const { data, error } = useLiquidity()
   const m2Vintage = monthLabel(data?.m2YoYAsOf)
   return (
     <>
-      <DesktopHeader section="Liquidity" breadcrumb="YieldScope · Money market & corridor" />
+      <DesktopHeader section="Liquidity" breadcrumb="YieldScope · Money market & corridor" action={error != null ? <OutageChip /> : undefined} />
 
       <div
         style={{

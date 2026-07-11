@@ -1,6 +1,6 @@
 import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
-import { Collapse, DemoBadge, SectionTitle } from '../components/primitives'
+import { Collapse, DemoBadge, OutageChip, SectionTitle } from '../components/primitives'
 import { YieldCurve } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useDashboard } from '../hooks/useDashboard'
@@ -14,7 +14,6 @@ interface MetricRow {
   lbl: string
   v: string
   u: string
-  hint?: string
 }
 
 interface MovingItem {
@@ -24,15 +23,7 @@ interface MovingItem {
   when?: string
 }
 
-const HERO_LINE =
-  'The short end is easing — but call money has now pierced the repo for a second session, and reserves slipped through the IMF floor.'
-
-const MOVING: MovingItem[] = [
-  { tag: 'Liquidity', text: 'Call rate breached the repo for a 2nd session — VAT outflow not fully sterilised.',  sev: 'warn', when: '09:42' },
-  { tag: 'Auctions',  text: '364-day undersubscribed in 3 of last 4 prints. Cover at 1.17x. Devolvement risk.',   sev: 'warn', when: '08:15' },
-  { tag: 'Reserves',  text: 'FX reserves through USD 21Bn floor. Import cover 2.94 months — below IMF EFF.',      sev: 'neg',  when: 'EOD' },
-  { tag: 'Inflation', text: 'Headline CPI down 18 bps to 9.20%. Food easing faster than core.',                   sev: 'pos',  when: 'M-1' },
-]
+const NO_BRIEFING_HERO = 'No weekly briefing yet — the figures below are live.'
 
 function sevColor(sev: 'warn' | 'neg' | 'pos') {
   return sev === 'warn' ? 'var(--warn)' : sev === 'neg' ? 'var(--neg)' : 'var(--pos)'
@@ -62,31 +53,36 @@ function BriefingDisclosure({ weekOf, dataAsOf, staleCount }: BriefingDisclosure
   )
 }
 
+function NoBriefNote({ pad }: { pad: string }) {
+  return (
+    <div style={{ padding: pad }}>
+      <div className="caption" style={{ color: 'var(--ink-2)' }}>
+        No weekly briefing yet — generated Monday mornings (BDT).
+      </div>
+    </div>
+  )
+}
+
 function DashboardMobile() {
-  const { data } = useDashboard()
+  const { data, error } = useDashboard()
   const { briefings } = useBriefing()
   const brief = briefings[0] ?? null
   const moving: MovingItem[] = brief
     ? brief.featuredAnomalies.map(a => ({ tag: a.label, text: a.why || a.detail, sev: sevFromAnomaly(a.severity) }))
-    : MOVING
+    : []
 
   const metrics: MetricRow[] = [
     { lbl: '91-day T-Bill',    v: data?.tbill91     != null ? data.tbill91.toFixed(2)     : '—', u: '%' },
     { lbl: '10-year BGTB',     v: data?.tbond10     != null ? data.tbond10.toFixed(2)     : '—', u: '%' },
-    { lbl: 'Call money · o/n', v: data?.callMoney   != null ? data.callMoney.toFixed(2)   : '—', u: '%',   hint: 'Above repo' },
-    { lbl: 'CPI · headline',   v: data?.cpiHeadline != null ? data.cpiHeadline.toFixed(2) : '—', u: '%·y', hint: 'April' },
+    { lbl: 'Call money · o/n', v: data?.callMoney   != null ? data.callMoney.toFixed(2)   : '—', u: '%' },
+    { lbl: 'CPI · headline',   v: data?.cpiHeadline != null ? data.cpiHeadline.toFixed(2) : '—', u: '%·y' },
   ]
 
   return (
     <>
-      <SectionTitle kicker={todayLabel()} title="Today" />
+      <SectionTitle kicker={todayLabel()} title="Today" action={error != null ? <OutageChip /> : undefined} />
 
       <div style={{ padding: '0 22px 24px' }}>
-        {brief == null && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <DemoBadge />
-          </div>
-        )}
         <p
           style={{
             margin: 0,
@@ -96,7 +92,7 @@ function DashboardMobile() {
             color: 'var(--ink)',
           }}
         >
-          {brief ? brief.title : HERO_LINE}
+          {brief ? brief.title : NO_BRIEFING_HERO}
         </p>
         {brief && (
           <BriefingDisclosure weekOf={brief.weekOf} dataAsOf={brief.dataAsOf} staleCount={brief.staleSeries.length} />
@@ -124,7 +120,6 @@ function DashboardMobile() {
                   <span className="caption">{m.u}</span>
                 </div>
               </div>
-              {m.hint && <div className="caption" style={{ textAlign: 'right' }}>{m.hint}</div>}
             </div>
           ))}
         </div>
@@ -149,37 +144,40 @@ function DashboardMobile() {
       <div style={{ padding: '32px 22px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div className="eyebrow">What's moving</div>
-          {brief == null && <DemoBadge />}
         </div>
       </div>
       <div style={{ padding: '0 22px 16px' }}>
-        {moving.slice(0, 3).map((a, i, arr) => (
-          <div
-            key={i}
-            style={{
-              padding: '14px 0',
-              borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none',
-              display: 'flex',
-              gap: 14,
-              alignItems: 'flex-start',
-            }}
-          >
-            <span
+        {moving.length === 0 ? (
+          <div className="caption">No briefing-flagged movers this week.</div>
+        ) : (
+          moving.slice(0, 3).map((a, i, arr) => (
+            <div
+              key={i}
               style={{
-                width: 5,
-                height: 5,
-                borderRadius: 99,
-                marginTop: 8,
-                background: sevColor(a.sev),
-                flexShrink: 0,
+                padding: '14px 0',
+                borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none',
+                display: 'flex',
+                gap: 14,
+                alignItems: 'flex-start',
               }}
-            />
-            <div style={{ flex: 1 }}>
-              <div className="caption" style={{ marginBottom: 3 }}>{a.tag}</div>
-              <div style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--ink)' }}>{a.text}</div>
+            >
+              <span
+                style={{
+                  width: 5,
+                  height: 5,
+                  borderRadius: 99,
+                  marginTop: 8,
+                  background: sevColor(a.sev),
+                  flexShrink: 0,
+                }}
+              />
+              <div style={{ flex: 1 }}>
+                <div className="caption" style={{ marginBottom: 3 }}>{a.tag}</div>
+                <div style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--ink)' }}>{a.text}</div>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       <div style={{ padding: '12px 16px 24px' }}>
@@ -187,13 +185,12 @@ function DashboardMobile() {
           eyebrow={
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
               Weekly briefing
-              {brief == null && <DemoBadge />}
             </span>
           }
-          title={brief ? brief.title : 'The short end is rotating, not relaxing'}
-          summary="Three forces are squeezing the front — read full analysis."
+          title={brief ? brief.title : 'Weekly briefing'}
+          summary={brief ? 'Read the full weekly analysis.' : undefined}
         >
-          <BriefingBody markdown={brief ? brief.body : FX.intel.weekly} baseSize={14} />
+          {brief ? <BriefingBody markdown={brief.body} baseSize={14} /> : <NoBriefNote pad="0" />}
           <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
             <button type="button" className="btn btn-sm">Open full notes</button>
           </div>
@@ -204,7 +201,7 @@ function DashboardMobile() {
 }
 
 function DashboardDesktop() {
-  const { data } = useDashboard()
+  const { data, error } = useDashboard()
   const { data: auctions } = useAuctions()
   const recentAuctions = (auctions?.results?.length ? auctions.results : fixtureToDisplay(FX.auctions)).slice(0, 4)
   const auctionsLive = !!auctions?.results?.length
@@ -212,25 +209,20 @@ function DashboardDesktop() {
   const brief = briefings[0] ?? null
   const moving: MovingItem[] = brief
     ? brief.featuredAnomalies.map(a => ({ tag: a.label, text: a.why || a.detail, sev: sevFromAnomaly(a.severity) }))
-    : MOVING
+    : []
 
   const metrics: MetricRow[] = [
     { lbl: '91-day T-Bill',    v: data?.tbill91     != null ? data.tbill91.toFixed(2)     : '—', u: '%' },
     { lbl: '10-year BGTB',     v: data?.tbond10     != null ? data.tbond10.toFixed(2)     : '—', u: '%' },
-    { lbl: 'Call money · o/n', v: data?.callMoney   != null ? data.callMoney.toFixed(2)   : '—', u: '%',   hint: 'Above repo' },
-    { lbl: 'CPI · headline',   v: data?.cpiHeadline != null ? data.cpiHeadline.toFixed(2) : '—', u: '%·y', hint: 'April' },
+    { lbl: 'Call money · o/n', v: data?.callMoney   != null ? data.callMoney.toFixed(2)   : '—', u: '%' },
+    { lbl: 'CPI · headline',   v: data?.cpiHeadline != null ? data.cpiHeadline.toFixed(2) : '—', u: '%·y' },
   ]
 
   return (
     <>
-      <DesktopHeader section="Today" breadcrumb={`YieldScope · ALCO Intelligence · ${weekdayName()}`} />
+      <DesktopHeader section="Today" breadcrumb={`YieldScope · ALCO Intelligence · ${weekdayName()}`} action={error != null ? <OutageChip /> : undefined} />
 
       <div style={{ padding: '40px 48px 24px' }}>
-        {brief == null && (
-          <div style={{ marginBottom: 14 }}>
-            <DemoBadge />
-          </div>
-        )}
         <p
           style={{
             margin: 0,
@@ -241,7 +233,7 @@ function DashboardDesktop() {
             maxWidth: 880,
           }}
         >
-          {brief ? brief.title : HERO_LINE}
+          {brief ? brief.title : NO_BRIEFING_HERO}
         </p>
         {brief && (
           <BriefingDisclosure weekOf={brief.weekOf} dataAsOf={brief.dataAsOf} staleCount={brief.staleSeries.length} />
@@ -263,9 +255,6 @@ function DashboardDesktop() {
               <span className="serif-num" style={{ fontSize: 48 }}>{m.v}</span>
               <span className="caption">{m.u}</span>
             </div>
-            {m.hint && (
-              <div className="caption" style={{ marginTop: 10 }}>{m.hint}</div>
-            )}
           </div>
         ))}
       </div>
@@ -297,38 +286,41 @@ function DashboardDesktop() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
             <div className="eyebrow">What's moving</div>
-            {brief == null && <DemoBadge />}
           </div>
-          {moving.map((a, i, arr) => (
-            <div
-              key={i}
-              style={{
-                padding: '16px 0',
-                borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none',
-                display: 'flex',
-                gap: 14,
-                alignItems: 'flex-start',
-              }}
-            >
-              <span
+          {moving.length === 0 ? (
+            <div className="caption">No briefing-flagged movers this week.</div>
+          ) : (
+            moving.map((a, i, arr) => (
+              <div
+                key={i}
                 style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: 99,
-                  marginTop: 8,
-                  background: sevColor(a.sev),
-                  flexShrink: 0,
+                  padding: '16px 0',
+                  borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none',
+                  display: 'flex',
+                  gap: 14,
+                  alignItems: 'flex-start',
                 }}
-              />
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-                  <span className="caption" style={{ color: 'var(--ink)', fontWeight: 500 }}>{a.tag}</span>
-                  {a.when && <span className="caption">{a.when}</span>}
+              >
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: 99,
+                    marginTop: 8,
+                    background: sevColor(a.sev),
+                    flexShrink: 0,
+                  }}
+                />
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+                    <span className="caption" style={{ color: 'var(--ink)', fontWeight: 500 }}>{a.tag}</span>
+                    {a.when && <span className="caption">{a.when}</span>}
+                  </div>
+                  <div style={{ fontSize: 14, lineHeight: 1.55, color: 'var(--ink)', marginTop: 4 }}>{a.text}</div>
                 </div>
-                <div style={{ fontSize: 14, lineHeight: 1.55, color: 'var(--ink)', marginTop: 4 }}>{a.text}</div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -346,13 +338,12 @@ function DashboardDesktop() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <div className="eyebrow">Weekly briefing · drafted by Claude</div>
-            {brief == null && <DemoBadge />}
           </div>
           <h3 className="display" style={{ fontSize: 28, margin: 0 }}>
-            {brief ? brief.title : 'The short end is rotating, not relaxing.'}
+            {brief ? brief.title : 'Weekly briefing'}
           </h3>
           <div style={{ marginTop: 14, maxWidth: 640 }}>
-            <BriefingBody markdown={brief ? brief.body : FX.intel.weekly} baseSize={15} />
+            {brief ? <BriefingBody markdown={brief.body} baseSize={15} /> : <NoBriefNote pad="0" />}
           </div>
           <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
             <button type="button" className="btn">Open full briefing</button>

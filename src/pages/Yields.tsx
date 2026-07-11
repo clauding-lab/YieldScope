@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
-import { Delta, DemoBadge, SectionTitle, Sparkline, Tabs } from '../components/primitives'
+import { Delta, DemoBadge, OutageChip, SectionTitle, Sparkline, Tabs } from '../components/primitives'
 import { AreaChart, YieldCurve } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
-import { useYields, type TenorKey } from '../hooks/useYields'
+import { useYields, type TenorKey, type YieldsData } from '../hooks/useYields'
 import { useAuctions } from '../hooks/useAuctions'
 import { fixtureToDisplay } from '../lib/auctions'
 import { isLiveDataAvailable } from '../lib/econdelta'
@@ -20,9 +20,7 @@ const UPCOMING = [
   { date: '09 Jun', day: 'Tue', tenor: '91D · 364D',        size: '32k Cr' },
 ]
 
-function YieldsCurveTab() {
-  const { data } = useYields()
-
+function YieldsCurveTab({ data }: { data: YieldsData | null }) {
   const tenorLadder = HISTORY_TENORS.map(t => {
     const yld = data?.yields[t] ?? null
     const spark = data?.series[t] ?? []
@@ -110,8 +108,7 @@ function YieldsCurveTab() {
   )
 }
 
-function YieldsHistoryTab() {
-  const { data: yieldsData } = useYields()
+function YieldsHistoryTab({ data: yieldsData }: { data: YieldsData | null }) {
   const [tenor, setTenor] = useState<TenorKey>('91D')
   const series = yieldsData?.series[tenor] ?? []
   const hasData = series.length > 0
@@ -255,9 +252,13 @@ function YieldsAuctionsTab() {
 
 function YieldsMobile() {
   const [tab, setTab] = useState<YieldsTab>('curve')
+  // Single useYields() call shared by header and body — the curve/history tabs
+  // used to call the hook independently, which could let the header chip and
+  // tab body disagree under partial fetch failure (module-mocked in tests too).
+  const { data, error } = useYields()
   return (
     <>
-      <SectionTitle kicker="Sovereign rates" title="Yields" />
+      <SectionTitle kicker="Sovereign rates" title="Yields" action={error != null ? <OutageChip /> : undefined} />
       <div style={{ padding: '0 22px 18px' }}>
         <Tabs<YieldsTab>
           tabs={[
@@ -269,15 +270,15 @@ function YieldsMobile() {
           onChange={setTab}
         />
       </div>
-      {tab === 'curve' && <YieldsCurveTab />}
-      {tab === 'series' && <YieldsHistoryTab />}
+      {tab === 'curve' && <YieldsCurveTab data={data} />}
+      {tab === 'series' && <YieldsHistoryTab data={data} />}
       {tab === 'auctions' && <YieldsAuctionsTab />}
     </>
   )
 }
 
 function YieldsDesktop() {
-  const { data } = useYields()
+  const { data, error } = useYields()
   const { data: auctions } = useAuctions()
   const recent = auctions?.results?.length ? auctions.results : fixtureToDisplay(FX.auctions)
   const recentLive = !!auctions?.results?.length
@@ -295,7 +296,7 @@ function YieldsDesktop() {
 
   return (
     <>
-      <DesktopHeader section="Yields" breadcrumb="YieldScope · Sovereign curve & auctions" />
+      <DesktopHeader section="Yields" breadcrumb="YieldScope · Sovereign curve & auctions" action={error != null ? <OutageChip /> : undefined} />
 
       <div
         style={{

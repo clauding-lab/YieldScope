@@ -4,12 +4,12 @@ import { useFiscal } from '../hooks/useFiscal'
 import { useIssuance } from '../hooks/useIssuance'
 import { roundTo } from '../lib/yieldMath'
 import { monthLabel } from '../lib/dates'
-import { Bar, DemoBadge, ListRow, SectionTitle } from '../components/primitives'
+import { Bar, DemoBadge, ListRow, OutageChip, SectionTitle } from '../components/primitives'
 import { AreaChart, RadialGauge } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 
 function FiscalMobile() {
-  const { data } = useFiscal()
+  const { data, error } = useFiscal()
   const nbrFytdCr = data?.nbrFytdCr ?? null
   const nbrFytdAsOf = data?.nbrFytdAsOf ?? null
   const domesticBorrowingCr = data?.domesticBorrowingCr ?? null
@@ -24,7 +24,7 @@ function FiscalMobile() {
   )
   return (
     <>
-      <SectionTitle kicker="Sovereign balance sheet" title="Fiscal" />
+      <SectionTitle kicker="Sovereign balance sheet" title="Fiscal" action={error != null ? <OutageChip /> : undefined} />
 
       <div style={{ padding: '0 22px 28px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
@@ -78,7 +78,7 @@ function FiscalMobile() {
 }
 
 function FiscalDesktop() {
-  const { data } = useFiscal()
+  const { data, error } = useFiscal()
   const { data: issuance, error: issuanceError } = useIssuance()
   const nbrFytdCr = data?.nbrFytdCr ?? null
   const domesticBorrowingCr = data?.domesticBorrowingCr ?? null
@@ -98,7 +98,7 @@ function FiscalDesktop() {
   )
   return (
     <>
-      <DesktopHeader section="Fiscal" breadcrumb="YieldScope · Sovereign balance sheet" />
+      <DesktopHeader section="Fiscal" breadcrumb="YieldScope · Sovereign balance sheet" action={error != null ? <OutageChip /> : undefined} />
 
       <div
         style={{

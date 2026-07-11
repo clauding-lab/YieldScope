@@ -80,3 +80,25 @@ describe('Liquidity — excess-liquidity render layer (100x label regression pin
     expect(m2Section.querySelector('svg')).toBeNull()
   })
 })
+
+describe('Liquidity · OutageChip surfaces a swallowed useLiquidity error', () => {
+  it('mobile: shows the outage chip when useLiquidity errors', () => {
+    vi.mocked(useIsDesktop).mockReturnValue(false)
+    vi.mocked(useLiquidity).mockReturnValue({ data: null, loading: false, error: new Error('boom') })
+    render(<Liquidity />)
+    expect(screen.getByText(/live data unavailable/i)).toBeInTheDocument()
+  })
+
+  it('desktop: shows the outage chip when useLiquidity errors', () => {
+    vi.mocked(useIsDesktop).mockReturnValue(true)
+    vi.mocked(useLiquidity).mockReturnValue({ data: null, loading: false, error: new Error('boom') })
+    render(<Liquidity />)
+    expect(screen.getByText(/live data unavailable/i)).toBeInTheDocument()
+  })
+
+  it('mobile: no outage chip when useLiquidity has no error', () => {
+    vi.mocked(useIsDesktop).mockReturnValue(false)
+    render(<Liquidity />)
+    expect(screen.queryByText(/live data unavailable/i)).not.toBeInTheDocument()
+  })
+})
