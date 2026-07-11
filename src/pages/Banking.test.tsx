@@ -60,3 +60,19 @@ describe('Banking · CAR provenance qualifier is print-specific', () => {
     expect(screen.queryByText('stale')).not.toBeInTheDocument()
   })
 })
+
+describe('Banking · mobile prudential list has LCR/NSFR fixture rows removed', () => {
+  it('renders the "Capital adequacy" heading with only the CAR row — no fixture LCR/NSFR rows', () => {
+    vi.mocked(useIsDesktop).mockReturnValue(false)
+    vi.mocked(useBanking).mockReturnValue({ data: BASE, loading: false, error: null })
+    render(<Banking />)
+    expect(screen.getByText('Capital adequacy')).toBeInTheDocument()
+    expect(screen.queryByText('Basel-III ratios')).not.toBeInTheDocument()
+    // Exact row labels — the Top-10 heatmap's 'LCR %'/'NSFR %' table columns
+    // are desktop-only (BankingDesktop) and don't render in mobile view, but
+    // asserting the exact 'LCR'/'NSFR' row label (not the ' %' column header)
+    // keeps this test correct even if that assumption ever changes.
+    expect(screen.queryByText('LCR')).not.toBeInTheDocument()
+    expect(screen.queryByText('NSFR')).not.toBeInTheDocument()
+  })
+})

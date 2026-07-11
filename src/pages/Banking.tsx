@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import { useIsDesktop } from '../lib/hooks'
-import { FX } from '../data/fixtures'
 import { Bar, DemoBadge, ListRow, SectionTitle } from '../components/primitives'
 import { AreaChart, Donut, DonutLegend, Heatmap, SlopeChart } from '../components/charts'
 import type { SlopeItem } from '../components/charts/SlopeChart'
@@ -76,7 +75,6 @@ function severityColor(sev: 'neg' | 'warn' | 'pos') {
 }
 
 function BankingMobile({ liveData }: { liveData: BankingData | null }) {
-  const B = FX.banking
   const nplRatio = liveData?.nplRatio ?? null
   const nplVintage = liveData?.nplVintage ?? null
   const crar     = liveData?.crar     ?? null  // plausibility-gated: null when fabricated/absent
@@ -92,9 +90,7 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
   // alone; hardcoding the string here would attach a false provenance to it.
   const crarQualifier = liveData?.crarQualifier ?? undefined
   const prudential: { lbl: string; v: number | null; max: number; unit: string; live: boolean; vintage?: string | null; qualifier?: string; stale?: boolean }[] = [
-    { lbl: 'CAR',  v: crar,   max: 16,  unit: '%', live: true, vintage: crarVintage, qualifier: crarQualifier, stale: crarStale },
-    { lbl: 'LCR',  v: B.lcr,  max: 180, unit: '%', live: false },
-    { lbl: 'NSFR', v: B.nsfr, max: 140, unit: '%', live: false },
+    { lbl: 'CAR', v: crar, max: 16, unit: '%', live: true, vintage: crarVintage, qualifier: crarQualifier, stale: crarStale },
   ]
   return (
     <>
@@ -155,7 +151,7 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
 
       <div style={{ padding: '0 22px 28px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-          <div className="eyebrow">Basel-III ratios</div>
+          <div className="eyebrow">Capital adequacy</div>
         </div>
         {prudential.map(p => {
           const provenance = p.qualifier && p.v != null
