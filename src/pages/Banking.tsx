@@ -95,9 +95,17 @@ function BankingDesktop({ liveData, error }: { liveData: BankingData | null; err
   const nplRatio = liveData?.nplRatio ?? null
   const nplVintage = liveData?.nplVintage ?? null
   const nplHist  = liveData?.nplHist?.length ? liveData.nplHist : null
-  const cdRatio  = liveData?.cdRatio ?? null
+  const crar = liveData?.crar ?? null
+  const crarVintage = liveData?.crarVintage ?? null
+  const crarStale = liveData?.crarStale ?? false
+  const crarQualifier = liveData?.crarQualifier ?? undefined
+  const pvtCreditYoY = liveData?.pvtCreditYoY ?? null
+  const pvtCreditVintage = monthLabel(liveData?.pvtCreditYoYAsOf)
   const repoBorrowCr = liveData?.repoBorrowCr ?? null
   const repoBorrowHist = liveData?.repoBorrowHist ?? []
+  const crarProvenance = crarQualifier && crar != null
+    ? `${crarQualifier}${crarVintage ? ` · ${crarVintage}` : ''}`
+    : crarVintage ?? null
   return (
     <>
       <DesktopHeader section="Banking" breadcrumb="YieldScope · Sector health & prudential" action={error != null ? <OutageChip /> : undefined} />
@@ -106,18 +114,22 @@ function BankingDesktop({ liveData, error }: { liveData: BankingData | null; err
         style={{
           padding: '40px 48px 32px',
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 48,
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: 40,
         }}
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <div className="eyebrow">Pvt credit / deposits</div>
-            {cdRatio == null && <DemoBadge />}
+            <div className="eyebrow">Capital adequacy · CAR</div>
+            {crar == null && <DemoBadge />}
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-            <span className="serif-num" style={{ fontSize: 72 }}>{cdRatio != null ? cdRatio.toFixed(1) : '—'}</span>
+            <span className="serif-num" style={{ fontSize: 56 }}>{crar != null ? crar : '—'}</span>
             <span className="caption">%</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
+            {crarProvenance && <div className="caption">{crarProvenance}</div>}
+            {crarStale && crar != null && <span className="chip chip-warn">stale</span>}
           </div>
         </div>
         <div>
@@ -126,15 +138,21 @@ function BankingDesktop({ liveData, error }: { liveData: BankingData | null; err
             {nplRatio == null && <DemoBadge />}
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-            <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>{nplRatio != null ? nplRatio.toFixed(1) : '—'}</span>
+            <span className="serif-num" style={{ fontSize: 56, color: 'var(--neg)' }}>{nplRatio != null ? nplRatio.toFixed(1) : '—'}</span>
             <span className="caption">%</span>
           </div>
           {nplVintage && <div className="caption" style={{ marginTop: 4 }}>{nplVintage}</div>}
-          {nplHist && (
-            <div style={{ marginTop: 18 }}>
-              <AreaChart data={nplHist} w={400} h={100} color="var(--neg)" />
-            </div>
-          )}
+        </div>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <div className="eyebrow">Pvt credit · YoY</div>
+            {pvtCreditYoY == null && <DemoBadge />}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+            <span className="serif-num" style={{ fontSize: 56 }}>{pvtCreditYoY != null ? pvtCreditYoY.toFixed(1) : '—'}</span>
+            <span className="caption">%</span>
+          </div>
+          {pvtCreditVintage && <div className="caption" style={{ marginTop: 4 }}>{pvtCreditVintage}</div>}
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
@@ -142,17 +160,41 @@ function BankingDesktop({ liveData, error }: { liveData: BankingData | null; err
             {repoBorrowCr == null && <DemoBadge />}
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-            <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>{repoBorrowCr != null ? (repoBorrowCr / 1000).toFixed(1) : '—'}</span>
+            <span className="serif-num" style={{ fontSize: 56, color: 'var(--neg)' }}>{repoBorrowCr != null ? (repoBorrowCr / 1000).toFixed(1) : '—'}</span>
             <span className="caption">k Cr</span>
           </div>
-          {repoBorrowHist.length >= 2 && (
-            <div style={{ marginTop: 18 }}>
-              <AreaChart data={repoBorrowHist} w={400} h={100} color="var(--neg)" />
-            </div>
-          )}
         </div>
       </div>
 
+      <div style={{ height: 1, background: 'var(--line)', margin: '0 48px' }} />
+
+      <div
+        style={{
+          padding: '36px 48px 48px',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 48,
+        }}
+      >
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+            <div className="eyebrow">NPL · industry · trend</div>
+            {nplHist == null && <DemoBadge />}
+          </div>
+          {nplHist
+            ? <AreaChart data={nplHist} w={560} h={200} color="var(--neg)" />
+            : <div className="caption">Awaiting NPL history.</div>}
+        </div>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+            <div className="eyebrow">Interbank repo · volume · trend</div>
+            {repoBorrowHist.length < 2 && <DemoBadge />}
+          </div>
+          {repoBorrowHist.length >= 2
+            ? <AreaChart data={repoBorrowHist} w={560} h={200} color="var(--neg)" />
+            : <div className="caption">Awaiting repo-volume history.</div>}
+        </div>
+      </div>
     </>
   )
 }
