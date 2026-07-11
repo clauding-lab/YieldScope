@@ -108,7 +108,7 @@ export function weekdayShort(iso: string): string {
 }
 
 /** Rank a tenor by duration so '91D · 182D · 364D · 2Y …' sorts naturally. */
-function tenorRankDays(tenor: string): number {
+export function tenorRankDays(tenor: string): number {
   const m = tenor.match(/^(\d+(?:\.\d+)?)\s*([DYM])/i)
   if (!m) return Number.MAX_SAFE_INTEGER
   const n = Number(m[1])
@@ -224,4 +224,39 @@ export function toUpcomingAuctions(
         size: `${roundTo(sum / 1000, 1)} k Cr`,
       }
     })
+}
+
+export interface WeeklyIssuance {
+  weekLabel: string  // 'w/c' start date of the 7-day window, e.g. '11 Jul'
+  tbillCr: number
+  tbondCr: number
+}
+
+const DAY_MS = 86_400_000
+
+/** Bucket forward calendar entries into 7-day windows from `now` (today inclusive).
+ *  Bills = tenor < 365 days; bonds = the rest. Trailing all-zero weeks are trimmed
+ *  so the chart only claims the horizon the BB calendar actually covers. */
+export function toWeeklyIssuance(
+  cal: AuctionCalendarEntry[],
+  now: Date,
+  weeks = 12,
+): WeeklyIssuance[] {
+  const todayISO = isoLocal(now)
+  const t0 = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())
+  const buckets: WeeklyIssuance[] = Array.from({ length: weeks }, (_, i) => {
+    const start = new Date(t0 + i * 7 * DAY_MS)
+    return { weekLabel: dayMon(start.toISOString().slice(0, 10), false), tbillCr: 0, tbondCr: 0 }
+  })
+  for (const e of cal) {
+    if (e.date < todayISO || e.notionalCr == null) continue
+    const [y, m, d] = e.date.split('-').map(Number)
+    const idx = Math.floor((Date.UTC(y, m - 1, d) - t0) / (7 * DAY_MS))
+    if (idx < 0 || idx >= weeks) continue
+    if (tenorRankDays(e.tenor) < 365) buckets[idx] = { ...buckets[idx], tbillCr: buckets[idx].tbillCr + e.notionalCr }
+    else buckets[idx] = { ...buckets[idx], tbondCr: buckets[idx].tbondCr + e.notionalCr }
+  }
+  let last = -1
+  buckets.forEach((b, i) => { if (b.tbillCr > 0 || b.tbondCr > 0) last = i })
+  return buckets.slice(0, last + 1)
 }

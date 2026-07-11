@@ -1,14 +1,12 @@
 import type { ReactNode } from 'react'
 import { useIsDesktop } from '../lib/hooks'
 import { useFiscal } from '../hooks/useFiscal'
+import { useIssuance } from '../hooks/useIssuance'
 import { roundTo } from '../lib/yieldMath'
 import { monthLabel } from '../lib/dates'
 import { Bar, DemoBadge, ListRow, SectionTitle } from '../components/primitives'
 import { AreaChart, RadialGauge } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
-
-const ISSUANCE_T_BILL = [50, 38, 32, 45, 30, 40, 50, 35, 32, 40, 38, 45]
-const ISSUANCE_T_BOND = [ 0, 15,  0,  0, 12,  0,  0, 18,  0,  0, 14,  0]
 
 function FiscalMobile() {
   const { data } = useFiscal()
@@ -91,6 +89,7 @@ function FiscalMobile() {
 
 function FiscalDesktop() {
   const { data } = useFiscal()
+  const { data: issuance, error: issuanceError } = useIssuance()
   const nbrFytdCr = data?.nbrFytdCr ?? null
   const domesticBorrowingCr = data?.domesticBorrowingCr ?? null
   const debtGdpRatio = roundTo(data?.debtGdpRatio ?? null, 1)
@@ -196,41 +195,52 @@ function FiscalDesktop() {
 
       <div style={{ padding: '36px 48px 48px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18 }}>
-          <div className="eyebrow">Gross issuance calendar · next 12 weeks</div>
-          <DemoBadge />
+          <div className="eyebrow">
+            Gross issuance calendar · next {issuance?.length ?? 0} weeks · BB forward calendar
+          </div>
+          {(issuance == null || issuance.length === 0) && <DemoBadge />}
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 8 }}>
-          {Array.from({ length: 12 }, (_, i) => {
-            const week = `W${23 + i}`
-            const tbill = ISSUANCE_T_BILL[i]
-            const bond = ISSUANCE_T_BOND[i]
-            return (
-              <div key={week} style={{ textAlign: 'center' }}>
-                <div style={{ height: 80, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: 2 }}>
-                  <div style={{ height: `${(tbill / 65) * 100}%`, background: 'var(--accent)', borderRadius: '2px 2px 0 0' }} />
-                  {bond > 0 && (
-                    <div style={{ height: `${(bond / 65) * 100}%`, background: 'var(--info)', borderRadius: '2px 2px 0 0' }} />
-                  )}
-                </div>
-                <div style={{ marginTop: 8 }}>
-                  <div className="caption">{week}</div>
-                  <div className="serif-num" style={{ fontSize: 14, marginTop: 2 }}>{tbill + bond}</div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-        <div style={{ display: 'flex', gap: 20, marginTop: 20 }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ width: 12, height: 12, background: 'var(--accent)', borderRadius: 3 }} />
-            <span className="caption">T-bills</span>
-          </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ width: 12, height: 12, background: 'var(--info)', borderRadius: 3 }} />
-            <span className="caption">BGTB</span>
-          </span>
-          <span className="caption" style={{ marginLeft: 'auto' }}>k Cr</span>
-        </div>
+        {issuanceError != null ? (
+          <div className="card-flat" style={{ padding: '20px 18px' }}>
+            <div style={{ fontSize: 14, color: 'var(--warn)' }}>Couldn't load the auction calendar</div>
+          </div>
+        ) : issuance != null && issuance.length > 0 ? (
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${issuance.length}, 1fr)`, gap: 8 }}>
+              {issuance.map(w => {
+                const maxTotal = Math.max(...issuance.map(x => x.tbillCr + x.tbondCr))
+                const total = w.tbillCr + w.tbondCr
+                return (
+                  <div key={w.weekLabel} style={{ textAlign: 'center' }}>
+                    <div style={{ height: 80, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: 2 }}>
+                      {w.tbillCr > 0 && (
+                        <div style={{ height: `${(w.tbillCr / maxTotal) * 100}%`, background: 'var(--accent)', borderRadius: '2px 2px 0 0' }} />
+                      )}
+                      {w.tbondCr > 0 && (
+                        <div style={{ height: `${(w.tbondCr / maxTotal) * 100}%`, background: 'var(--info)', borderRadius: '2px 2px 0 0' }} />
+                      )}
+                    </div>
+                    <div style={{ marginTop: 8 }}>
+                      <div className="caption">{w.weekLabel}</div>
+                      <div className="serif-num" style={{ fontSize: 14, marginTop: 2 }}>{(total / 1000).toFixed(1)}</div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            <div style={{ display: 'flex', gap: 20, marginTop: 20 }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ width: 12, height: 12, background: 'var(--accent)', borderRadius: 3 }} />
+                <span className="caption">T-bills</span>
+              </span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ width: 12, height: 12, background: 'var(--info)', borderRadius: 3 }} />
+                <span className="caption">BGTB</span>
+              </span>
+              <span className="caption" style={{ marginLeft: 'auto' }}>k Cr / week</span>
+            </div>
+          </>
+        ) : null}
       </div>
     </>
   )
