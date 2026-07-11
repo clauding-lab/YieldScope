@@ -29,15 +29,56 @@ describe('Dashboard · honesty (no briefing)', () => {
     // The weekly-briefing panel is a collapsed accordion by default on mobile
     // (Collapse's defaultOpen is false) — open it to reach its body content.
     fireEvent.click(screen.getByRole('button', { name: /weekly briefing/i }))
-    expect(screen.getByText(/no weekly briefing yet/i)).toBeInTheDocument()
+    // Two honest "no briefing" surfaces now render (hero line + panel note) —
+    // assert on the panel note's unique tail to disambiguate from the hero.
+    expect(screen.getByText(/generated monday mornings/i)).toBeInTheDocument()
     expect(screen.queryByText(/three forces are squeezing the short end/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/call money has now pierced the repo/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/364-day undersubscribed/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/short end is rotating/i)).not.toBeInTheDocument()
   })
 
   it('desktop: renders an empty-state note, not the fixture essay, when no briefing exists', () => {
     vi.mocked(useIsDesktop).mockReturnValue(true)
     render(<Dashboard />)
-    expect(screen.getByText(/no weekly briefing yet/i)).toBeInTheDocument()
+    // Two honest "no briefing" surfaces now render (hero line + panel note) —
+    // assert on the panel note's unique tail to disambiguate from the hero.
+    expect(screen.getByText(/generated monday mornings/i)).toBeInTheDocument()
     expect(screen.queryByText(/three forces are squeezing the short end/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/call money has now pierced the repo/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/364-day undersubscribed/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/short end is rotating/i)).not.toBeInTheDocument()
+  })
+})
+
+describe('Dashboard · positive path (live briefing)', () => {
+  const LIVE_BRIEFING = {
+    weekOf: '2026-07-06',
+    generatedAt: '2026-07-06T01:04:32Z',
+    title: 'Live Title X',
+    body: 'Live body.',
+    featuredAnomalies: [],
+    openThreads: [],
+    dataAsOf: '2026-07-06',
+    staleSeries: [],
+  }
+
+  it('mobile: renders the live briefing title and drops the empty-state note', () => {
+    vi.mocked(useIsDesktop).mockReturnValue(false)
+    vi.mocked(useBriefing).mockReturnValue({ briefings: [LIVE_BRIEFING], loading: false, error: null })
+    render(<Dashboard />)
+    // Title renders twice on mobile: hero <p> + always-visible Collapse header.
+    expect(screen.getAllByText('Live Title X').length).toBeGreaterThan(0)
+    expect(screen.queryByText(/no weekly briefing yet/i)).not.toBeInTheDocument()
+  })
+
+  it('desktop: renders the live briefing title and drops the empty-state note', () => {
+    vi.mocked(useIsDesktop).mockReturnValue(true)
+    vi.mocked(useBriefing).mockReturnValue({ briefings: [LIVE_BRIEFING], loading: false, error: null })
+    render(<Dashboard />)
+    // Title renders twice on desktop: hero <p> + briefing panel <h3>.
+    expect(screen.getAllByText('Live Title X').length).toBeGreaterThan(0)
+    expect(screen.queryByText(/no weekly briefing yet/i)).not.toBeInTheDocument()
   })
 })
 

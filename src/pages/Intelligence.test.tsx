@@ -33,6 +33,14 @@ describe('Intelligence · honesty', () => {
     expect(screen.getByText('Call money breach')).toBeInTheDocument()
     expect(screen.queryByText(/alco decisions/i)).not.toBeInTheDocument()
   })
+
+  it('desktop, with no briefings: renders an empty state, never the fixture essay', () => {
+    vi.mocked(useIsDesktop).mockReturnValue(true)
+    vi.mocked(useBriefing).mockReturnValue({ briefings: [], loading: false, error: null })
+    render(<Intelligence />)
+    expect(screen.getByText(/no briefing published yet/i)).toBeInTheDocument()
+    expect(screen.queryByText(/the short end is rotating/i)).not.toBeInTheDocument()
+  })
 })
 
 describe('briefingsToTimeline', () => {
