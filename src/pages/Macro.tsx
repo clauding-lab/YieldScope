@@ -1,40 +1,11 @@
 import type { ReactNode } from 'react'
 import { useIsDesktop } from '../lib/hooks'
 import { Delta, DemoBadge, ListRow, OutageChip, SectionTitle, Sparkline } from '../components/primitives'
-import { AreaChart, Heatmap } from '../components/charts'
+import { AreaChart } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useMacro } from '../hooks/useMacro'
 import { monthLabel } from '../lib/dates'
 import { roundTo } from '../lib/yieldMath'
-
-const CPI_ROWS = ['Food', 'Non-food', 'Core', 'Headline']
-const CORE_CPI_FIXTURE = [8.40, 8.32, 8.18, 8.04, 7.94, 7.82, 7.74, 7.62]
-const CPI_COLS_FALLBACK = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr']
-
-function padOrTrim<T>(arr: T[], len: number, fill: T): T[] {
-  if (arr.length === len) return arr
-  if (arr.length > len) return arr.slice(-len)
-  return [...Array(len - arr.length).fill(fill), ...arr]
-}
-
-function buildCpiHeatmapData(data: ReturnType<typeof useMacro>['data']): number[][] {
-  const food = data?.foodHist?.length ? padOrTrim(data.foodHist, 8, NaN) : CORE_CPI_FIXTURE
-  const nonFood = data?.nonFoodHist?.length ? padOrTrim(data.nonFoodHist, 8, NaN) : CORE_CPI_FIXTURE
-  const headline = data?.cpiHist?.length ? padOrTrim(data.cpiHist, 8, NaN) : CORE_CPI_FIXTURE
-  return [food, nonFood, CORE_CPI_FIXTURE, headline]
-}
-
-function buildCpiHeatmapCols(data: ReturnType<typeof useMacro>['data']): string[] {
-  const months = data?.cpiMonths?.filter(Boolean) ?? []
-  return months.length === 8 ? months : CPI_COLS_FALLBACK
-}
-
-function cpiColor(v: number) {
-  const pct = Math.max(0, Math.min(1, (v - 7.5) / (11.5 - 7.5)))
-  if (pct > 0.66) return { bg: `rgba(213, 143, 118, ${0.25 + pct * 0.4})`,  fg: 'var(--neg)' }
-  if (pct > 0.33) return { bg: `rgba(215, 184, 114, ${0.22 + pct * 0.35})`, fg: 'var(--warn)' }
-  return { bg: `rgba(146, 176, 149, ${0.18 + (1 - pct) * 0.25})`, fg: 'var(--pos)' }
-}
 
 interface BopItem {
   lbl: string
@@ -106,7 +77,7 @@ function MacroMobile() {
       <SectionTitle kicker="Inflation · reserves · BoP" title="Macro" action={error != null ? <OutageChip /> : undefined} />
 
       <div style={{ padding: '0 22px 28px' }}>
-        <div className="caption">CPI · headline · April</div>
+        <div className="caption">CPI · headline</div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginTop: 4 }}>
           <span className="serif-num" style={{ fontSize: 64 }}>{data?.cpiHeadline?.toFixed(2) ?? '—'}</span>
           <span className="caption">% YoY</span>
@@ -124,10 +95,6 @@ function MacroMobile() {
             label="Food"
             value={fmtPct(data?.cpiFood)}
             sub={data?.foodHist?.length ? <Sparkline data={data.foodHist} w={80} h={16} color="var(--neg)" /> as ReactNode : undefined}
-          />
-          <ListRow
-            label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>Core <DemoBadge /></span> as ReactNode}
-            value="—"
           />
           <ListRow
             label="Non-food"
@@ -196,8 +163,6 @@ function MacroDesktop() {
   const { data, error } = useMacro()
   const bopItems = buildBopItems(data)
   const commodities = buildCommodities(data)
-  const cpiHeatmapData = buildCpiHeatmapData(data)
-  const cpiHeatmapCols = buildCpiHeatmapCols(data)
   const usdBdtChartData = data?.usdBdtHist?.length ? data.usdBdtHist : null
   const usdDelta = (data?.usdBdtHist && data.usdBdtHist.length >= 2)
     ? roundTo(data.usdBdtHist[data.usdBdtHist.length - 1] - data.usdBdtHist[data.usdBdtHist.length - 2], 2)
@@ -217,7 +182,7 @@ function MacroDesktop() {
         }}
       >
         <div>
-          <div className="eyebrow" style={{ marginBottom: 8 }}>Inflation · April</div>
+          <div className="eyebrow" style={{ marginBottom: 8 }}>Inflation</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
             <span className="serif-num" style={{ fontSize: 72 }}>{data?.cpiHeadline?.toFixed(2) ?? '—'}</span>
             <span className="caption">% YoY</span>
@@ -263,32 +228,6 @@ function MacroDesktop() {
               {b.d && <div className="caption" style={{ marginTop: 4 }}>{b.d}</div>}
             </div>
           ))}
-        </div>
-      </div>
-
-      <div style={{ height: 1, background: 'var(--line)', margin: '0 48px' }} />
-
-      <div style={{ padding: '36px 48px' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 18 }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <div className="eyebrow">CPI components · 8-month trajectory</div>
-              <DemoBadge />
-            </div>
-            <h3 className="display" style={{ fontSize: 22, margin: 0 }}>Where the heat is leaving</h3>
-          </div>
-          <div className="caption">YoY %, by month</div>
-        </div>
-        <div className="card-flat" style={{ padding: '22px 24px' }}>
-          <Heatmap
-            rows={CPI_ROWS}
-            cols={cpiHeatmapCols}
-            data={cpiHeatmapData}
-            leftW={100}
-            cellH={36}
-            fmt={v => Number.isFinite(v) ? v.toFixed(2) : '—'}
-            getColor={cpiColor}
-          />
         </div>
       </div>
 

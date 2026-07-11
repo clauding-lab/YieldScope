@@ -38,3 +38,22 @@ describe('Macro · OutageChip surfaces a swallowed useMacro error', () => {
     expect(screen.queryByText(/live data unavailable/i)).not.toBeInTheDocument()
   })
 })
+
+// Task 3: Core CPI row was a fabricated "—" fixture and the CPI-components
+// heatmap was backed by a hardcoded April vintage. Both are removed; the
+// live Food/Non-food rows and headline CPI number must survive.
+describe('Macro · Core CPI + heatmap removed', () => {
+  it.each([[false], [true]])('desktop=%s: no fabricated CPI surfaces', (desktop) => {
+    vi.mocked(useIsDesktop).mockReturnValue(desktop)
+    render(<Macro />)
+    expect(screen.queryByText(/CPI components/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/^Core$/)).not.toBeInTheDocument()       // fabricated Core row gone
+    expect(screen.queryByText(/· April/)).not.toBeInTheDocument()      // hardcoded vintage gone
+  })
+  it('keeps the live Food and Non-food CPI rows (mobile)', () => {
+    vi.mocked(useIsDesktop).mockReturnValue(false)
+    render(<Macro />)
+    expect(screen.getByText('Food')).toBeInTheDocument()
+    expect(screen.getByText('Non-food')).toBeInTheDocument()
+  })
+})
