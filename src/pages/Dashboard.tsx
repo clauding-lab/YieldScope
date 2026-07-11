@@ -24,15 +24,7 @@ interface MovingItem {
   when?: string
 }
 
-const HERO_LINE =
-  'The short end is easing — but call money has now pierced the repo for a second session, and reserves slipped through the IMF floor.'
-
-const MOVING: MovingItem[] = [
-  { tag: 'Liquidity', text: 'Call rate breached the repo for a 2nd session — VAT outflow not fully sterilised.',  sev: 'warn', when: '09:42' },
-  { tag: 'Auctions',  text: '364-day undersubscribed in 3 of last 4 prints. Cover at 1.17x. Devolvement risk.',   sev: 'warn', when: '08:15' },
-  { tag: 'Reserves',  text: 'FX reserves through USD 21Bn floor. Import cover 2.94 months — below IMF EFF.',      sev: 'neg',  when: 'EOD' },
-  { tag: 'Inflation', text: 'Headline CPI down 18 bps to 9.20%. Food easing faster than core.',                   sev: 'pos',  when: 'M-1' },
-]
+const NO_BRIEFING_HERO = 'No weekly briefing yet — the figures below are live.'
 
 function sevColor(sev: 'warn' | 'neg' | 'pos') {
   return sev === 'warn' ? 'var(--warn)' : sev === 'neg' ? 'var(--neg)' : 'var(--pos)'
@@ -78,7 +70,7 @@ function DashboardMobile() {
   const brief = briefings[0] ?? null
   const moving: MovingItem[] = brief
     ? brief.featuredAnomalies.map(a => ({ tag: a.label, text: a.why || a.detail, sev: sevFromAnomaly(a.severity) }))
-    : MOVING
+    : []
 
   const metrics: MetricRow[] = [
     { lbl: '91-day T-Bill',    v: data?.tbill91     != null ? data.tbill91.toFixed(2)     : '—', u: '%' },
@@ -101,7 +93,7 @@ function DashboardMobile() {
             color: 'var(--ink)',
           }}
         >
-          {brief ? brief.title : HERO_LINE}
+          {brief ? brief.title : NO_BRIEFING_HERO}
         </p>
         {brief && (
           <BriefingDisclosure weekOf={brief.weekOf} dataAsOf={brief.dataAsOf} staleCount={brief.staleSeries.length} />
@@ -157,33 +149,37 @@ function DashboardMobile() {
         </div>
       </div>
       <div style={{ padding: '0 22px 16px' }}>
-        {moving.slice(0, 3).map((a, i, arr) => (
-          <div
-            key={i}
-            style={{
-              padding: '14px 0',
-              borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none',
-              display: 'flex',
-              gap: 14,
-              alignItems: 'flex-start',
-            }}
-          >
-            <span
+        {moving.length === 0 ? (
+          <div className="caption">No briefing-flagged movers this week.</div>
+        ) : (
+          moving.slice(0, 3).map((a, i, arr) => (
+            <div
+              key={i}
               style={{
-                width: 5,
-                height: 5,
-                borderRadius: 99,
-                marginTop: 8,
-                background: sevColor(a.sev),
-                flexShrink: 0,
+                padding: '14px 0',
+                borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none',
+                display: 'flex',
+                gap: 14,
+                alignItems: 'flex-start',
               }}
-            />
-            <div style={{ flex: 1 }}>
-              <div className="caption" style={{ marginBottom: 3 }}>{a.tag}</div>
-              <div style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--ink)' }}>{a.text}</div>
+            >
+              <span
+                style={{
+                  width: 5,
+                  height: 5,
+                  borderRadius: 99,
+                  marginTop: 8,
+                  background: sevColor(a.sev),
+                  flexShrink: 0,
+                }}
+              />
+              <div style={{ flex: 1 }}>
+                <div className="caption" style={{ marginBottom: 3 }}>{a.tag}</div>
+                <div style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--ink)' }}>{a.text}</div>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       <div style={{ padding: '12px 16px 24px' }}>
@@ -193,7 +189,7 @@ function DashboardMobile() {
               Weekly briefing
             </span>
           }
-          title={brief ? brief.title : 'The short end is rotating, not relaxing'}
+          title={brief ? brief.title : 'Weekly briefing'}
           summary="Three forces are squeezing the front — read full analysis."
         >
           {brief ? <BriefingBody markdown={brief.body} baseSize={14} /> : <NoBriefNote pad="0" />}
@@ -215,7 +211,7 @@ function DashboardDesktop() {
   const brief = briefings[0] ?? null
   const moving: MovingItem[] = brief
     ? brief.featuredAnomalies.map(a => ({ tag: a.label, text: a.why || a.detail, sev: sevFromAnomaly(a.severity) }))
-    : MOVING
+    : []
 
   const metrics: MetricRow[] = [
     { lbl: '91-day T-Bill',    v: data?.tbill91     != null ? data.tbill91.toFixed(2)     : '—', u: '%' },
@@ -239,7 +235,7 @@ function DashboardDesktop() {
             maxWidth: 880,
           }}
         >
-          {brief ? brief.title : HERO_LINE}
+          {brief ? brief.title : NO_BRIEFING_HERO}
         </p>
         {brief && (
           <BriefingDisclosure weekOf={brief.weekOf} dataAsOf={brief.dataAsOf} staleCount={brief.staleSeries.length} />
@@ -296,36 +292,40 @@ function DashboardDesktop() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
             <div className="eyebrow">What's moving</div>
           </div>
-          {moving.map((a, i, arr) => (
-            <div
-              key={i}
-              style={{
-                padding: '16px 0',
-                borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none',
-                display: 'flex',
-                gap: 14,
-                alignItems: 'flex-start',
-              }}
-            >
-              <span
+          {moving.length === 0 ? (
+            <div className="caption">No briefing-flagged movers this week.</div>
+          ) : (
+            moving.map((a, i, arr) => (
+              <div
+                key={i}
                 style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: 99,
-                  marginTop: 8,
-                  background: sevColor(a.sev),
-                  flexShrink: 0,
+                  padding: '16px 0',
+                  borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none',
+                  display: 'flex',
+                  gap: 14,
+                  alignItems: 'flex-start',
                 }}
-              />
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-                  <span className="caption" style={{ color: 'var(--ink)', fontWeight: 500 }}>{a.tag}</span>
-                  {a.when && <span className="caption">{a.when}</span>}
+              >
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: 99,
+                    marginTop: 8,
+                    background: sevColor(a.sev),
+                    flexShrink: 0,
+                  }}
+                />
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+                    <span className="caption" style={{ color: 'var(--ink)', fontWeight: 500 }}>{a.tag}</span>
+                    {a.when && <span className="caption">{a.when}</span>}
+                  </div>
+                  <div style={{ fontSize: 14, lineHeight: 1.55, color: 'var(--ink)', marginTop: 4 }}>{a.text}</div>
                 </div>
-                <div style={{ fontSize: 14, lineHeight: 1.55, color: 'var(--ink)', marginTop: 4 }}>{a.text}</div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -345,7 +345,7 @@ function DashboardDesktop() {
             <div className="eyebrow">Weekly briefing · drafted by Claude</div>
           </div>
           <h3 className="display" style={{ fontSize: 28, margin: 0 }}>
-            {brief ? brief.title : 'The short end is rotating, not relaxing.'}
+            {brief ? brief.title : 'Weekly briefing'}
           </h3>
           <div style={{ marginTop: 14, maxWidth: 640 }}>
             {brief ? <BriefingBody markdown={brief.body} baseSize={15} /> : <NoBriefNote pad="0" />}
