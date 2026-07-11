@@ -4,8 +4,8 @@ import { useFiscal } from '../hooks/useFiscal'
 import { useIssuance } from '../hooks/useIssuance'
 import { roundTo } from '../lib/yieldMath'
 import { monthLabel } from '../lib/dates'
-import { Bar, DemoBadge, ListRow, OutageChip, SectionTitle } from '../components/primitives'
-import { AreaChart, RadialGauge } from '../components/charts'
+import { DemoBadge, ListRow, OutageChip, SectionTitle } from '../components/primitives'
+import { AreaChart } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 
 function FiscalMobile() {
@@ -25,26 +25,6 @@ function FiscalMobile() {
   return (
     <>
       <SectionTitle kicker="Sovereign balance sheet" title="Fiscal" action={error != null ? <OutageChip /> : undefined} />
-
-      <div style={{ padding: '0 22px 28px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-          <div className="caption">Fiscal pressure · composite</div>
-          <DemoBadge />
-        </div>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginTop: 4 }}>
-          <span className="serif-num" style={{ fontSize: 64, color: 'var(--warn)' }}>68</span>
-          <span className="caption">/ 100</span>
-        </div>
-
-        <div style={{ marginTop: 18 }}>
-          <Bar value={68} thresholds={[0.33, 0.66]} h={8} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-            <span className="caption">Low</span>
-            <span className="caption">Stress</span>
-            <span className="caption">Crisis</span>
-          </div>
-        </div>
-      </div>
 
       <div style={{ padding: '0 16px 24px' }}>
         <div className="card-flat">
@@ -100,41 +80,24 @@ function FiscalDesktop() {
     <>
       <DesktopHeader section="Fiscal" breadcrumb="YieldScope · Sovereign balance sheet" action={error != null ? <OutageChip /> : undefined} />
 
-      <div
-        style={{
-          padding: '40px 48px 32px',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1.2fr',
-          gap: 48,
-          alignItems: 'center',
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <RadialGauge value={68} max={100} label="Fiscal pressure · 0–100" thresholds={[33, 66]} size={280} />
-        </div>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <div className="eyebrow">Fiscal pressure index</div>
-            <DemoBadge />
-          </div>
-          <h2 className="display" style={{ fontSize: 36, margin: 0, color: 'var(--warn)' }}>Elevated.</h2>
-          <div className="card-flat" style={{ padding: 18, marginTop: 22, maxWidth: 540 }}>
-            <ListRow
-              label={nbrFytdCr == null ? demoLabel('NBR revenue · FYTD') : 'NBR revenue · FYTD'}
-              value={nbrFytdCr != null ? `${(nbrFytdCr / 1000).toFixed(1)} k Cr` : '—'}
-              sub={monthLabel(data?.nbrFytdAsOf ?? null) ?? undefined}
-            />
-            <ListRow
-              label={debtGdpRatio == null ? demoLabel('Debt / GDP') : 'Debt / GDP'}
-              value={debtGdpRatio != null ? `${debtGdpRatio}%` : '—'}
-              sub={debtGdpRatio != null && debtGdpAsOf ? `FY${debtGdpAsOf.slice(0, 4)}` : undefined}
-            />
-            <ListRow
-              label={domesticBorrowingCr == null ? demoLabel('Net dom. borrow') : 'Net dom. borrow'}
-              value={domesticBorrowingCr != null ? `${(domesticBorrowingCr / 1000).toFixed(1)} k Cr` : '—'}
-              last
-            />
-          </div>
+      <div style={{ padding: '40px 48px 32px' }}>
+        <div className="eyebrow" style={{ marginBottom: 12 }}>Key fiscal metrics</div>
+        <div className="card-flat" style={{ padding: 18, maxWidth: 540 }}>
+          <ListRow
+            label={nbrFytdCr == null ? demoLabel('NBR revenue · FYTD') : 'NBR revenue · FYTD'}
+            value={nbrFytdCr != null ? `${(nbrFytdCr / 1000).toFixed(1)} k Cr` : '—'}
+            sub={monthLabel(data?.nbrFytdAsOf ?? null) ?? undefined}
+          />
+          <ListRow
+            label={debtGdpRatio == null ? demoLabel('Debt / GDP') : 'Debt / GDP'}
+            value={debtGdpRatio != null ? `${debtGdpRatio}%` : '—'}
+            sub={debtGdpRatio != null && debtGdpAsOf ? `FY${debtGdpAsOf.slice(0, 4)}` : undefined}
+          />
+          <ListRow
+            label={domesticBorrowingCr == null ? demoLabel('Net dom. borrow') : 'Net dom. borrow'}
+            value={domesticBorrowingCr != null ? `${(domesticBorrowingCr / 1000).toFixed(1)} k Cr` : '—'}
+            last
+          />
         </div>
       </div>
 
