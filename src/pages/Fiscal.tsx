@@ -66,16 +66,6 @@ function FiscalMobile() {
         </div>
       </div>
 
-      <div style={{ padding: '12px 22px 28px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-          <div className="eyebrow">NBR collection · FYTD ramp</div>
-          {(data?.nbrFytdHist?.length ?? 0) < 2 && <DemoBadge />}
-        </div>
-        {(data?.nbrFytdHist?.length ?? 0) >= 2 && (
-          <AreaChart data={data!.nbrFytdHist} w={346} h={90} color="var(--accent)" />
-        )}
-      </div>
-
       <div style={{ padding: '0 22px 28px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <div className="eyebrow">Public debt / GDP</div>
@@ -161,11 +151,6 @@ function FiscalDesktop() {
             <span className="caption">k Cr</span>
           </div>
           <div className="caption" style={{ marginTop: 4 }}>{monthLabel(data?.nbrFytdAsOf ?? null) ?? ''}</div>
-          {(data?.nbrFytdHist?.length ?? 0) >= 2 && (
-            <div style={{ marginTop: 14 }}>
-              <AreaChart data={data!.nbrFytdHist} w={360} h={100} color="var(--accent)" />
-            </div>
-          )}
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>

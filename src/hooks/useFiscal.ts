@@ -5,7 +5,6 @@ import { METRIC } from '../lib/econdelta-metrics'
 export interface FiscalData {
   nbrFytdCr: number | null             // tax_revenue — NBR collection, FYTD cumulative (BDT crore)
   nbrFytdAsOf: string | null
-  nbrFytdHist: number[]                // monthly FYTD ramp, ascending
   taxToGdp: number | null              // tax_gdp_ratio
   domesticBorrowingCr: number | null   // domestic_borrowing_for_budget_deficit (crore)
   debtGdpRatio: number | null          // debt_gdp_ratio — latest COMPLETE-YEAR actual (% of GDP)
@@ -55,9 +54,8 @@ export function useFiscal(): UseFiscalResult {
     let cancelled = false
     ;(async () => {
       try {
-        const [nbr, nbrSer, tgd, dom, debtGdpSeries, debtDom, debtExt, imfEff] = await Promise.all([
+        const [nbr, tgd, dom, debtGdpSeries, debtDom, debtExt, imfEff] = await Promise.all([
           fetchLatest(METRIC.TAX_REV),
-          fetchSeries(METRIC.TAX_REV, { limit: 12 }),
           fetchLatest(METRIC.TAX_GDP),
           fetchLatest(METRIC.DOMESTIC_BORROW),
           fetchSeries(METRIC.DEBT_GDP, { limit: 40 }),
@@ -73,7 +71,6 @@ export function useFiscal(): UseFiscalResult {
           data: {
             nbrFytdCr:           nbr?.value ?? null,
             nbrFytdAsOf:         nbr?.asOf ?? null,
-            nbrFytdHist:         nbrSer.map(p => p.value),
             taxToGdp:            tgd?.value ?? null,
             domesticBorrowingCr: dom?.value ?? null,
             debtGdpRatio:        debtGdp.latest?.value ?? null,

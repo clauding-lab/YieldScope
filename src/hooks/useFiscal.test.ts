@@ -65,15 +65,11 @@ describe('useFiscal', () => {
 
   it('exposes NBR FYTD collection from tax_revenue and no longer fetches retired ids', async () => {
     vi.mocked(fetchLatest).mockImplementation(async (id: string) =>
-      id === 'tax_revenue' ? { asOf: '2026-06-30', value: 312400 } : null)
-    vi.mocked(fetchSeries).mockImplementation(async (id: string) =>
-      id === 'tax_revenue'
-        ? [{ asOf: '2026-05-31', value: 285000 }, { asOf: '2026-06-30', value: 312400 }]
-        : [])
+      id === 'tax_revenue' ? { asOf: '2026-06-30', value: 360642 } : null)
+    vi.mocked(fetchSeries).mockImplementation(async () => [])
     const { result } = renderHook(() => useFiscal())
     await waitFor(() => expect(result.current.loading).toBe(false))
-    expect(result.current.data?.nbrFytdCr).toBe(312400)
-    expect(result.current.data?.nbrFytdHist).toEqual([285000, 312400])
+    expect(result.current.data?.nbrFytdCr).toBe(360642)
     const fetchedIds = vi.mocked(fetchLatest).mock.calls.map(c => c[0])
     expect(fetchedIds).not.toContain('total_revenue_budget_vs_actual')
     expect(fetchedIds).not.toContain('budget_adpex_of_the_fy_vs_utilization')

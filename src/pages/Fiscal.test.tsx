@@ -9,7 +9,7 @@ import { useFiscal } from '../hooks/useFiscal'
 import Fiscal from './Fiscal'
 
 const BASE = {
-  nbrFytdCr: 312400, nbrFytdAsOf: '2026-06-30', nbrFytdHist: [285000, 312400],
+  nbrFytdCr: 312400, nbrFytdAsOf: '2026-06-30',
   taxToGdp: 7.6, domesticBorrowingCr: 84500,
   debtGdpRatio: 41.2, debtGdpAsOf: '2025-12-31', debtGdpHist: [39.6, 40.4, 41.2],
   debtDomesticCr: 1195000, debtExternalCr: 949000, debtStockAsOf: '2026-03-31',
