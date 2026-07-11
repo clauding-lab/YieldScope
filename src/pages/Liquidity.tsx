@@ -1,9 +1,8 @@
 import { useIsDesktop } from '../lib/hooks'
-import { FX } from '../data/fixtures'
 import { useLiquidity } from '../hooks/useLiquidity'
 import { monthLabel } from '../lib/dates'
 import { DemoBadge, ListRow, SectionTitle } from '../components/primitives'
-import { AreaChart, BarChart, Heatmap } from '../components/charts'
+import { AreaChart, BarChart } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 
 interface CorridorVizProps {
@@ -105,23 +104,6 @@ function CorridorViz({ tall = false, callRate, repo, sdf, slf }: CorridorVizProp
 const EXCESS_LIQ_WARN_LAKH_CR = 2.0   // bars below this render warn (tightening liquidity)
 const EXCESS_LIQ_FLOOR_LAKH_CR = 1.5  // reference line on the desktop bar chart
 
-const INTRADAY_ROWS = ['Monday', 'Tuesday', 'Wed', 'Thursday', 'Sunday']
-const INTRADAY_COLS = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00']
-const INTRADAY_DATA = [
-  [9.18, 9.22, 8.94, 8.78, 8.62, 8.55, 8.62, 8.74],
-  [9.04, 9.08, 8.92, 8.74, 8.58, 8.52, 8.58, 8.68],
-  [9.34, 9.32, 9.08, 8.92, 8.74, 8.64, 8.72, 8.84],
-  [8.92, 8.96, 8.84, 8.68, 8.54, 8.48, 8.56, 8.66],
-  [8.62, 8.54, 8.42, 8.34, 8.28, 8.24, 8.30, 8.42],
-]
-
-function intradayColor(v: number) {
-  const pct = Math.max(0, Math.min(1, (v - 8.20) / (9.40 - 8.20)))
-  if (pct > 0.66) return { bg: `rgba(213, 143, 118, ${0.30 + pct * 0.35})`, fg: 'var(--neg)' }
-  if (pct > 0.33) return { bg: `rgba(215, 184, 114, ${0.25 + pct * 0.30})`, fg: 'var(--warn)' }
-  return { bg: `rgba(146, 176, 149, ${0.18 + (1 - pct) * 0.22})`, fg: 'var(--pos)' }
-}
-
 function LiquidityMobile() {
   const { data } = useLiquidity()
   const m2Vintage = monthLabel(data?.m2YoYAsOf)
@@ -192,7 +174,6 @@ function LiquidityMobile() {
 
 function LiquidityDesktop() {
   const { data } = useLiquidity()
-  const L = FX.liquidity
   const m2Vintage = monthLabel(data?.m2YoYAsOf)
   return (
     <>
@@ -275,9 +256,11 @@ function LiquidityDesktop() {
             <span className="caption">%</span>
           </div>
           {m2Vintage && <div className="caption" style={{ marginTop: 4 }}>{m2Vintage}</div>}
-          <div style={{ marginTop: 16 }}>
-            <AreaChart data={data?.m2Hist?.length ? data.m2Hist : L.m2Hist} w={360} h={100} color="var(--info)" />
-          </div>
+          {data?.m2Hist?.length ? (
+            <div style={{ marginTop: 16 }}>
+              <AreaChart data={data.m2Hist} w={360} h={100} color="var(--info)" />
+            </div>
+          ) : null}
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
@@ -296,37 +279,6 @@ function LiquidityDesktop() {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      <div style={{ height: 1, background: 'var(--line)', margin: '0 48px' }} />
-
-      <div style={{ padding: '36px 48px 48px' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 18 }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <div className="eyebrow">Call money · intraday this week</div>
-              <DemoBadge />
-            </div>
-            <h3 className="display" style={{ fontSize: 22, margin: 0 }}>Pressure builds at the open</h3>
-          </div>
-          <div className="caption">Rates %, by hour</div>
-        </div>
-        <div className="card-flat" style={{ padding: '22px 24px' }}>
-          <Heatmap
-            rows={INTRADAY_ROWS}
-            cols={INTRADAY_COLS}
-            data={INTRADAY_DATA}
-            leftW={110}
-            cellH={34}
-            fmt={v => v.toFixed(2)}
-            getColor={intradayColor}
-          />
-          <div style={{ display: 'flex', gap: 20, marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--line)' }}>
-            <span className="caption">
-              Wednesday opened at 9.34 — second consecutive open above the repo. Afternoons consistently calmer.
-            </span>
-          </div>
         </div>
       </div>
     </>

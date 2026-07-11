@@ -16,6 +16,9 @@ export interface BankingData {
   pvtCreditYoY: number | null // private_sector_credit_yoy_pct
   pvtCreditYoYAsOf: string | null // vintage of the pvt-credit YoY print
   cdRatio: number | null      // derived: private_sector_credit / deposits_of_the_system * 100
+  repoBorrowCr: number | null   // interbank_repo_data (BDT crore, daily)
+  repoBorrowHist: number[]      // ascending, for the trend chart
+  repoBorrowAsOf: string | null
   asOf: string | null
 }
 
@@ -50,13 +53,15 @@ export function useBanking(): UseBankingResult {
     let cancelled = false
     ;(async () => {
       try {
-        const [npl, crar, nplSer, pcy, pc, dep] = await Promise.all([
+        const [npl, crar, nplSer, pcy, pc, dep, repoB, repoSer] = await Promise.all([
           fetchLatest(METRIC.NPL_RATIO),
           fetchLatest(METRIC.CRAR),
           fetchSeries(METRIC.NPL_RATIO, { limit: 8 }),
           fetchLatest(METRIC.PRIV_CREDIT_YOY),
           fetchLatest(METRIC.PRIV_CREDIT),
           fetchLatest(METRIC.TOTAL_DEPOSITS),
+          fetchLatest(METRIC.INTERBANK_REPO),
+          fetchSeries(METRIC.INTERBANK_REPO, { limit: 8 }),
         ])
         if (cancelled) return
         // Plausibility + vintage gate: CAR and NPL are quarterly. A data-fault
@@ -86,6 +91,9 @@ export function useBanking(): UseBankingResult {
             pvtCreditYoY: pcy?.value ?? null,
             pvtCreditYoYAsOf: pcy?.asOf ?? null,
             cdRatio: (pc?.value != null && dep?.value) ? (pc.value / dep.value) * 100 : null,
+            repoBorrowCr: repoB?.value ?? null,
+            repoBorrowHist: repoSer.map(p => p.value),
+            repoBorrowAsOf: repoB?.asOf ?? null,
             asOf:     npl?.asOf ?? null,
           },
         })
