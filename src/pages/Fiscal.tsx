@@ -103,39 +103,21 @@ function FiscalDesktop() {
 
       <div style={{ height: 1, background: 'var(--line)', margin: '0 48px' }} />
 
-      <div style={{ padding: '36px 48px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <div className="eyebrow">NBR revenue · FYTD</div>
-            {nbrFytdCr == null && <DemoBadge />}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span className="serif-num" style={{ fontSize: 44 }}>{nbrFytdCr != null ? (nbrFytdCr / 1000).toFixed(1) : '—'}</span>
-            <span className="caption">k Cr</span>
-          </div>
-          <div className="caption" style={{ marginTop: 4 }}>{monthLabel(data?.nbrFytdAsOf ?? null) ?? ''}</div>
+      <div style={{ padding: '36px 48px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          <div className="eyebrow">Public debt / GDP · trend</div>
+          {debtGdpRatio == null && <DemoBadge />}
         </div>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <div className="eyebrow">Public debt / GDP</div>
-            {debtGdpRatio == null && <DemoBadge />}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span className="serif-num" style={{ fontSize: 44, color: 'var(--neg)' }}>{debtGdpRatio != null ? debtGdpRatio : '—'}</span>
-            <span className="caption">%</span>
-          </div>
-          <div className="caption" style={{ marginTop: 4 }}>
-            {debtGdpRatio != null && debtGdpAsOf ? `FY${debtGdpAsOf.slice(0, 4)}` : ''}
-            {debtGdp24mBps != null ? `${debtGdpAsOf ? ' · ' : ''}${debtGdp24mBps >= 0 ? '↑' : '↓'} ${Math.abs(debtGdp24mBps)} bps / 24m` : ''}
-          </div>
-          <div style={{ marginTop: 14 }}>
-            <AreaChart data={debtGdpHist} w={360} h={100} color="var(--neg)" />
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-            <div><div className="caption">Domestic</div><div className="serif-num" style={{ fontSize: 18 }}>{debtDomesticCr != null ? `৳${(debtDomesticCr / 100000).toFixed(1)}L cr` : '—'}</div></div>
-            <div><div className="caption">External</div><div className="serif-num" style={{ fontSize: 18 }}>{debtExternalCr != null ? `৳${(debtExternalCr / 100000).toFixed(1)}L cr` : '—'}</div></div>
-            <div><div className="caption">IMF EFF</div><div className="serif-num" style={{ fontSize: 18 }}>{imfEffSdrMn != null ? `SDR ${(imfEffSdrMn / 1000).toFixed(2)}B` : '—'}</div></div>
-          </div>
+        <div className="caption" style={{ marginBottom: 10 }}>
+          {debtGdpRatio != null ? `${debtGdpRatio}%` : '—'}
+          {debtGdpRatio != null && debtGdpAsOf ? ` · FY${debtGdpAsOf.slice(0, 4)}` : ''}
+          {debtGdp24mBps != null ? ` · ${debtGdp24mBps >= 0 ? '↑' : '↓'} ${Math.abs(debtGdp24mBps)} bps / 24m` : ''}
+        </div>
+        <AreaChart data={debtGdpHist} w={760} h={140} color="var(--neg)" />
+        <div style={{ display: 'flex', gap: 48, marginTop: 16 }}>
+          <div><div className="caption">Domestic</div><div className="serif-num" style={{ fontSize: 20 }}>{debtDomesticCr != null ? `৳${(debtDomesticCr / 100000).toFixed(1)}L cr` : '—'}</div></div>
+          <div><div className="caption">External</div><div className="serif-num" style={{ fontSize: 20 }}>{debtExternalCr != null ? `৳${(debtExternalCr / 100000).toFixed(1)}L cr` : '—'}</div></div>
+          <div><div className="caption">IMF EFF</div><div className="serif-num" style={{ fontSize: 20 }}>{imfEffSdrMn != null ? `SDR ${(imfEffSdrMn / 1000).toFixed(2)}B` : '—'}</div></div>
         </div>
       </div>
 

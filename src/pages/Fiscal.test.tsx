@@ -25,7 +25,7 @@ describe('Fiscal · live revenue, no W&M/ADP', () => {
     vi.mocked(useIsDesktop).mockReturnValue(desktop)
     render(<Fiscal />)
     expect(screen.getAllByText(/NBR revenue · FYTD/i).length).toBeGreaterThanOrEqual(1)
-    expect(screen.getAllByText('312.4').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/312\.4/).length).toBeGreaterThanOrEqual(1)
     expect(screen.queryByText(/Ways & Means/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/W&M/)).not.toBeInTheDocument()
     expect(screen.queryByText(/ADP implementation/i)).not.toBeInTheDocument()
