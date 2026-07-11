@@ -14,7 +14,6 @@ interface MetricRow {
   lbl: string
   v: string
   u: string
-  hint?: string
 }
 
 interface MovingItem {
@@ -75,8 +74,8 @@ function DashboardMobile() {
   const metrics: MetricRow[] = [
     { lbl: '91-day T-Bill',    v: data?.tbill91     != null ? data.tbill91.toFixed(2)     : '—', u: '%' },
     { lbl: '10-year BGTB',     v: data?.tbond10     != null ? data.tbond10.toFixed(2)     : '—', u: '%' },
-    { lbl: 'Call money · o/n', v: data?.callMoney   != null ? data.callMoney.toFixed(2)   : '—', u: '%',   hint: 'Above repo' },
-    { lbl: 'CPI · headline',   v: data?.cpiHeadline != null ? data.cpiHeadline.toFixed(2) : '—', u: '%·y', hint: 'April' },
+    { lbl: 'Call money · o/n', v: data?.callMoney   != null ? data.callMoney.toFixed(2)   : '—', u: '%' },
+    { lbl: 'CPI · headline',   v: data?.cpiHeadline != null ? data.cpiHeadline.toFixed(2) : '—', u: '%·y' },
   ]
 
   return (
@@ -121,7 +120,6 @@ function DashboardMobile() {
                   <span className="caption">{m.u}</span>
                 </div>
               </div>
-              {m.hint && <div className="caption" style={{ textAlign: 'right' }}>{m.hint}</div>}
             </div>
           ))}
         </div>
@@ -190,7 +188,7 @@ function DashboardMobile() {
             </span>
           }
           title={brief ? brief.title : 'Weekly briefing'}
-          summary="Three forces are squeezing the front — read full analysis."
+          summary={brief ? 'Read the full weekly analysis.' : undefined}
         >
           {brief ? <BriefingBody markdown={brief.body} baseSize={14} /> : <NoBriefNote pad="0" />}
           <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
@@ -216,8 +214,8 @@ function DashboardDesktop() {
   const metrics: MetricRow[] = [
     { lbl: '91-day T-Bill',    v: data?.tbill91     != null ? data.tbill91.toFixed(2)     : '—', u: '%' },
     { lbl: '10-year BGTB',     v: data?.tbond10     != null ? data.tbond10.toFixed(2)     : '—', u: '%' },
-    { lbl: 'Call money · o/n', v: data?.callMoney   != null ? data.callMoney.toFixed(2)   : '—', u: '%',   hint: 'Above repo' },
-    { lbl: 'CPI · headline',   v: data?.cpiHeadline != null ? data.cpiHeadline.toFixed(2) : '—', u: '%·y', hint: 'April' },
+    { lbl: 'Call money · o/n', v: data?.callMoney   != null ? data.callMoney.toFixed(2)   : '—', u: '%' },
+    { lbl: 'CPI · headline',   v: data?.cpiHeadline != null ? data.cpiHeadline.toFixed(2) : '—', u: '%·y' },
   ]
 
   return (
@@ -257,9 +255,6 @@ function DashboardDesktop() {
               <span className="serif-num" style={{ fontSize: 48 }}>{m.v}</span>
               <span className="caption">{m.u}</span>
             </div>
-            {m.hint && (
-              <div className="caption" style={{ marginTop: 10 }}>{m.hint}</div>
-            )}
           </div>
         ))}
       </div>

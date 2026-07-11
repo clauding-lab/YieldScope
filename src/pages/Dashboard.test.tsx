@@ -26,6 +26,14 @@ describe('Dashboard · honesty (no briefing)', () => {
   it('mobile: renders an empty-state note, not the fixture essay, when no briefing exists', () => {
     vi.mocked(useIsDesktop).mockReturnValue(false)
     render(<Dashboard />)
+    // Assert on the default COLLAPSED state first — this is where the old
+    // fabricated Collapse summary ("Three forces are squeezing the front…")
+    // used to render unconditionally regardless of briefing state. Must run
+    // before the click below, which opens the accordion and hides `summary`.
+    expect(screen.queryByText(/squeezing the front/i)).not.toBeInTheDocument()
+    // Stat-tile hint ("Above repo" on the Call money tile) was a static,
+    // unverifiable claim beside a live value — also checked here.
+    expect(screen.queryByText(/above repo/i)).not.toBeInTheDocument()
     // The weekly-briefing panel is a collapsed accordion by default on mobile
     // (Collapse's defaultOpen is false) — open it to reach its body content.
     fireEvent.click(screen.getByRole('button', { name: /weekly briefing/i }))
@@ -48,6 +56,9 @@ describe('Dashboard · honesty (no briefing)', () => {
     expect(screen.queryByText(/call money has now pierced the repo/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/364-day undersubscribed/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/short end is rotating/i)).not.toBeInTheDocument()
+    // Stat-tile hint ("Above repo" on the Call money tile) was a static,
+    // unverifiable claim beside a live value.
+    expect(screen.queryByText(/above repo/i)).not.toBeInTheDocument()
   })
 })
 
