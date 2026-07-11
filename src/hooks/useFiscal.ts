@@ -3,8 +3,8 @@ import { fetchLatest, fetchSeries, type MetricPoint } from '../lib/econdelta'
 import { METRIC } from '../lib/econdelta-metrics'
 
 export interface FiscalData {
-  revenuePct: number | null            // total_revenue_budget_vs_actual (% of target)
-  adpPct: number | null                // budget_adpex_of_the_fy_vs_utilization
+  nbrFytdCr: number | null             // tax_revenue — NBR collection, FYTD cumulative (BDT crore)
+  nbrFytdAsOf: string | null
   taxToGdp: number | null              // tax_gdp_ratio
   domesticBorrowingCr: number | null   // domestic_borrowing_for_budget_deficit (crore)
   debtGdpRatio: number | null          // debt_gdp_ratio — latest COMPLETE-YEAR actual (% of GDP)
@@ -54,9 +54,8 @@ export function useFiscal(): UseFiscalResult {
     let cancelled = false
     ;(async () => {
       try {
-        const [rev, adp, tgd, dom, debtGdpSeries, debtDom, debtExt, imfEff] = await Promise.all([
-          fetchLatest(METRIC.TOTAL_REV),
-          fetchLatest(METRIC.BUDGET_ADPEX),
+        const [nbr, tgd, dom, debtGdpSeries, debtDom, debtExt, imfEff] = await Promise.all([
+          fetchLatest(METRIC.TAX_REV),
           fetchLatest(METRIC.TAX_GDP),
           fetchLatest(METRIC.DOMESTIC_BORROW),
           fetchSeries(METRIC.DEBT_GDP, { limit: 40 }),
@@ -70,8 +69,8 @@ export function useFiscal(): UseFiscalResult {
           loading: false,
           error: null,
           data: {
-            revenuePct:          rev?.value ?? null,
-            adpPct:              adp?.value ?? null,
+            nbrFytdCr:           nbr?.value ?? null,
+            nbrFytdAsOf:         nbr?.asOf ?? null,
             taxToGdp:            tgd?.value ?? null,
             domesticBorrowingCr: dom?.value ?? null,
             debtGdpRatio:        debtGdp.latest?.value ?? null,
@@ -82,7 +81,7 @@ export function useFiscal(): UseFiscalResult {
             debtStockAsOf:       debtDom?.asOf ?? debtExt?.asOf ?? null,
             imfEffSdrMn:         imfEff?.value ?? null,
             imfEffAsOf:          imfEff?.asOf ?? null,
-            asOf:                rev?.asOf ?? null,
+            asOf:                nbr?.asOf ?? null,
           },
         })
       } catch (e) {

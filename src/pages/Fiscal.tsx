@@ -1,32 +1,21 @@
 import type { ReactNode } from 'react'
 import { useIsDesktop } from '../lib/hooks'
-import { FX } from '../data/fixtures'
 import { useFiscal } from '../hooks/useFiscal'
+import { useIssuance } from '../hooks/useIssuance'
 import { roundTo } from '../lib/yieldMath'
+import { monthLabel } from '../lib/dates'
 import { Bar, DemoBadge, ListRow, SectionTitle } from '../components/primitives'
-import { AreaChart, Donut, DonutLegend, DotMatrix, RadialGauge } from '../components/charts'
+import { AreaChart, RadialGauge } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
-import type { DonutSegment } from '../components/charts/Donut'
-
-const REVENUE_SEGMENTS: DonutSegment[] = [
-  { value: 274.2, color: 'var(--accent)', label: 'NBR tax' },
-  { value: 38.2,  color: 'var(--info)',   label: 'Non-NBR' },
-  { value: 22.4,  color: 'var(--warn)',   label: 'Non-tax' },
-]
-
-const ISSUANCE_T_BILL = [50, 38, 32, 45, 30, 40, 50, 35, 32, 40, 38, 45]
-const ISSUANCE_T_BOND = [ 0, 15,  0,  0, 12,  0,  0, 18,  0,  0, 14,  0]
 
 function FiscalMobile() {
-  const F = FX.fiscal
   const { data } = useFiscal()
-  const revenuePct = data?.revenuePct ?? null
-  const adpPct = data?.adpPct ?? null
+  const nbrFytdCr = data?.nbrFytdCr ?? null
+  const nbrFytdAsOf = data?.nbrFytdAsOf ?? null
   const domesticBorrowingCr = data?.domesticBorrowingCr ?? null
   const debtGdpRatio = roundTo(data?.debtGdpRatio ?? null, 1)
   const debtGdpAsOf = data?.debtGdpAsOf ?? null
   const debtGdpHist = data?.debtGdpHist ?? []
-  const fmtPct = (n: number | null) => n != null ? `${n}%` : '—'
   const demoLabel = (label: string): ReactNode => (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
       {label}
@@ -59,39 +48,21 @@ function FiscalMobile() {
 
       <div style={{ padding: '0 16px 24px' }}>
         <div className="card-flat">
-          <ListRow label="Revenue / target" value={fmtPct(revenuePct)} />
+          <ListRow
+            label={nbrFytdCr == null ? demoLabel('NBR revenue · FYTD') : 'NBR revenue · FYTD'}
+            value={nbrFytdCr != null ? <><span className="num">{(nbrFytdCr / 1000).toFixed(1)}</span> k Cr</> : '—'}
+            sub={monthLabel(nbrFytdAsOf) ?? undefined}
+          />
           <ListRow
             label={debtGdpRatio == null ? demoLabel('Debt / GDP') : 'Debt / GDP'}
             value={debtGdpRatio != null ? `${debtGdpRatio}%` : '—'}
             sub={debtGdpRatio != null && debtGdpAsOf ? `FY${debtGdpAsOf.slice(0, 4)}` : undefined}
           />
-          <ListRow label={domesticBorrowingCr == null ? demoLabel('Net dom. borrow') : 'Net dom. borrow'} value={domesticBorrowingCr != null ? `${(domesticBorrowingCr / 1000).toFixed(1)} k Cr` : `${F.netDomesticBorrowingYTD} k Cr`} />
-          <ListRow label={demoLabel('Ways & Means')}      value={`${F.waysMeans} k Cr`} />
-          <ListRow label="ADP implementation" value={fmtPct(adpPct)} last />
-        </div>
-      </div>
-
-      <div style={{ padding: '12px 22px 28px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-          <div className="eyebrow">Revenue progress</div>
-          {revenuePct == null && <DemoBadge />}
-        </div>
-        <div style={{ position: 'relative', height: 8, background: 'var(--sunken)', borderRadius: 99 }}>
-          <div
-            style={{
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              bottom: 0,
-              width: `${revenuePct ?? 0}%`,
-              background: 'var(--accent)',
-              borderRadius: 99,
-            }}
+          <ListRow
+            label={domesticBorrowingCr == null ? demoLabel('Net dom. borrow') : 'Net dom. borrow'}
+            value={domesticBorrowingCr != null ? `${(domesticBorrowingCr / 1000).toFixed(1)} k Cr` : '—'}
+            last
           />
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-          <span className="caption">0</span>
-          <span className="caption">100%</span>
         </div>
       </div>
 
@@ -100,17 +71,17 @@ function FiscalMobile() {
           <div className="eyebrow">Public debt / GDP</div>
           {debtGdpHist.length === 0 && <DemoBadge />}
         </div>
-        <AreaChart data={debtGdpHist.length ? debtGdpHist : F.debtHist} w={346} h={90} color="var(--neg)" />
+        <AreaChart data={debtGdpHist} w={346} h={90} color="var(--neg)" />
       </div>
     </>
   )
 }
 
 function FiscalDesktop() {
-  const F = FX.fiscal
   const { data } = useFiscal()
-  const revenuePct = data?.revenuePct ?? null
-  const adpPct = data?.adpPct ?? null
+  const { data: issuance, error: issuanceError } = useIssuance()
+  const nbrFytdCr = data?.nbrFytdCr ?? null
+  const domesticBorrowingCr = data?.domesticBorrowingCr ?? null
   const debtGdpRatio = roundTo(data?.debtGdpRatio ?? null, 1)
   const debtGdpAsOf = data?.debtGdpAsOf ?? null
   const debtGdpHist = data?.debtGdpHist ?? []
@@ -119,7 +90,6 @@ function FiscalDesktop() {
   const imfEffSdrMn = data?.imfEffSdrMn ?? null
   const n = debtGdpHist.length
   const debtGdp24mBps = n >= 3 ? roundTo((debtGdpHist[n - 1] - debtGdpHist[n - 3]) * 100, 0) : null
-  const fmtPct = (n: number | null) => n != null ? `${n}%` : '—'
   const demoLabel = (label: string): ReactNode => (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
       {label}
@@ -149,47 +119,38 @@ function FiscalDesktop() {
           </div>
           <h2 className="display" style={{ fontSize: 36, margin: 0, color: 'var(--warn)' }}>Elevated.</h2>
           <div className="card-flat" style={{ padding: 18, marginTop: 22, maxWidth: 540 }}>
-            <ListRow label="Revenue / target" value={fmtPct(revenuePct)} />
+            <ListRow
+              label={nbrFytdCr == null ? demoLabel('NBR revenue · FYTD') : 'NBR revenue · FYTD'}
+              value={nbrFytdCr != null ? `${(nbrFytdCr / 1000).toFixed(1)} k Cr` : '—'}
+              sub={monthLabel(data?.nbrFytdAsOf ?? null) ?? undefined}
+            />
             <ListRow
               label={debtGdpRatio == null ? demoLabel('Debt / GDP') : 'Debt / GDP'}
               value={debtGdpRatio != null ? `${debtGdpRatio}%` : '—'}
               sub={debtGdpRatio != null && debtGdpAsOf ? `FY${debtGdpAsOf.slice(0, 4)}` : undefined}
             />
-            <ListRow label={demoLabel('W&M usage')}         value="46%" />
-            <ListRow label="ADP implementation" value={fmtPct(adpPct)} last />
+            <ListRow
+              label={domesticBorrowingCr == null ? demoLabel('Net dom. borrow') : 'Net dom. borrow'}
+              value={domesticBorrowingCr != null ? `${(domesticBorrowingCr / 1000).toFixed(1)} k Cr` : '—'}
+              last
+            />
           </div>
         </div>
       </div>
 
       <div style={{ height: 1, background: 'var(--line)', margin: '0 48px' }} />
 
-      <div style={{ padding: '36px 48px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 32 }}>
+      <div style={{ padding: '36px 48px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-            <div className="eyebrow">Revenue · YTD composition</div>
-            <DemoBadge />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <div className="eyebrow">NBR revenue · FYTD</div>
+            {nbrFytdCr == null && <DemoBadge />}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-            <Donut
-              size={140}
-              thickness={22}
-              segments={REVENUE_SEGMENTS}
-              centerValue={F.revenueYTD}
-              centerLabel="k Cr · YTD"
-            />
-            <div style={{ flex: 1 }}>
-              <DonutLegend
-                segments={[
-                  { value: 274.2, color: 'var(--accent)', label: 'NBR tax' },
-                  { value: 38.2,  color: 'var(--info)',   label: 'Non-NBR' },
-                  { value: 22.4,  color: 'var(--warn)',   label: 'Non-tax' },
-                ]}
-              />
-            </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <span className="serif-num" style={{ fontSize: 44 }}>{nbrFytdCr != null ? (nbrFytdCr / 1000).toFixed(1) : '—'}</span>
+            <span className="caption">k Cr</span>
           </div>
-          <div className="caption" style={{ marginTop: 14 }}>
-            <span className="num" style={{ color: 'var(--ink)' }}>{fmtPct(revenuePct)}</span> of target
-          </div>
+          <div className="caption" style={{ marginTop: 4 }}>{monthLabel(data?.nbrFytdAsOf ?? null) ?? ''}</div>
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
@@ -205,7 +166,7 @@ function FiscalDesktop() {
             {debtGdp24mBps != null ? `${debtGdpAsOf ? ' · ' : ''}${debtGdp24mBps >= 0 ? '↑' : '↓'} ${Math.abs(debtGdp24mBps)} bps / 24m` : ''}
           </div>
           <div style={{ marginTop: 14 }}>
-            <AreaChart data={debtGdpHist.length ? debtGdpHist : F.debtHist} w={360} h={100} color="var(--neg)" />
+            <AreaChart data={debtGdpHist} w={360} h={100} color="var(--neg)" />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
             <div><div className="caption">Domestic</div><div className="serif-num" style={{ fontSize: 18 }}>{debtDomesticCr != null ? `৳${(debtDomesticCr / 100000).toFixed(1)}L cr` : '—'}</div></div>
@@ -213,62 +174,58 @@ function FiscalDesktop() {
             <div><div className="caption">IMF EFF</div><div className="serif-num" style={{ fontSize: 18 }}>{imfEffSdrMn != null ? `SDR ${(imfEffSdrMn / 1000).toFixed(2)}B` : '—'}</div></div>
           </div>
         </div>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <div className="eyebrow">Ways & Means · BB</div>
-            <DemoBadge />
-          </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span className="serif-num" style={{ fontSize: 44, color: 'var(--warn)' }}>46</span>
-            <span className="caption">% of limit</span>
-          </div>
-          <div className="caption" style={{ marginTop: 4 }}>{F.waysMeans} of {F.waysMeansLimit} k Cr drawn</div>
-          <div style={{ marginTop: 18 }}>
-            <DotMatrix cols={10} total={100} dotSize={11} gap={4} segments={[{ value: 46, color: 'var(--warn)' }]} />
-          </div>
-          <div className="caption" style={{ marginTop: 12, color: 'var(--warn)' }}>Monetary financing active</div>
-        </div>
       </div>
 
       <div style={{ height: 1, background: 'var(--line)', margin: '0 48px' }} />
 
       <div style={{ padding: '36px 48px 48px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18 }}>
-          <div className="eyebrow">Gross issuance calendar · next 12 weeks</div>
-          <DemoBadge />
+          <div className="eyebrow">
+            Gross issuance calendar{issuanceError == null ? ` · next ${issuance?.length ?? 0} weeks` : ''} · BB forward calendar
+          </div>
+          {issuanceError == null && (issuance == null || issuance.length === 0) && <DemoBadge />}
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 8 }}>
-          {Array.from({ length: 12 }, (_, i) => {
-            const week = `W${23 + i}`
-            const tbill = ISSUANCE_T_BILL[i]
-            const bond = ISSUANCE_T_BOND[i]
-            return (
-              <div key={week} style={{ textAlign: 'center' }}>
-                <div style={{ height: 80, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: 2 }}>
-                  <div style={{ height: `${(tbill / 65) * 100}%`, background: 'var(--accent)', borderRadius: '2px 2px 0 0' }} />
-                  {bond > 0 && (
-                    <div style={{ height: `${(bond / 65) * 100}%`, background: 'var(--info)', borderRadius: '2px 2px 0 0' }} />
-                  )}
-                </div>
-                <div style={{ marginTop: 8 }}>
-                  <div className="caption">{week}</div>
-                  <div className="serif-num" style={{ fontSize: 14, marginTop: 2 }}>{tbill + bond}</div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-        <div style={{ display: 'flex', gap: 20, marginTop: 20 }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ width: 12, height: 12, background: 'var(--accent)', borderRadius: 3 }} />
-            <span className="caption">T-bills</span>
-          </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ width: 12, height: 12, background: 'var(--info)', borderRadius: 3 }} />
-            <span className="caption">BGTB</span>
-          </span>
-          <span className="caption" style={{ marginLeft: 'auto' }}>k Cr</span>
-        </div>
+        {issuanceError != null ? (
+          <div className="card-flat" style={{ padding: '20px 18px' }}>
+            <div style={{ fontSize: 14, color: 'var(--warn)' }}>Couldn't load the auction calendar</div>
+          </div>
+        ) : issuance != null && issuance.length > 0 ? (
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${issuance.length}, 1fr)`, gap: 8 }}>
+              {issuance.map(w => {
+                const maxTotal = Math.max(...issuance.map(x => x.tbillCr + x.tbondCr))
+                const total = w.tbillCr + w.tbondCr
+                return (
+                  <div key={w.weekLabel} style={{ textAlign: 'center' }}>
+                    <div style={{ height: 80, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: 2 }}>
+                      {w.tbillCr > 0 && (
+                        <div style={{ height: `${(w.tbillCr / maxTotal) * 100}%`, background: 'var(--accent)', borderRadius: '2px 2px 0 0' }} />
+                      )}
+                      {w.tbondCr > 0 && (
+                        <div style={{ height: `${(w.tbondCr / maxTotal) * 100}%`, background: 'var(--info)', borderRadius: '2px 2px 0 0' }} />
+                      )}
+                    </div>
+                    <div style={{ marginTop: 8 }}>
+                      <div className="caption">{w.weekLabel}</div>
+                      <div className="serif-num" style={{ fontSize: 14, marginTop: 2 }}>{(total / 1000).toFixed(1)}</div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            <div style={{ display: 'flex', gap: 20, marginTop: 20 }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ width: 12, height: 12, background: 'var(--accent)', borderRadius: 3 }} />
+                <span className="caption">T-bills</span>
+              </span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ width: 12, height: 12, background: 'var(--info)', borderRadius: 3 }} />
+                <span className="caption">BGTB</span>
+              </span>
+              <span className="caption" style={{ marginLeft: 'auto' }}>k Cr / week</span>
+            </div>
+          </>
+        ) : null}
       </div>
     </>
   )
