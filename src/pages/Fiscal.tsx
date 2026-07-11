@@ -50,7 +50,7 @@ function FiscalMobile() {
         <div className="card-flat">
           <ListRow
             label={nbrFytdCr == null ? demoLabel('NBR revenue · FYTD') : 'NBR revenue · FYTD'}
-            value={nbrFytdCr != null ? <>{(nbrFytdCr / 1000).toFixed(1)}<span className="caption"> k Cr</span></> : '—'}
+            value={nbrFytdCr != null ? <><span className="num">{(nbrFytdCr / 1000).toFixed(1)}</span> k Cr</> : '—'}
             sub={monthLabel(nbrFytdAsOf) ?? undefined}
           />
           <ListRow
@@ -181,9 +181,9 @@ function FiscalDesktop() {
       <div style={{ padding: '36px 48px 48px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18 }}>
           <div className="eyebrow">
-            Gross issuance calendar · next {issuance?.length ?? 0} weeks · BB forward calendar
+            Gross issuance calendar{issuanceError == null ? ` · next ${issuance?.length ?? 0} weeks` : ''} · BB forward calendar
           </div>
-          {(issuance == null || issuance.length === 0) && <DemoBadge />}
+          {issuanceError == null && (issuance == null || issuance.length === 0) && <DemoBadge />}
         </div>
         {issuanceError != null ? (
           <div className="card-flat" style={{ padding: '20px 18px' }}>

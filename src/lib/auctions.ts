@@ -107,7 +107,9 @@ export function weekdayShort(iso: string): string {
   return DOW[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]
 }
 
-/** Rank a tenor by duration so '91D · 182D · 364D · 2Y …' sorts naturally. */
+/** Rank a tenor by duration so '91D · 182D · 364D · 2Y …' sorts naturally.
+ * NOTE: 30-day months → '12M' ranks <365 (bill); unparseable tenor → MAX_SAFE_INTEGER (bond).
+ * BD data uses D (bills) / Y (bonds), so both edges are latent. */
 export function tenorRankDays(tenor: string): number {
   const m = tenor.match(/^(\d+(?:\.\d+)?)\s*([DYM])/i)
   if (!m) return Number.MAX_SAFE_INTEGER
