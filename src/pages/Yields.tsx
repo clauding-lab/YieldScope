@@ -48,10 +48,12 @@ function YieldsCurveTab() {
   const spread5y2y = spreadBps(data?.yields['5Y'] ?? null, data?.yields['2Y'] ?? null)
   const fmtBps = (n: number) => `${n >= 0 ? '+' : ''}${n}`
 
+  const spread91dSdf = data?.spread91D_SDF_bps ?? null
+
   const liveSpreads = [
     { lbl: '10y – 91d', v: slopeLabel, u: 'bps', demo: false },
-    { lbl: '5y – 2y',   v: spread5y2y != null ? fmtBps(spread5y2y) : '+19', u: 'bps', demo: spread5y2y == null },
-    { lbl: '91d – SDF', v: '+492',     u: 'bps', demo: true  },
+    { lbl: '5y – 2y',   v: spread5y2y != null ? fmtBps(spread5y2y) : '—', u: 'bps', demo: spread5y2y == null },
+    { lbl: '91d – SDF', v: spread91dSdf != null ? fmtBps(spread91dSdf) : '—', u: 'bps', demo: spread91dSdf == null },
   ]
 
   return (
