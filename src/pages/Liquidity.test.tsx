@@ -70,5 +70,13 @@ describe('Liquidity — excess-liquidity render layer (100x label regression pin
     render(<Liquidity />)
     expect(screen.queryByText(/intraday this week/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/pressure builds at the open/i)).not.toBeInTheDocument()
+
+    // m2 chart is live-only: with no live data the M2 section must contain NO chart svg.
+    // Scoped to the "Money supply · M2 YoY" panel (a page-wide svg count is fragile and
+    // not specific to the m2 claim this test's name makes).
+    const m2Eyebrow = screen.getByText('Money supply · M2 YoY')      // desktop eyebrow (unique in desktop mode)
+    const m2Section = m2Eyebrow.parentElement?.parentElement as HTMLElement  // eyebrow → header row → panel cell
+    expect(m2Section).toBeTruthy()
+    expect(m2Section.querySelector('svg')).toBeNull()
   })
 })
