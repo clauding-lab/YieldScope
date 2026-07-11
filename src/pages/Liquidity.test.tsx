@@ -63,4 +63,12 @@ describe('Liquidity — excess-liquidity render layer (100x label regression pin
     expect(bars.filter(b => b.getAttribute('fill') === 'var(--warn)')).toHaveLength(1)
     expect(bars.filter(b => b.getAttribute('fill') === 'var(--accent)')).toHaveLength(7)
   })
+
+  it('desktop: intraday heatmap is gone and no fixture m2 history renders without live data', () => {
+    vi.mocked(useIsDesktop).mockReturnValue(true)
+    vi.mocked(useLiquidity).mockReturnValue({ data: null, loading: false, error: null })
+    render(<Liquidity />)
+    expect(screen.queryByText(/intraday this week/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/pressure builds at the open/i)).not.toBeInTheDocument()
+  })
 })
