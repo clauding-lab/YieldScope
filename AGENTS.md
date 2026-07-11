@@ -152,7 +152,7 @@ query **Context7** for current, version-pinned docs — do NOT rely on training-
 
 ## 31. `fixtures.ts` scope after the de-demo batch
 
-**`src/data/fixtures.ts` is curve + auctions (+ meta/ticker/macro) ONLY.** The Fiscal/Banking/Intel/Liquidity page fixtures were removed 2026-07-11 (de-demo batch). A missing live value renders `—` + `<DemoBadge />` or an honest empty-state — never reintroduce page-level fixture objects.
+**`src/data/fixtures.ts` is curve + auctions (the two sanctioned offline fallbacks) ONLY.** The Fiscal/Banking/Intel/Liquidity page fixtures were removed 2026-07-11 (de-demo batch). A missing live value renders `—` + `<DemoBadge />` or an honest empty-state — never reintroduce page-level fixture objects.
 
 ## Communication & timezone
 

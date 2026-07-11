@@ -30,7 +30,7 @@ The rules below scope what AI agents and contributors can ship without explicit 
 - **Currency / locale changes** — anything that touches the `৳` symbol or BDT labeling.
 - **Palette / theme system changes** — adding a palette, changing default palette, changing the `theme-*` className mechanism, changing `globals.css` CSS-variable names.
 - **Up=red / down=green convention** on yield / inflation / call-money / CPI panels — this is deliberate (fixed-income markets convention) and not to be "fixed."
-- **Data-seam changes** — the EconDelta swap SHIPPED (PRs #10–#17); `src/data/fixtures.ts` is now the no-credentials/demo fallback only (curve + auctions + meta/ticker/macro). Modifications to the live data seam (Supabase hooks/queries) cascade to all pages.
+- **Data-seam changes** — the EconDelta swap SHIPPED (PRs #10–#17); `src/data/fixtures.ts` now holds ONLY the curve + auctions offline fallbacks (swap shipped). Modifications to the live data seam (Supabase hooks/queries) cascade to all pages.
 - **GitHub Pages base path** — `/` (custom domain `yieldscope.clauding-lab.com`, pinned by `public/CNAME`) is set in three places (`vite.config.ts` `base: '/'`, `BrowserRouter basename` — auto-derived from `import.meta.env.BASE_URL`, don't hardcode it — and the PWA manifest `start_url`/`scope`) and must move together.
 - **Adding any auth pattern** — there is intentionally no auth in v3.0. If an admin surface is needed later, no client-side password gates (see AGENTS.md landmine #10).
 - **Privacy-impacting changes** — telemetry, network destinations, data storage locations beyond Supabase, log content with user-identifying data.

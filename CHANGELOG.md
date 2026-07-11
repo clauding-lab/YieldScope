@@ -22,7 +22,7 @@ De-demo batch: closed out the remaining Tier-2 wiring gaps, removed panels with 
 - The call-money intraday heatmap (Liquidity).
 - The ALCO decision log (Intelligence).
 - The Fiscal revenue-split donut.
-- The dead `Liquidity`/`Fiscal`/`Banking`/`Intel` fixture blocks in `src/data/fixtures.ts` (interfaces + data) — the file now backs only the offline curve/auctions fallback plus `meta`/`ticker`/`macro`.
+- The dead `Liquidity`/`Fiscal`/`Banking`/`Intel` fixture blocks in `src/data/fixtures.ts` (interfaces + data) — the file now retains curve + auctions offline fallbacks only.
 
 ### Added
 
