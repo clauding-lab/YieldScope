@@ -25,7 +25,7 @@ describe('Fiscal · live revenue, no W&M/ADP', () => {
     vi.mocked(useIsDesktop).mockReturnValue(desktop)
     render(<Fiscal />)
     expect(screen.getAllByText(/NBR revenue · FYTD/i).length).toBeGreaterThanOrEqual(1)
-    expect(screen.getAllByText('312.4').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/312\.4/).length).toBeGreaterThanOrEqual(1)
     expect(screen.queryByText(/Ways & Means/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/W&M/)).not.toBeInTheDocument()
     expect(screen.queryByText(/ADP implementation/i)).not.toBeInTheDocument()
@@ -39,5 +39,17 @@ describe('Fiscal · OutageChip surfaces a swallowed useFiscal error', () => {
     vi.mocked(useFiscal).mockReturnValue({ data: null, loading: false, error: new Error('boom') })
     render(<Fiscal />)
     expect(screen.getByText(/live data unavailable/i)).toBeInTheDocument()
+  })
+})
+
+describe('Fiscal · pressure composite removed', () => {
+  it.each([[false], [true]])('desktop=%s: no fiscal-pressure gauge, live stats survive', (desktop) => {
+    vi.mocked(useIsDesktop).mockReturnValue(desktop)
+    render(<Fiscal />)
+    expect(screen.queryByText(/Fiscal pressure/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/^Elevated\.$/)).not.toBeInTheDocument()
+    // live fiscal stats still render (they were nested in the gauge's right cell on desktop):
+    expect(screen.getAllByText(/NBR revenue · FYTD/i).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/Debt \/ GDP/i).length).toBeGreaterThanOrEqual(1)
   })
 })
