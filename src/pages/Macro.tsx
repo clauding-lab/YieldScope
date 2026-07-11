@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useIsDesktop } from '../lib/hooks'
-import { Delta, DemoBadge, ListRow, SectionTitle, Sparkline } from '../components/primitives'
+import { Delta, DemoBadge, ListRow, OutageChip, SectionTitle, Sparkline } from '../components/primitives'
 import { AreaChart, Heatmap } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useMacro } from '../hooks/useMacro'
@@ -97,13 +97,13 @@ function commoditiesAllLive(data: MacroDataT): boolean {
 }
 
 function MacroMobile() {
-  const { data } = useMacro()
+  const { data, error } = useMacro()
   const bopItems = buildBopItems(data)
   const importVintage = monthLabel(data?.importCoverAsOf)
   const fmtPct = (n: number | null | undefined) => n != null ? `${n.toFixed(2)}%` : '—'
   return (
     <>
-      <SectionTitle kicker="Inflation · reserves · BoP" title="Macro" />
+      <SectionTitle kicker="Inflation · reserves · BoP" title="Macro" action={error != null ? <OutageChip /> : undefined} />
 
       <div style={{ padding: '0 22px 28px' }}>
         <div className="caption">CPI · headline · April</div>
@@ -193,7 +193,7 @@ function MacroMobile() {
 }
 
 function MacroDesktop() {
-  const { data } = useMacro()
+  const { data, error } = useMacro()
   const bopItems = buildBopItems(data)
   const commodities = buildCommodities(data)
   const cpiHeatmapData = buildCpiHeatmapData(data)
@@ -206,7 +206,7 @@ function MacroDesktop() {
   const importVintage = monthLabel(data?.importCoverAsOf)
   return (
     <>
-      <DesktopHeader section="Macro" breadcrumb="YieldScope · Inflation, reserves, balance of payments" />
+      <DesktopHeader section="Macro" breadcrumb="YieldScope · Inflation, reserves, balance of payments" action={error != null ? <OutageChip /> : undefined} />
 
       <div
         style={{

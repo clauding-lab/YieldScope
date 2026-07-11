@@ -76,3 +76,19 @@ describe('Banking · mobile prudential list has LCR/NSFR fixture rows removed', 
     expect(screen.queryByText('NSFR')).not.toBeInTheDocument()
   })
 })
+
+describe('Banking · OutageChip surfaces a swallowed useBanking error', () => {
+  it('mobile: shows the outage chip when useBanking errors', () => {
+    vi.mocked(useIsDesktop).mockReturnValue(false)
+    vi.mocked(useBanking).mockReturnValue({ data: null, loading: false, error: new Error('boom') })
+    render(<Banking />)
+    expect(screen.getByText(/live data unavailable/i)).toBeInTheDocument()
+  })
+
+  it('desktop: shows the outage chip when useBanking errors', () => {
+    vi.mocked(useIsDesktop).mockReturnValue(true)
+    vi.mocked(useBanking).mockReturnValue({ data: null, loading: false, error: new Error('boom') })
+    render(<Banking />)
+    expect(screen.getByText(/live data unavailable/i)).toBeInTheDocument()
+  })
+})

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useIsDesktop } from '../lib/hooks'
-import { Bar, DemoBadge, ListRow, SectionTitle } from '../components/primitives'
+import { Bar, DemoBadge, ListRow, OutageChip, SectionTitle } from '../components/primitives'
 import { AreaChart, Donut, DonutLegend, Heatmap, SlopeChart } from '../components/charts'
 import type { SlopeItem } from '../components/charts/SlopeChart'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
@@ -74,7 +74,7 @@ function severityColor(sev: 'neg' | 'warn' | 'pos') {
   return sev === 'neg' ? 'var(--neg)' : sev === 'warn' ? 'var(--warn)' : 'var(--pos)'
 }
 
-function BankingMobile({ liveData }: { liveData: BankingData | null }) {
+function BankingMobile({ liveData, error }: { liveData: BankingData | null; error: Error | null }) {
   const nplRatio = liveData?.nplRatio ?? null
   const nplVintage = liveData?.nplVintage ?? null
   const crar     = liveData?.crar     ?? null  // plausibility-gated: null when fabricated/absent
@@ -94,7 +94,7 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
   ]
   return (
     <>
-      <SectionTitle kicker="Sector health" title="Banks" />
+      <SectionTitle kicker="Sector health" title="Banks" action={error != null ? <OutageChip /> : undefined} />
 
       <div style={{ padding: '0 22px 28px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
@@ -180,7 +180,7 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
   )
 }
 
-function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
+function BankingDesktop({ liveData, error }: { liveData: BankingData | null; error: Error | null }) {
   const nplRatio = liveData?.nplRatio ?? null
   const nplVintage = liveData?.nplVintage ?? null
   const nplHist  = liveData?.nplHist?.length ? liveData.nplHist : null
@@ -189,7 +189,7 @@ function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
   const repoBorrowHist = liveData?.repoBorrowHist ?? []
   return (
     <>
-      <DesktopHeader section="Banking" breadcrumb="YieldScope · Sector health & prudential" />
+      <DesktopHeader section="Banking" breadcrumb="YieldScope · Sector health & prudential" action={error != null ? <OutageChip /> : undefined} />
 
       <div
         style={{
@@ -335,6 +335,8 @@ function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
 
 export default function Banking() {
   const isDesktop = useIsDesktop()
-  const { data } = useBanking()
-  return isDesktop ? <BankingDesktop liveData={data} /> : <BankingMobile liveData={data} />
+  const { data, error } = useBanking()
+  return isDesktop
+    ? <BankingDesktop liveData={data} error={error} />
+    : <BankingMobile liveData={data} error={error} />
 }

@@ -1,6 +1,6 @@
 import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
-import { Collapse, DemoBadge, SectionTitle } from '../components/primitives'
+import { Collapse, DemoBadge, OutageChip, SectionTitle } from '../components/primitives'
 import { YieldCurve } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useDashboard } from '../hooks/useDashboard'
@@ -73,7 +73,7 @@ function NoBriefNote({ pad }: { pad: string }) {
 }
 
 function DashboardMobile() {
-  const { data } = useDashboard()
+  const { data, error } = useDashboard()
   const { briefings } = useBriefing()
   const brief = briefings[0] ?? null
   const moving: MovingItem[] = brief
@@ -89,7 +89,7 @@ function DashboardMobile() {
 
   return (
     <>
-      <SectionTitle kicker={todayLabel()} title="Today" />
+      <SectionTitle kicker={todayLabel()} title="Today" action={error != null ? <OutageChip /> : undefined} />
 
       <div style={{ padding: '0 22px 24px' }}>
         <p
@@ -207,7 +207,7 @@ function DashboardMobile() {
 }
 
 function DashboardDesktop() {
-  const { data } = useDashboard()
+  const { data, error } = useDashboard()
   const { data: auctions } = useAuctions()
   const recentAuctions = (auctions?.results?.length ? auctions.results : fixtureToDisplay(FX.auctions)).slice(0, 4)
   const auctionsLive = !!auctions?.results?.length
@@ -226,7 +226,7 @@ function DashboardDesktop() {
 
   return (
     <>
-      <DesktopHeader section="Today" breadcrumb={`YieldScope · ALCO Intelligence · ${weekdayName()}`} />
+      <DesktopHeader section="Today" breadcrumb={`YieldScope · ALCO Intelligence · ${weekdayName()}`} action={error != null ? <OutageChip /> : undefined} />
 
       <div style={{ padding: '40px 48px 24px' }}>
         <p

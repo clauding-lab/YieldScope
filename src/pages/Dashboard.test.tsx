@@ -40,3 +40,31 @@ describe('Dashboard · honesty (no briefing)', () => {
     expect(screen.queryByText(/three forces are squeezing the short end/i)).not.toBeInTheDocument()
   })
 })
+
+describe('Dashboard · OutageChip surfaces a swallowed useDashboard error', () => {
+  it('mobile: shows the outage chip when useDashboard errors', () => {
+    vi.mocked(useIsDesktop).mockReturnValue(false)
+    vi.mocked(useDashboard).mockReturnValue({ data: null, loading: false, error: new Error('boom') })
+    render(<Dashboard />)
+    expect(screen.getByText(/live data unavailable/i)).toBeInTheDocument()
+  })
+
+  it('desktop: shows the outage chip when useDashboard errors', () => {
+    vi.mocked(useIsDesktop).mockReturnValue(true)
+    vi.mocked(useDashboard).mockReturnValue({ data: null, loading: false, error: new Error('boom') })
+    render(<Dashboard />)
+    expect(screen.getByText(/live data unavailable/i)).toBeInTheDocument()
+  })
+
+  it('mobile: no outage chip when useDashboard has no error', () => {
+    vi.mocked(useIsDesktop).mockReturnValue(false)
+    render(<Dashboard />)
+    expect(screen.queryByText(/live data unavailable/i)).not.toBeInTheDocument()
+  })
+
+  it('desktop: no outage chip when useDashboard has no error', () => {
+    vi.mocked(useIsDesktop).mockReturnValue(true)
+    render(<Dashboard />)
+    expect(screen.queryByText(/live data unavailable/i)).not.toBeInTheDocument()
+  })
+})

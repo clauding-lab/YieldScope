@@ -32,3 +32,12 @@ describe('Fiscal · live revenue, no W&M/ADP', () => {
     expect(screen.queryByText(/Monetary financing active/i)).not.toBeInTheDocument()
   })
 })
+
+describe('Fiscal · OutageChip surfaces a swallowed useFiscal error', () => {
+  it.each([[false], [true]])('desktop=%s: shows the outage chip when useFiscal errors', (desktop) => {
+    vi.mocked(useIsDesktop).mockReturnValue(desktop)
+    vi.mocked(useFiscal).mockReturnValue({ data: null, loading: false, error: new Error('boom') })
+    render(<Fiscal />)
+    expect(screen.getByText(/live data unavailable/i)).toBeInTheDocument()
+  })
+})

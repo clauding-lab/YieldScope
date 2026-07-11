@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useIsDesktop } from '../lib/hooks'
 import { FX } from '../data/fixtures'
-import { Delta, DemoBadge, SectionTitle, Sparkline, Tabs } from '../components/primitives'
+import { Delta, DemoBadge, OutageChip, SectionTitle, Sparkline, Tabs } from '../components/primitives'
 import { AreaChart, YieldCurve } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 import { useYields, type TenorKey } from '../hooks/useYields'
@@ -255,9 +255,13 @@ function YieldsAuctionsTab() {
 
 function YieldsMobile() {
   const [tab, setTab] = useState<YieldsTab>('curve')
+  // Main-hook error surfaced at the page-root header regardless of which tab is
+  // active — the curve/history tabs each call useYields() independently, but
+  // SectionTitle lives here, above the tab switch.
+  const { error } = useYields()
   return (
     <>
-      <SectionTitle kicker="Sovereign rates" title="Yields" />
+      <SectionTitle kicker="Sovereign rates" title="Yields" action={error != null ? <OutageChip /> : undefined} />
       <div style={{ padding: '0 22px 18px' }}>
         <Tabs<YieldsTab>
           tabs={[
@@ -277,7 +281,7 @@ function YieldsMobile() {
 }
 
 function YieldsDesktop() {
-  const { data } = useYields()
+  const { data, error } = useYields()
   const { data: auctions } = useAuctions()
   const recent = auctions?.results?.length ? auctions.results : fixtureToDisplay(FX.auctions)
   const recentLive = !!auctions?.results?.length
@@ -295,7 +299,7 @@ function YieldsDesktop() {
 
   return (
     <>
-      <DesktopHeader section="Yields" breadcrumb="YieldScope · Sovereign curve & auctions" />
+      <DesktopHeader section="Yields" breadcrumb="YieldScope · Sovereign curve & auctions" action={error != null ? <OutageChip /> : undefined} />
 
       <div
         style={{
