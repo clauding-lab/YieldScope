@@ -84,6 +84,7 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
   const pvtCreditYoY = liveData?.pvtCreditYoY ?? null
   const pvtCreditVintage = monthLabel(liveData?.pvtCreditYoYAsOf)
   const cdRatio  = liveData?.cdRatio ?? null
+  const repoBorrowCr = liveData?.repoBorrowCr ?? null
   const crarStale = liveData?.crarStale ?? false
   // Provenance qualifier comes from the HOOK, keyed to the specific print's
   // as_of (#25 review HIGH) — e.g. "BB QFSAR pre-shock" is true of the
@@ -123,8 +124,8 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
             sub={pvtCreditVintage ?? undefined}
           />
           <ListRow
-            label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>Repo borrow · from BB <DemoBadge /></span> as ReactNode}
-            value="124.6 k Cr"
+            label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>Interbank repo · volume {repoBorrowCr == null && <DemoBadge />}</span> as ReactNode}
+            value={repoBorrowCr != null ? `${(repoBorrowCr / 1000).toFixed(1)} k Cr` : '—'}
             last
           />
         </div>
@@ -184,11 +185,12 @@ function BankingMobile({ liveData }: { liveData: BankingData | null }) {
 }
 
 function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
-  const B = FX.banking
   const nplRatio = liveData?.nplRatio ?? null
   const nplVintage = liveData?.nplVintage ?? null
   const nplHist  = liveData?.nplHist?.length ? liveData.nplHist : null
   const cdRatio  = liveData?.cdRatio ?? null
+  const repoBorrowCr = liveData?.repoBorrowCr ?? null
+  const repoBorrowHist = liveData?.repoBorrowHist ?? []
   return (
     <>
       <DesktopHeader section="Banking" breadcrumb="YieldScope · Sector health & prudential" />
@@ -229,16 +231,18 @@ function BankingDesktop({ liveData }: { liveData: BankingData | null }) {
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <div className="eyebrow">Repo borrow · from BB</div>
-            <DemoBadge />
+            <div className="eyebrow">Interbank repo · volume</div>
+            {repoBorrowCr == null && <DemoBadge />}
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-            <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>124.6</span>
+            <span className="serif-num" style={{ fontSize: 72, color: 'var(--neg)' }}>{repoBorrowCr != null ? (repoBorrowCr / 1000).toFixed(1) : '—'}</span>
             <span className="caption">k Cr</span>
           </div>
-          <div style={{ marginTop: 18 }}>
-            <AreaChart data={B.repoSpark} w={400} h={100} color="var(--neg)" />
-          </div>
+          {repoBorrowHist.length >= 2 && (
+            <div style={{ marginTop: 18 }}>
+              <AreaChart data={repoBorrowHist} w={400} h={100} color="var(--neg)" />
+            </div>
+          )}
         </div>
       </div>
 

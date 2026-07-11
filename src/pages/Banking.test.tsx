@@ -27,6 +27,9 @@ const BASE: BankingData = {
   pvtCreditYoY: 6.03,
   pvtCreditYoYAsOf: '2026-05-30',
   cdRatio: 89.5,
+  repoBorrowCr: 124600,
+  repoBorrowHist: [118000, 124600],
+  repoBorrowAsOf: '2026-07-11',
   asOf: '2026-03-31',
 }
 
