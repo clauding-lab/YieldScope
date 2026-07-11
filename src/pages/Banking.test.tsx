@@ -92,3 +92,18 @@ describe('Banking · OutageChip surfaces a swallowed useBanking error', () => {
     expect(screen.getByText(/live data unavailable/i)).toBeInTheDocument()
   })
 })
+
+describe('Banking · demo panels removed', () => {
+  it.each([[false], [true]])('desktop=%s: no fixture panels', (desktop) => {
+    vi.mocked(useIsDesktop).mockReturnValue(desktop)
+    vi.mocked(useBanking).mockReturnValue({ data: BASE, loading: false, error: null })
+    render(<Banking />)
+    expect(screen.queryByText(/NPL by segment/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Top 10 banks/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/NPL trajectory/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/deposits · by ownership/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/All 60 banks/i)).not.toBeInTheDocument() // dead Export/All-60 buttons went with the heatmap
+    // a surviving live section still renders in BOTH views (the interbank-repo tile is present mobile + desktop):
+    expect(screen.getAllByText(/Interbank repo · volume/i).length).toBeGreaterThanOrEqual(1)
+  })
+})
