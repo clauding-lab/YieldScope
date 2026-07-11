@@ -16,8 +16,6 @@ const SEV_DOT_COLOR: Record<AnomalySev, string> = {
   down: 'var(--pos)',
 }
 
-const DEMO_TITLE = 'The short end is rotating, not relaxing.'
-
 const TIMELINE_EVENTS = [
   { pct: 0.04, label: 'Repo held at 9.00%',       sub: 'MPC · 8 Apr',     sev: 'info' as const },
   { pct: 0.18, label: 'CPI prints 9.94',          sub: 'April release',   sev: 'warn' as const },
@@ -28,13 +26,6 @@ const TIMELINE_EVENTS = [
   { pct: 0.86, label: 'Reserves below USD 21Bn',  sub: 'IMF floor',       sev: 'neg'  as const },
   { pct: 0.96, label: 'Call breach',              sub: 'O/N 9.34',        sev: 'neg'  as const },
 ]
-
-const EXTRA_ANOMALIES = [
-  { code: 'X-RES', label: 'Repo borrowing from BB +42% in 8 weeks', sev: 'up'   as AnomalySev },
-  { code: 'X-CPI', label: 'CPI food deceleration below trend',       sev: 'down' as AnomalySev },
-]
-
-const RECENT_RELATIVE = ['Just now', '2h', '8h', '1d', '2d']
 
 const EXTRA_DECISIONS = [
   { code: 'D-04', topic: 'Cross-currency swap window (USD/BDT)',    status: 'DRAFT' },
@@ -58,10 +49,13 @@ function liveAnomalies(b: Briefing): DisplayAnomaly[] {
   }))
 }
 
-function demoAnomalies(extra: { code: string; label: string; sev: AnomalySev }[]): DisplayAnomaly[] {
-  return [...FX.intel.anomalies, ...extra].map((a, i) => ({
-    key: a.code, label: a.label, sub: RECENT_RELATIVE[i] ?? '3d', severity: a.sev as AnomalySev,
-  }))
+function NoBriefingYet() {
+  return (
+    <div className="card-flat" style={{ padding: '20px 18px' }}>
+      <div style={{ fontSize: 14, color: 'var(--ink-2)' }}>No briefing published yet</div>
+      <div className="caption" style={{ marginTop: 4 }}>The weekly read is generated every Monday morning (BDT).</div>
+    </div>
+  )
 }
 
 // "data as of X — N series stale" honesty banner; null when the briefing is fully fresh.
@@ -140,29 +134,30 @@ function IntelMobile() {
   const latest = briefings[0] ?? null
   const shown = (selectedWeek && briefings.find(b => b.weekOf === selectedWeek)) || latest
 
-  const anomalies = shown ? liveAnomalies(shown) : demoAnomalies(EXTRA_ANOMALIES)
+  const anomalies = shown ? liveAnomalies(shown) : []
   const banner = staleNote(shown)
 
   return (
     <>
       <SectionTitle kicker="Weekly read · drafted by Claude" title="Briefings" />
-      {latest == null && (
-        <div style={{ padding: '0 22px 12px' }}>
-          <DemoBadge />
-        </div>
-      )}
 
       <div style={{ padding: '0 22px 24px' }}>
-        <h2 className="display" style={{ fontSize: 28, margin: 0, lineHeight: 1.2 }}>
-          {shown ? shown.title : DEMO_TITLE}
-        </h2>
-        <div style={{ display: 'flex', gap: 12, marginTop: 14, flexWrap: 'wrap' }}>
-          <span className="chip">{shown ? shown.weekOf : 'Fresh · 6h ago'}</span>
-          {banner && <span className="chip chip-warn">{banner}</span>}
-        </div>
-        <div style={{ marginTop: 18 }}>
-          <BriefingBody markdown={shown ? shown.body : FX.intel.weekly} baseSize={15} />
-        </div>
+        {shown ? (
+          <>
+            <h2 className="display" style={{ fontSize: 28, margin: 0, lineHeight: 1.2 }}>
+              {shown.title}
+            </h2>
+            <div style={{ display: 'flex', gap: 12, marginTop: 14, flexWrap: 'wrap' }}>
+              <span className="chip">{shown.weekOf}</span>
+              {banner && <span className="chip chip-warn">{banner}</span>}
+            </div>
+            <div style={{ marginTop: 18 }}>
+              <BriefingBody markdown={shown.body} baseSize={15} />
+            </div>
+          </>
+        ) : (
+          <NoBriefingYet />
+        )}
         <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
           <button type="button" className="btn btn-sm" onClick={() => setShowHistory(v => !v)}>
             {showHistory ? 'Hide history' : 'Read history'}
@@ -178,16 +173,17 @@ function IntelMobile() {
       </div>
 
       <div style={{ padding: '0 22px 24px' }}>
-        <div className="section-rule">Anomalies · 24h</div>
+        <div className="section-rule">Anomalies · this week</div>
       </div>
-      {shown == null && (
-        <div style={{ padding: '0 22px 8px' }}>
-          <DemoBadge />
+      {shown != null && (
+        <div style={{ padding: '0 22px 24px' }}>
+          {anomalies.length === 0 ? (
+            <div className="caption">No anomalies flagged this week.</div>
+          ) : (
+            <AnomalyList items={anomalies} compact />
+          )}
         </div>
       )}
-      <div style={{ padding: '0 22px 24px' }}>
-        <AnomalyList items={anomalies} compact />
-      </div>
 
       <div style={{ padding: '0 22px 16px' }}>
         <div className="section-rule">ALCO decisions</div>
@@ -219,38 +215,37 @@ function IntelDesktop() {
   const latest = briefings[0] ?? null
   const shown = (selectedWeek && briefings.find(b => b.weekOf === selectedWeek)) || latest
 
-  const sidebarDemo = demoAnomalies([
-    { code: 'X-RES', label: 'Repo borrowing +42% in 8w', sev: 'up'   as AnomalySev },
-    { code: 'X-AUC', label: '364D under-sub 3 of 4',     sev: 'warn' as AnomalySev },
-  ])
-  const anomalies = shown ? liveAnomalies(shown) : sidebarDemo
+  const anomalies = shown ? liveAnomalies(shown) : []
   const banner = staleNote(shown)
 
   return (
     <>
       <DesktopHeader section="Briefings" breadcrumb="YieldScope · Weekly read & ALCO log" />
-      {latest == null && (
-        <div style={{ padding: '0 48px' }}>
-          <DemoBadge />
-        </div>
-      )}
 
       <div style={{ padding: '40px 48px 0', display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 56 }}>
         <div>
           <div className="eyebrow" style={{ marginBottom: 8 }}>
-            Weekly read · {shown ? shown.weekOf : 'Wednesday'} · drafted by Claude
+            Weekly read{shown ? ` · ${shown.weekOf}` : ''} · drafted by Claude
           </div>
-          <h2 className="display" style={{ fontSize: 44, margin: 0, lineHeight: 1.15 }}>
-            {shown ? shown.title : DEMO_TITLE}
-          </h2>
-          {banner && (
+          {shown ? (
+            <>
+              <h2 className="display" style={{ fontSize: 44, margin: 0, lineHeight: 1.15 }}>
+                {shown.title}
+              </h2>
+              {banner && (
+                <div style={{ marginTop: 14 }}>
+                  <span className="chip chip-warn">{banner}</span>
+                </div>
+              )}
+              <div style={{ marginTop: 22, color: 'var(--ink)', maxWidth: 720 }}>
+                <BriefingBody markdown={shown.body} baseSize={17} />
+              </div>
+            </>
+          ) : (
             <div style={{ marginTop: 14 }}>
-              <span className="chip chip-warn">{banner}</span>
+              <NoBriefingYet />
             </div>
           )}
-          <div style={{ marginTop: 22, color: 'var(--ink)', maxWidth: 720 }}>
-            <BriefingBody markdown={shown ? shown.body : FX.intel.weekly} baseSize={17} />
-          </div>
           <div style={{ display: 'flex', gap: 8, marginTop: 22 }}>
             <button type="button" className="btn" onClick={() => setShowHistory(v => !v)}>
               {showHistory ? 'Hide history' : 'Read history'}
@@ -269,10 +264,16 @@ function IntelDesktop() {
 
         <aside>
           <div className="card-flat" style={{ padding: 22 }}>
-            <div className="eyebrow" style={{ marginBottom: 12, display: 'flex', gap: 8, alignItems: 'center' }}>
-              Anomalies · 24h{shown == null && <DemoBadge />}
+            <div className="eyebrow" style={{ marginBottom: 12 }}>
+              Anomalies · this week
             </div>
-            <AnomalyList items={anomalies} />
+            {shown != null && (
+              anomalies.length === 0 ? (
+                <div className="caption">No anomalies flagged this week.</div>
+              ) : (
+                <AnomalyList items={anomalies} />
+              )
+            )}
           </div>
         </aside>
       </div>
