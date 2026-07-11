@@ -23,8 +23,7 @@ const UPCOMING = [
 function YieldsCurveTab() {
   const { data } = useYields()
 
-  const LADDER: TenorKey[] = ['91D', '182D', '364D', '2Y', '5Y', '10Y', '20Y']
-  const tenorLadder = LADDER.map(t => {
+  const tenorLadder = HISTORY_TENORS.map(t => {
     const yld = data?.yields[t] ?? null
     const spark = data?.series[t] ?? []
     const delta = spark.length >= 2 ? roundTo(spark[spark.length - 1] - spark[spark.length - 2], 2) : null

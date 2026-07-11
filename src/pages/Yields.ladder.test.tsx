@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 
 vi.mock('../lib/hooks', () => ({ useIsDesktop: vi.fn(), useMediaQuery: vi.fn() }))
 vi.mock('../hooks/useYields', () => ({ useYields: vi.fn() }))
@@ -36,6 +36,9 @@ describe('Yields · tenor ladder honesty', () => {
     // old fixture digits must be gone
     expect(screen.queryByText('11.42')).not.toBeInTheDocument()
     expect(screen.queryByText('12.31')).not.toBeInTheDocument() // 15Y fixture rung removed
+    // the live 91D rung itself must carry no demo badge
+    const liveRung = screen.getByText('9.33').parentElement!.parentElement!
+    expect(within(liveRung).queryByText('Demo data')).not.toBeInTheDocument()
   })
 
   it('renders — plus a demo badge on rungs with no live value', () => {
@@ -45,5 +48,7 @@ describe('Yields · tenor ladder honesty', () => {
     })
     render(<Yields />)
     expect(screen.getAllByText('—').length).toBeGreaterThanOrEqual(7)
+    // all 7 null ladder rungs must be badged as demo data
+    expect(screen.getAllByText('Demo data').length).toBeGreaterThanOrEqual(7)
   })
 })
