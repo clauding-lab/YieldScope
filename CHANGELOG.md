@@ -4,6 +4,10 @@ All notable changes to YieldScope are documented in this file.
 
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Dates in BDT.
 
+## [3.2.0] — 2026-07-11
+
+Removed the last always-demo panels — Banking NPL-by-segment / top-10 heatmap / NPL trajectory / deposits-by-ownership donut, the Fiscal-pressure composite gauge, and Macro Core CPI + CPI-components heatmap — and their fixture consts; dropped the hardcoded Macro "April" vintages (mobile + desktop) and the dead "All 60 banks"/"Export" buttons. Only the offline curve/auctions fallbacks remain fixture-backed.
+
 ## [3.1.0] — 2026-07-11
 
 De-demo batch: closed out the remaining Tier-2 wiring gaps, removed panels with no realistic live source, and tightened the honesty/CI rails around what ships as "live" vs "demo."
