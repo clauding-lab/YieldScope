@@ -34,6 +34,12 @@ jobs:
 
       - run: npm ci
 
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test:run
+
       # Vite bakes VITE_* env vars into the static bundle at build time.
       # VITE_SUPABASE_URL is public (same project The Brief uses).
       # VITE_SUPABASE_ANON_KEY is RLS-scoped read-only — sourced from a GitHub Secret.
