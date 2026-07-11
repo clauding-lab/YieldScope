@@ -6,7 +6,7 @@ vi.mock('../hooks/useBriefing', () => ({ useBriefing: vi.fn() }))
 
 import { useIsDesktop } from '../lib/hooks'
 import { useBriefing } from '../hooks/useBriefing'
-import Intelligence from './Intelligence'
+import Intelligence, { briefingsToTimeline } from './Intelligence'
 
 const BRIEFING = {
   weekOf: '2026-07-06', generatedAt: '2026-07-06T01:04:32Z',
@@ -31,6 +31,23 @@ describe('Intelligence · honesty', () => {
     render(<Intelligence />)
     expect(screen.getByText(/anomalies · this week/i)).toBeInTheDocument()
     expect(screen.getByText('Call money breach')).toBeInTheDocument()
-    // TODO(Task 10): assert ALCO decision log absent
+    expect(screen.queryByText(/alco decisions/i)).not.toBeInTheDocument()
+  })
+})
+
+describe('briefingsToTimeline', () => {
+  const mk = (weekOf: string, title: string, n: number) => ({
+    ...BRIEFING, weekOf, title,
+    featuredAnomalies: Array.from({ length: n }, (_, i) => ({ ...BRIEFING.featuredAnomalies[0], candidate_id: `a${i}` })),
+  })
+  it('maps up to 7 briefings oldest→newest with evenly spaced pcts and anomaly-count severity', () => {
+    const out = briefingsToTimeline([mk('2026-07-06', 'B', 4), mk('2026-06-29', 'A', 0)])
+    expect(out).not.toBeNull()
+    expect(out!.axis).toEqual(['29 Jun', '06 Jul'])
+    expect(out!.events[0]).toMatchObject({ label: 'A', sub: '29 Jun', sev: 'info', pct: 0.04 })
+    expect(out!.events[1]).toMatchObject({ label: 'B', sub: '06 Jul', sev: 'neg', pct: 0.96 })
+  })
+  it('returns null with fewer than 2 briefings', () => {
+    expect(briefingsToTimeline([mk('2026-07-06', 'B', 1)])).toBeNull()
   })
 })

@@ -3,8 +3,8 @@ import { useIsDesktop } from '../lib/hooks'
 import { useBriefing } from '../hooks/useBriefing'
 import type { Briefing } from '../lib/econdelta'
 import { BriefingBody } from '../lib/briefingMarkdown'
-import { FX } from '../data/fixtures'
-import { DemoBadge, ListRow, SectionTitle } from '../components/primitives'
+import { dayMon } from '../lib/auctions'
+import { SectionTitle } from '../components/primitives'
 import { Timeline } from '../components/charts'
 import { DesktopHeader } from '../components/layout/DesktopHeader'
 
@@ -16,27 +16,24 @@ const SEV_DOT_COLOR: Record<AnomalySev, string> = {
   down: 'var(--pos)',
 }
 
-const TIMELINE_EVENTS = [
-  { pct: 0.04, label: 'Repo held at 9.00%',       sub: 'MPC · 8 Apr',     sev: 'info' as const },
-  { pct: 0.18, label: 'CPI prints 9.94',          sub: 'April release',   sev: 'warn' as const },
-  { pct: 0.30, label: 'IMF EFF review',           sub: 'Tranche cleared', sev: 'pos'  as const },
-  { pct: 0.46, label: 'Reserves below USD 22Bn',  sub: 'BB weekly',       sev: 'neg'  as const },
-  { pct: 0.60, label: '364D under-sub',           sub: 'Cover 1.04x',     sev: 'warn' as const },
-  { pct: 0.74, label: 'CPI eases to 9.20',        sub: 'April final',     sev: 'pos'  as const },
-  { pct: 0.86, label: 'Reserves below USD 21Bn',  sub: 'IMF floor',       sev: 'neg'  as const },
-  { pct: 0.96, label: 'Call breach',              sub: 'O/N 9.34',        sev: 'neg'  as const },
-]
+interface TimelineEvent { pct: number; label: string; sub: string; sev: 'info' | 'warn' | 'pos' | 'neg' }
 
-const EXTRA_DECISIONS = [
-  { code: 'D-04', topic: 'Cross-currency swap window (USD/BDT)',    status: 'DRAFT' },
-  { code: 'D-05', topic: 'Deposit pricing — Tier-1 corporates',     status: 'SIGNED' },
-  { code: 'D-06', topic: 'IFRS-9 stage 2 reclassification batch',   status: 'PENDING' },
-]
-
-function chipForStatus(status: string): string {
-  if (status === 'SIGNED') return 'chip chip-pos'
-  if (status === 'PENDING') return 'chip chip-warn'
-  return 'chip'
+/** Newest-first briefings → oldest-left timeline. Severity = anomaly count
+ *  (0 info · 1–3 warn · 4+ neg). Null under 2 points — a one-dot timeline lies. */
+// eslint-disable-next-line react-refresh/only-export-components -- exported for unit test coverage
+export function briefingsToTimeline(briefings: Briefing[]): { axis: string[]; events: TimelineEvent[] } | null {
+  const asc = briefings.slice(0, 7).reverse()
+  if (asc.length < 2) return null
+  const events = asc.map((b, i) => {
+    const n = b.featuredAnomalies.length
+    return {
+      pct: Math.round((0.04 + (0.92 * i) / (asc.length - 1)) * 10000) / 10000,
+      label: b.title.length > 44 ? `${b.title.slice(0, 43)}…` : b.title,
+      sub: dayMon(b.weekOf, false),
+      sev: (n === 0 ? 'info' : n <= 3 ? 'warn' : 'neg') as TimelineEvent['sev'],
+    }
+  })
+  return { axis: asc.map(b => dayMon(b.weekOf, false)), events }
 }
 
 interface DisplayAnomaly { key: string; label: string; sub: string; severity: AnomalySev }
@@ -184,26 +181,6 @@ function IntelMobile() {
           )}
         </div>
       )}
-
-      <div style={{ padding: '0 22px 16px' }}>
-        <div className="section-rule">ALCO decisions</div>
-      </div>
-      <div style={{ padding: '0 16px 8px' }}>
-        <DemoBadge />
-      </div>
-      <div style={{ padding: '0 16px 24px' }}>
-        <div className="card-flat">
-          {FX.intel.decisions.map((d, i, arr) => (
-            <ListRow
-              key={d.code}
-              label={d.topic}
-              sub={d.code}
-              value={<span className={chipForStatus(d.status)}>{d.status.toLowerCase()}</span>}
-              last={i === arr.length - 1}
-            />
-          ))}
-        </div>
-      </div>
     </>
   )
 }
@@ -220,7 +197,7 @@ function IntelDesktop() {
 
   return (
     <>
-      <DesktopHeader section="Briefings" breadcrumb="YieldScope · Weekly read & ALCO log" />
+      <DesktopHeader section="Briefings" breadcrumb="YieldScope · Weekly read" />
 
       <div style={{ padding: '40px 48px 0', display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 56 }}>
         <div>
@@ -278,59 +255,24 @@ function IntelDesktop() {
         </aside>
       </div>
 
-      <div style={{ height: 1, background: 'var(--line)', margin: '40px 48px 0' }} />
-
-      <div style={{ padding: '32px 48px 0' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 22 }}>
-          <div>
-            <div className="eyebrow" style={{ marginBottom: 6, display: 'flex', gap: 10, alignItems: 'center' }}>
-              What happened · 7 weeks <DemoBadge />
+      {(() => {
+        const tl = briefingsToTimeline(briefings)
+        if (!tl) return null
+        return (
+          <>
+            <div style={{ height: 1, background: 'var(--line)', margin: '40px 48px 0' }} />
+            <div style={{ padding: '32px 48px 48px' }}>
+              <div style={{ marginBottom: 22 }}>
+                <div className="eyebrow" style={{ marginBottom: 6 }}>What happened · last {tl.events.length} weeks</div>
+                <h3 className="display" style={{ fontSize: 24, margin: 0 }}>The market, week by week</h3>
+              </div>
+              <div className="card-flat" style={{ padding: '24px 24px 16px' }}>
+                <Timeline w={1100} h={150} axis={tl.axis} events={tl.events} />
+              </div>
             </div>
-            <h3 className="display" style={{ fontSize: 24, margin: 0 }}>The market through April–May</h3>
-          </div>
-        </div>
-        <div className="card-flat" style={{ padding: '24px 24px 16px' }}>
-          <Timeline
-            w={1100}
-            h={150}
-            axis={['W16', 'W17', 'W18', 'W19', 'W20', 'W21', 'W22']}
-            events={TIMELINE_EVENTS}
-          />
-        </div>
-      </div>
-
-      <div style={{ padding: '32px 48px 48px' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 18 }}>
-          <div>
-            <div className="eyebrow" style={{ marginBottom: 6, display: 'flex', gap: 10, alignItems: 'center' }}>
-              ALCO decision log · Week 22 <DemoBadge />
-            </div>
-            <h3 className="display" style={{ fontSize: 24, margin: 0 }}>Six entries</h3>
-          </div>
-        </div>
-        <div className="card-flat">
-          {[...FX.intel.decisions, ...EXTRA_DECISIONS].map((d, i, arr) => (
-            <div
-              key={d.code}
-              style={{
-                padding: '16px 22px',
-                borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none',
-                display: 'grid',
-                gridTemplateColumns: '70px 1fr 160px 110px',
-                alignItems: 'center',
-                gap: 16,
-              }}
-            >
-              <span className="caption">{d.code}</span>
-              <span style={{ fontSize: 14, color: 'var(--ink)' }}>{d.topic}</span>
-              <span className="caption">Jane D · Desk 04</span>
-              <span className={chipForStatus(d.status)} style={{ justifySelf: 'flex-end' }}>
-                {d.status.toLowerCase()}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
+          </>
+        )
+      })()}
     </>
   )
 }
